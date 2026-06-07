@@ -1,0 +1,1215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#1a1a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="FlowLog — Registra tu salud digestiva y urinaria">
+<title>FlowLog</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0d1a;
+    --surface: #13131f;
+    --surface2: #1c1c2e;
+    --border: #2a2a40;
+    --text: #e8e8f0;
+    --muted: #6b6b8a;
+    --pee: #f4c430;
+    --pee-soft: rgba(244, 196, 48, 0.12);
+    --poo: #8B5E3C;
+    --poo-soft: rgba(139, 94, 60, 0.12);
+    --period: #e05a7a;
+    --period-soft: rgba(224, 90, 122, 0.12);
+    --accent: #6c63ff;
+    --accent-soft: rgba(108, 99, 255, 0.12);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+    padding-bottom: 90px;
+  }
+
+  /* HEADER */
+  .header {
+    padding: 20px 20px 12px;
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-top { display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-family: 'Space Mono', monospace; font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+  .logo span { color: var(--accent); }
+  .settings-btn {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; font-size: 18px;
+  }
+  .date-display {
+    font-size: 13px; color: var(--muted); margin-top: 6px;
+    font-family: 'Space Mono', monospace;
+  }
+
+  /* NAV TABS */
+  .nav-tabs {
+    display: flex; gap: 6px; padding: 10px 20px 0;
+    overflow-x: auto; scrollbar-width: none;
+  }
+  .nav-tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    padding: 8px 16px; border-radius: 20px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--muted); white-space: nowrap; transition: all 0.2s;
+  }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  /* MAIN CONTENT */
+  .screen { display: none; padding: 20px; }
+  .screen.active { display: block; }
+
+  /* REGISTRO BUTTONS */
+  .register-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 14px; margin-bottom: 24px;
+  }
+  .register-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .register-btn:active { transform: scale(0.96); }
+  .register-btn.pee { border-color: var(--pee); }
+  .register-btn.poo { border-color: var(--poo); }
+  .register-btn.period { border-color: var(--period); }
+  .register-btn .emoji { font-size: 40px; display: block; margin-bottom: 8px; }
+  .register-btn .label { font-size: 14px; font-weight: 600; }
+  .register-btn .count-badge {
+    position: absolute; top: 10px; right: 10px;
+    background: var(--accent); color: #fff;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; font-weight: 700;
+    width: 22px; height: 22px;
+    border-radius: 50%; display: flex;
+    align-items: center; justify-content: center;
+  }
+
+  /* RIPPLE */
+  @keyframes ripple {
+    from { transform: scale(0); opacity: 0.5; }
+    to { transform: scale(4); opacity: 0; }
+  }
+  .ripple-effect {
+    position: absolute; border-radius: 50%;
+    width: 60px; height: 60px;
+    background: rgba(255,255,255,0.15);
+    animation: ripple 0.5s linear;
+    pointer-events: none;
+  }
+
+  /* TODAY SUMMARY */
+  .section-title {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .today-stats {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin-bottom: 24px;
+  }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 10px;
+    text-align: center;
+  }
+  .stat-card .stat-num {
+    font-family: 'Space Mono', monospace;
+    font-size: 28px; font-weight: 700;
+    line-height: 1;
+  }
+  .stat-card .stat-label { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .stat-card.pee .stat-num { color: var(--pee); }
+  .stat-card.poo .stat-num { color: var(--poo); }
+  .stat-card.period .stat-num { color: var(--period); }
+
+  /* LOG LIST */
+  .log-list { display: flex; flex-direction: column; gap: 8px; }
+  .log-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px 14px;
+    display: flex; align-items: center; gap: 12px;
+    animation: slideIn 0.25s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .log-item .log-emoji { font-size: 22px; }
+  .log-item .log-info { flex: 1; }
+  .log-item .log-type { font-size: 13px; font-weight: 600; }
+  .log-item .log-time { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); }
+  .log-item .log-note { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .log-item .delete-btn {
+    padding: 6px; cursor: pointer; color: var(--muted);
+    font-size: 16px; opacity: 0.5;
+  }
+
+  /* RESUMEN SCREENS */
+  .summary-period-selector {
+    display: flex; gap: 8px; margin-bottom: 20px; overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .period-btn {
+    padding: 7px 16px; border-radius: 20px; font-size: 13px;
+    border: 1px solid var(--border); background: transparent;
+    color: var(--muted); cursor: pointer; white-space: nowrap;
+    font-family: 'DM Sans', sans-serif; transition: all 0.2s;
+  }
+  .period-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .summary-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 18px; margin-bottom: 14px;
+  }
+  .summary-card h3 {
+    font-size: 13px; color: var(--muted); margin-bottom: 14px;
+    font-family: 'Space Mono', monospace; letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .summary-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 8px 0; border-bottom: 1px solid var(--border);
+  }
+  .summary-row:last-child { border-bottom: none; }
+  .summary-row .sr-label { font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .summary-row .sr-value {
+    font-family: 'Space Mono', monospace; font-weight: 700; font-size: 16px;
+  }
+  .summary-row .sr-value.pee { color: var(--pee); }
+  .summary-row .sr-value.poo { color: var(--poo); }
+  .summary-row .sr-value.period { color: var(--period); }
+
+  /* BAR CHART */
+  .bar-chart { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin-top: 10px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar {
+    width: 100%; border-radius: 4px 4px 0 0;
+    min-height: 3px; transition: height 0.4s ease;
+  }
+  .bar.pee { background: var(--pee); }
+  .bar.poo { background: var(--poo); }
+  .bar-label { font-size: 9px; color: var(--muted); font-family: 'Space Mono', monospace; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    z-index: 100; display: flex; align-items: flex-end;
+    opacity: 0; pointer-events: none; transition: opacity 0.25s;
+  }
+  .modal-overlay.open { opacity: 1; pointer-events: all; }
+  .modal {
+    background: var(--surface2); border-radius: 24px 24px 0 0;
+    padding: 24px 24px 40px; width: 100%;
+    transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1);
+    border-top: 1px solid var(--border);
+  }
+  .modal-overlay.open .modal { transform: translateY(0); }
+  .modal-handle {
+    width: 40px; height: 4px; background: var(--border);
+    border-radius: 2px; margin: 0 auto 20px;
+  }
+  .modal h2 { font-size: 18px; font-weight: 600; margin-bottom: 20px; text-align: center; }
+  
+  .note-input {
+    width: 100%; background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 12px 14px;
+    color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px;
+    margin-bottom: 16px; resize: none; height: 80px;
+  }
+  .note-input:focus { outline: none; border-color: var(--accent); }
+
+  .poo-types {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 8px; margin-bottom: 16px;
+  }
+  .poo-type-btn {
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 10px 6px;
+    text-align: center; cursor: pointer; transition: all 0.2s;
+  }
+  .poo-type-btn.selected { border-color: var(--poo); background: var(--poo-soft); }
+  .poo-type-btn .pt-emoji { font-size: 20px; }
+  .poo-type-btn .pt-label { font-size: 10px; color: var(--muted); margin-top: 4px; }
+
+  .modal-confirm-btn {
+    width: 100%; padding: 16px; border-radius: var(--radius);
+    border: none; font-family: 'DM Sans', sans-serif;
+    font-size: 15px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .modal-confirm-btn.pee { background: var(--pee); color: #000; }
+  .modal-confirm-btn.poo { background: var(--poo); color: #fff; }
+  .modal-confirm-btn.period { background: var(--period); color: #fff; }
+
+  /* SETTINGS */
+  .settings-section { margin-bottom: 24px; }
+  .settings-row {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 14px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 8px;
+  }
+  .settings-row .sr-text { font-size: 14px; }
+  .settings-row .sr-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  
+  /* TOGGLE */
+  .toggle {
+    width: 46px; height: 26px; background: var(--border);
+    border-radius: 13px; position: relative; cursor: pointer;
+    transition: background 0.2s;
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle::after {
+    content: ''; position: absolute; width: 20px; height: 20px;
+    background: #fff; border-radius: 50%; top: 3px; left: 3px;
+    transition: transform 0.2s;
+  }
+  .toggle.on::after { transform: translateX(20px); }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-top: 1px solid var(--border);
+    display: flex; padding: 8px 0 20px;
+    z-index: 50;
+  }
+  .nav-item {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; gap: 4px; cursor: pointer;
+    padding: 6px; transition: all 0.2s;
+  }
+  .nav-item .nav-icon { font-size: 22px; }
+  .nav-item .nav-label { font-size: 10px; color: var(--muted); }
+  .nav-item.active .nav-label { color: var(--accent); }
+  .nav-item.active .nav-icon { transform: scale(1.15); }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center; padding: 40px 20px;
+    color: var(--muted);
+  }
+  .empty-state .es-emoji { font-size: 48px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+
+  /* PERIOD CALENDAR */
+  .period-section { margin-bottom: 20px; }
+  .cycle-info {
+    background: var(--period-soft); border: 1px solid var(--period);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 14px;
+  }
+  .cycle-info h3 { font-size: 13px; color: var(--period); margin-bottom: 10px; font-family: 'Space Mono', monospace; }
+  .cycle-stat { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
+  .cycle-stat span:last-child { font-family: 'Space Mono', monospace; font-weight: 700; color: var(--period); }
+
+  .mini-calendar {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 14px;
+  }
+  .cal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .cal-nav { background: none; border: none; color: var(--text); font-size: 18px; cursor: pointer; padding: 4px 8px; }
+  .cal-month { font-family: 'Space Mono', monospace; font-size: 13px; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .cal-day-label { text-align: center; font-size: 10px; color: var(--muted); padding: 4px; font-family: 'Space Mono', monospace; }
+  .cal-day {
+    text-align: center; padding: 6px 2px; font-size: 12px;
+    border-radius: 6px; cursor: pointer; transition: all 0.15s;
+  }
+  .cal-day:empty { cursor: default; }
+  .cal-day.today { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+  .cal-day.period-day { background: var(--period); color: #fff; font-weight: 600; border-radius: 50%; }
+  .cal-day.predicted { background: var(--period-soft); color: var(--period); border-radius: 50%; }
+  .cal-day.pee-day::after, .cal-day.poo-day::after {
+    content: '·'; display: block; font-size: 16px; line-height: 0; margin-top: 2px;
+  }
+  .cal-day.pee-day::after { color: var(--pee); }
+
+  /* EXPORT */
+  .export-btn {
+    width: 100%; padding: 14px; border-radius: var(--radius);
+    background: var(--surface); border: 1px solid var(--accent);
+    color: var(--accent); font-family: 'DM Sans', sans-serif;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    margin-top: 8px; transition: all 0.2s;
+  }
+  .export-btn:active { background: var(--accent-soft); }
+
+  .install-banner {
+    background: var(--accent-soft); border: 1px solid var(--accent);
+    border-radius: var(--radius); padding: 14px; margin-bottom: 20px;
+    font-size: 13px; display: none;
+  }
+  .install-banner.visible { display: flex; gap: 12px; align-items: center; }
+  .install-banner .ib-text { flex: 1; }
+  .install-banner .ib-btn {
+    background: var(--accent); color: #fff; border: none;
+    border-radius: 8px; padding: 8px 14px; font-size: 13px;
+    font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div class="logo">Flow<span>Log</span></div>
+    <div class="settings-btn" onclick="showScreen('settings')">⚙️</div>
+  </div>
+  <div class="date-display" id="headerDate"></div>
+</div>
+
+<!-- NAV TABS -->
+<div class="nav-tabs">
+  <div class="tab active" onclick="showScreen('registro')">Registro</div>
+  <div class="tab" onclick="showScreen('resumen')">Resumen</div>
+  <div class="tab period-tab" onclick="showScreen('ciclo')" style="display:none">Ciclo</div>
+  <div class="tab" onclick="showScreen('historial')">Historial</div>
+</div>
+
+<!-- === REGISTRO === -->
+<div class="screen active" id="screen-registro">
+  <div class="install-banner" id="installBanner">
+    <span>📲</span>
+    <div class="ib-text">Instala FlowLog en tu teléfono para usarla como app</div>
+    <button class="ib-btn" id="installBtn">Instalar</button>
+  </div>
+  
+  <p class="section-title">Registrar ahora</p>
+  <div class="register-grid">
+    <div class="register-btn pee" onclick="openModal('pee')">
+      <span class="emoji">💧</span>
+      <div class="label">Pipí</div>
+      <div class="count-badge pee-today">0</div>
+    </div>
+    <div class="register-btn poo" onclick="openModal('poo')">
+      <span class="emoji">💩</span>
+      <div class="label">Caca</div>
+      <div class="count-badge poo-today" style="background:var(--poo)">0</div>
+    </div>
+    <div class="register-btn period period-register" onclick="openModal('period')" style="display:none">
+      <span class="emoji">🌸</span>
+      <div class="label">Menstruación</div>
+      <div class="count-badge period-today" style="background:var(--period)">0</div>
+    </div>
+  </div>
+
+  <p class="section-title">Hoy</p>
+  <div class="today-stats">
+    <div class="stat-card pee">
+      <div class="stat-num pee-count">0</div>
+      <div class="stat-label">💧 pipí</div>
+    </div>
+    <div class="stat-card poo">
+      <div class="stat-num poo-count">0</div>
+      <div class="stat-label">💩 caca</div>
+    </div>
+    <div class="stat-card period period-stat" style="display:none">
+      <div class="stat-num period-count">0</div>
+      <div class="stat-label">🌸 ciclo</div>
+    </div>
+  </div>
+
+  <p class="section-title">Últimos registros</p>
+  <div class="log-list" id="todayLog">
+    <div class="empty-state">
+      <div class="es-emoji">📋</div>
+      <p>Nada registrado hoy</p>
+    </div>
+  </div>
+</div>
+
+<!-- === RESUMEN === -->
+<div class="screen" id="screen-resumen">
+  <div class="summary-period-selector">
+    <button class="period-btn active" onclick="setSummaryPeriod('day',this)">Hoy</button>
+    <button class="period-btn" onclick="setSummaryPeriod('week',this)">Esta semana</button>
+    <button class="period-btn" onclick="setSummaryPeriod('month',this)">Este mes</button>
+    <button class="period-btn" onclick="setSummaryPeriod('year',this)">Este año</button>
+  </div>
+  <div id="summaryContent"></div>
+  <button class="export-btn" onclick="exportCSV()">📤 Exportar datos (.csv)</button>
+</div>
+
+<!-- === CICLO MENSTRUAL === -->
+<div class="screen" id="screen-ciclo">
+  <div class="cycle-info" id="cycleInfo">
+    <h3>CICLO ACTUAL</h3>
+    <div class="cycle-stat"><span>Duración promedio</span><span id="avgCycle">—</span></div>
+    <div class="cycle-stat"><span>Último período</span><span id="lastPeriod">—</span></div>
+    <div class="cycle-stat"><span>Próximo período (est.)</span><span id="nextPeriod">—</span></div>
+    <div class="cycle-stat"><span>Día del ciclo</span><span id="cycleDay">—</span></div>
+  </div>
+
+  <div class="mini-calendar" id="periodCalendar">
+    <div class="cal-header">
+      <button class="cal-nav" onclick="calNav(-1)">‹</button>
+      <span class="cal-month" id="calMonthLabel"></span>
+      <button class="cal-nav" onclick="calNav(1)">›</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+  </div>
+
+  <div class="summary-card">
+    <h3>HISTORIAL MENSTRUAL</h3>
+    <div id="periodHistory"></div>
+  </div>
+</div>
+
+<!-- === HISTORIAL === -->
+<div class="screen" id="screen-historial">
+  <div class="summary-period-selector">
+    <button class="period-btn active" onclick="setHistFilter('all',this)">Todo</button>
+    <button class="period-btn" onclick="setHistFilter('pee',this)">💧 Pipí</button>
+    <button class="period-btn" onclick="setHistFilter('poo',this)">💩 Caca</button>
+    <button class="period-btn period-hist-filter" onclick="setHistFilter('period',this)" style="display:none">🌸 Ciclo</button>
+  </div>
+  <div class="log-list" id="historialList"></div>
+</div>
+
+<!-- === SETTINGS === -->
+<div class="screen" id="screen-settings">
+  <div class="settings-section">
+    <p class="section-title">Perfil</p>
+    <div class="settings-row">
+      <div>
+        <div class="sr-text">Modo menstrual</div>
+        <div class="sr-sub">Activa el seguimiento del ciclo</div>
+      </div>
+      <div class="toggle" id="periodToggle" onclick="togglePeriodMode()"></div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <p class="section-title">Notificaciones</p>
+    <div class="settings-row">
+      <div>
+        <div class="sr-text">Recordatorio diario</div>
+        <div class="sr-sub">Recuerda registrar tus hábitos</div>
+      </div>
+      <div class="toggle" id="notifToggle" onclick="toggleNotif()"></div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <p class="section-title">Datos</p>
+    <div class="settings-row" onclick="exportCSV()" style="cursor:pointer">
+      <div>
+        <div class="sr-text">Exportar a CSV</div>
+        <div class="sr-sub">Descarga todos tus registros</div>
+      </div>
+      <span>›</span>
+    </div>
+    <div class="settings-row" onclick="clearData()" style="cursor:pointer">
+      <div>
+        <div class="sr-text" style="color:#ff6b6b">Borrar todos los datos</div>
+        <div class="sr-sub">Esta acción no se puede deshacer</div>
+      </div>
+      <span>›</span>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <p class="section-title">Acerca de</p>
+    <div class="settings-row">
+      <div>
+        <div class="sr-text">FlowLog</div>
+        <div class="sr-sub">v1.0 · Datos guardados localmente</div>
+      </div>
+      <span style="color:var(--muted)">💙</span>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" id="nav-registro" onclick="showScreen('registro')">
+    <div class="nav-icon">🏠</div>
+    <div class="nav-label">Inicio</div>
+  </div>
+  <div class="nav-item" id="nav-resumen" onclick="showScreen('resumen')">
+    <div class="nav-icon">📊</div>
+    <div class="nav-label">Resumen</div>
+  </div>
+  <div class="nav-item nav-ciclo" id="nav-ciclo" onclick="showScreen('ciclo')" style="display:none">
+    <div class="nav-icon">🌸</div>
+    <div class="nav-label">Ciclo</div>
+  </div>
+  <div class="nav-item" id="nav-historial" onclick="showScreen('historial')">
+    <div class="nav-icon">📋</div>
+    <div class="nav-label">Historial</div>
+  </div>
+  <div class="nav-item" id="nav-settings" onclick="showScreen('settings')">
+    <div class="nav-icon">⚙️</div>
+    <div class="nav-label">Ajustes</div>
+  </div>
+</div>
+
+<!-- MODAL PEE -->
+<div class="modal-overlay" id="modal-pee">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>💧 Registrar pipí</h2>
+    <textarea class="note-input" id="pee-note" placeholder="Nota opcional (color, urgencia, dolor...)"></textarea>
+    <button class="modal-confirm-btn pee" onclick="saveEntry('pee')">Guardar registro</button>
+  </div>
+</div>
+
+<!-- MODAL POO -->
+<div class="modal-overlay" id="modal-poo">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>💩 Registrar caca</h2>
+    <p class="section-title" style="margin-bottom:10px">Tipo (Escala Bristol)</p>
+    <div class="poo-types">
+      <div class="poo-type-btn" onclick="selectPooType(1,this)">
+        <div class="pt-emoji">🟤</div><div class="pt-label">Tipo 1<br>Bolitas</div>
+      </div>
+      <div class="poo-type-btn" onclick="selectPooType(2,this)">
+        <div class="pt-emoji">🫘</div><div class="pt-label">Tipo 2<br>Grumos</div>
+      </div>
+      <div class="poo-type-btn" onclick="selectPooType(3,this)">
+        <div class="pt-emoji">🌭</div><div class="pt-label">Tipo 3<br>Grietas</div>
+      </div>
+      <div class="poo-type-btn" onclick="selectPooType(4,this)">
+        <div class="pt-emoji">✅</div><div class="pt-label">Tipo 4<br>Normal</div>
+      </div>
+      <div class="poo-type-btn" onclick="selectPooType(5,this)">
+        <div class="pt-emoji">🌊</div><div class="pt-label">Tipo 5<br>Suave</div>
+      </div>
+      <div class="poo-type-btn" onclick="selectPooType(6,this)">
+        <div class="pt-emoji">💦</div><div class="pt-label">Tipo 6<br>Líquido</div>
+      </div>
+      <div class="poo-type-btn" onclick="selectPooType(7,this)">
+        <div class="pt-emoji">🚿</div><div class="pt-label">Tipo 7<br>Acuoso</div>
+      </div>
+    </div>
+    <textarea class="note-input" id="poo-note" placeholder="Nota opcional (dolor, color, urgencia...)"></textarea>
+    <button class="modal-confirm-btn poo" onclick="saveEntry('poo')">Guardar registro</button>
+  </div>
+</div>
+
+<!-- MODAL PERIOD -->
+<div class="modal-overlay" id="modal-period">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h2>🌸 Ciclo menstrual</h2>
+    <div class="poo-types" style="grid-template-columns: repeat(3,1fr)">
+      <div class="poo-type-btn" onclick="selectFlow(1,this)">
+        <div class="pt-emoji">🩸</div><div class="pt-label">Ligero</div>
+      </div>
+      <div class="poo-type-btn" onclick="selectFlow(2,this)">
+        <div class="pt-emoji">🩸🩸</div><div class="pt-label">Moderado</div>
+      </div>
+      <div class="poo-type-btn" onclick="selectFlow(3,this)">
+        <div class="pt-emoji">🩸🩸🩸</div><div class="pt-label">Abundante</div>
+      </div>
+    </div>
+    <textarea class="note-input" id="period-note" placeholder="Síntomas (cólicos, dolor de cabeza...)"></textarea>
+    <button class="modal-confirm-btn period" onclick="saveEntry('period')">Guardar registro</button>
+  </div>
+</div>
+
+<script>
+// ============ DATA LAYER ============
+let db = JSON.parse(localStorage.getItem('flowlog_data') || '{"entries":[],"settings":{"periodMode":false,"notif":false}}');
+
+let selectedPooType = 4;
+let selectedFlow = 2;
+let calViewDate = new Date();
+let currentHistFilter = 'all';
+let currentSummaryPeriod = 'day';
+
+function saveDB() {
+  localStorage.setItem('flowlog_data', JSON.stringify(db));
+}
+
+function todayStr() {
+  return new Date().toISOString().split('T')[0];
+}
+
+function getEntriesByDate(dateStr) {
+  return db.entries.filter(e => e.date === dateStr);
+}
+
+function getEntriesByRange(start, end) {
+  return db.entries.filter(e => e.date >= start && e.date <= end);
+}
+
+// ============ UI ============
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.getElementById('nav-' + name)?.classList.add('active');
+  document.querySelector(`.tab[onclick="showScreen('${name}')"]`)?.classList.add('active');
+
+  if (name === 'registro') renderToday();
+  if (name === 'resumen') renderSummary(currentSummaryPeriod);
+  if (name === 'ciclo') renderCycle();
+  if (name === 'historial') renderHistorial();
+}
+
+function openModal(type) {
+  const overlay = document.getElementById('modal-' + type);
+  overlay.classList.add('open');
+  overlay.addEventListener('click', function handler(e) {
+    if (e.target === overlay) { overlay.classList.remove('open'); overlay.removeEventListener('click', handler); }
+  });
+}
+
+function closeModal(type) {
+  document.getElementById('modal-' + type).classList.remove('open');
+}
+
+function selectPooType(t, el) {
+  selectedPooType = t;
+  document.querySelectorAll('.poo-type-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectFlow(f, el) {
+  selectedFlow = f;
+  el.closest('.poo-types').querySelectorAll('.poo-type-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function ripple(btn, e) {
+  const r = document.createElement('div');
+  r.className = 'ripple-effect';
+  const rect = btn.getBoundingClientRect();
+  r.style.left = (e.clientX - rect.left - 30) + 'px';
+  r.style.top = (e.clientY - rect.top - 30) + 'px';
+  btn.appendChild(r);
+  setTimeout(() => r.remove(), 500);
+}
+
+// ============ SAVE ============
+function saveEntry(type) {
+  const now = new Date();
+  const note = document.getElementById(type + '-note')?.value?.trim() || '';
+  
+  const entry = {
+    id: Date.now(),
+    type,
+    date: todayStr(),
+    time: now.toTimeString().slice(0,5),
+    timestamp: now.toISOString(),
+    note,
+  };
+
+  if (type === 'poo') entry.bristolType = selectedPooType;
+  if (type === 'period') entry.flow = selectedFlow;
+
+  db.entries.unshift(entry);
+  saveDB();
+
+  // reset note
+  if (document.getElementById(type + '-note')) document.getElementById(type + '-note').value = '';
+  if (type === 'poo') { selectedPooType = 4; document.querySelectorAll('.poo-type-btn').forEach(b => b.classList.remove('selected')); }
+  if (type === 'period') { selectedFlow = 2; }
+
+  closeModal(type);
+  renderToday();
+
+  // haptic
+  if (navigator.vibrate) navigator.vibrate(30);
+}
+
+// ============ RENDER TODAY ============
+function renderToday() {
+  const today = todayStr();
+  const entries = getEntriesByDate(today);
+  const peeCount = entries.filter(e => e.type === 'pee').length;
+  const pooCount = entries.filter(e => e.type === 'poo').length;
+  const periodCount = entries.filter(e => e.type === 'period').length;
+
+  document.querySelectorAll('.pee-today').forEach(el => el.textContent = peeCount);
+  document.querySelectorAll('.poo-today').forEach(el => el.textContent = pooCount);
+  document.querySelectorAll('.period-today').forEach(el => el.textContent = periodCount);
+  document.querySelectorAll('.pee-count').forEach(el => el.textContent = peeCount);
+  document.querySelectorAll('.poo-count').forEach(el => el.textContent = pooCount);
+  document.querySelectorAll('.period-count').forEach(el => el.textContent = periodCount);
+
+  const logEl = document.getElementById('todayLog');
+  const recent = db.entries.filter(e => e.date === today).slice(0, 8);
+  
+  if (recent.length === 0) {
+    logEl.innerHTML = '<div class="empty-state"><div class="es-emoji">📋</div><p>Nada registrado hoy</p></div>';
+    return;
+  }
+
+  logEl.innerHTML = recent.map(e => `
+    <div class="log-item">
+      <div class="log-emoji">${typeEmoji(e.type)}</div>
+      <div class="log-info">
+        <div class="log-type">${typeName(e.type)}${e.bristolType ? ` · Tipo ${e.bristolType}` : ''}${e.flow ? ` · ${flowLabel(e.flow)}` : ''}</div>
+        <div class="log-time">${e.time}</div>
+        ${e.note ? `<div class="log-note">${e.note}</div>` : ''}
+      </div>
+      <div class="delete-btn" onclick="deleteEntry(${e.id})">✕</div>
+    </div>
+  `).join('');
+}
+
+function deleteEntry(id) {
+  if (!confirm('¿Eliminar este registro?')) return;
+  db.entries = db.entries.filter(e => e.id !== id);
+  saveDB();
+  renderToday();
+  renderHistorial();
+}
+
+// ============ SUMMARY ============
+function setSummaryPeriod(period, btn) {
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentSummaryPeriod = period;
+  renderSummary(period);
+}
+
+function getRange(period) {
+  const today = new Date();
+  const pad = n => String(n).padStart(2,'0');
+  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+  
+  if (period === 'day') return { start: fmt(today), end: fmt(today), label: 'Hoy' };
+  
+  if (period === 'week') {
+    const start = new Date(today);
+    start.setDate(today.getDate() - today.getDay() + 1);
+    const end = new Date(start); end.setDate(start.getDate() + 6);
+    return { start: fmt(start), end: fmt(end), label: 'Esta semana' };
+  }
+  
+  if (period === 'month') {
+    const start = new Date(today.getFullYear(), today.getMonth(), 1);
+    const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+    return { start: fmt(start), end: fmt(end), label: today.toLocaleDateString('es', {month:'long', year:'numeric'}) };
+  }
+  
+  if (period === 'year') {
+    return { start: `${today.getFullYear()}-01-01`, end: `${today.getFullYear()}-12-31`, label: today.getFullYear() };
+  }
+}
+
+function renderSummary(period) {
+  const range = getRange(period);
+  const entries = getEntriesByRange(range.start, range.end);
+  const peeEntries = entries.filter(e => e.type === 'pee');
+  const pooEntries = entries.filter(e => e.type === 'poo');
+  const periodEntries = entries.filter(e => e.type === 'period');
+
+  const days = daysBetween(range.start, range.end);
+  const avgPee = days > 0 ? (peeEntries.length / days).toFixed(1) : 0;
+  const avgPoo = days > 0 ? (pooEntries.length / days).toFixed(1) : 0;
+
+  // Poo type distribution
+  const bristolCounts = [0,0,0,0,0,0,0];
+  pooEntries.forEach(e => { if (e.bristolType) bristolCounts[e.bristolType-1]++; });
+  const mostCommonType = bristolCounts.indexOf(Math.max(...bristolCounts)) + 1;
+
+  let html = `
+    <div class="summary-card">
+      <h3>${range.label.toString().toUpperCase()}</h3>
+      <div class="summary-row">
+        <div class="sr-label">💧 Total pipí</div>
+        <div class="sr-value pee">${peeEntries.length}</div>
+      </div>
+      <div class="summary-row">
+        <div class="sr-label">💧 Promedio diario</div>
+        <div class="sr-value pee">${avgPee}×</div>
+      </div>
+      <div class="summary-row">
+        <div class="sr-label">💩 Total caca</div>
+        <div class="sr-value poo">${pooEntries.length}</div>
+      </div>
+      <div class="summary-row">
+        <div class="sr-label">💩 Promedio diario</div>
+        <div class="sr-value poo">${avgPoo}×</div>
+      </div>
+      ${pooEntries.length > 0 ? `
+      <div class="summary-row">
+        <div class="sr-label">💩 Tipo Bristol más común</div>
+        <div class="sr-value poo">Tipo ${mostCommonType}</div>
+      </div>` : ''}
+      ${db.settings.periodMode && periodEntries.length > 0 ? `
+      <div class="summary-row">
+        <div class="sr-label">🌸 Días de periodo</div>
+        <div class="sr-value period">${periodEntries.length}</div>
+      </div>` : ''}
+    </div>
+  `;
+
+  if (period === 'week' || period === 'month') {
+    html += renderBarChart(range.start, range.end, period);
+  }
+
+  if (period === 'year') {
+    html += renderMonthlyChart();
+  }
+
+  document.getElementById('summaryContent').innerHTML = html;
+}
+
+function daysBetween(start, end) {
+  const d1 = new Date(start), d2 = new Date(end);
+  return Math.max(1, Math.round((d2-d1)/(1000*60*60*24)) + 1);
+}
+
+function renderBarChart(start, end, period) {
+  const days = [];
+  let cur = new Date(start);
+  const endDate = new Date(end);
+  
+  while (cur <= endDate) {
+    const ds = cur.toISOString().split('T')[0];
+    const entries = getEntriesByDate(ds);
+    days.push({
+      label: period === 'week' ? ['L','M','X','J','V','S','D'][cur.getDay() === 0 ? 6 : cur.getDay()-1] : String(cur.getDate()),
+      pee: entries.filter(e => e.type === 'pee').length,
+      poo: entries.filter(e => e.type === 'poo').length,
+    });
+    cur.setDate(cur.getDate() + 1);
+  }
+
+  const maxVal = Math.max(...days.map(d => d.pee + d.poo), 1);
+
+  // Show max 14 days for month
+  const display = days.slice(-14);
+
+  const bars = display.map(d => {
+    const peeH = Math.round((d.pee / maxVal) * 60);
+    const pooH = Math.round((d.poo / maxVal) * 60);
+    return `
+      <div class="bar-col">
+        <div class="bar pee" style="height:${peeH}px"></div>
+        <div class="bar poo" style="height:${pooH}px"></div>
+        <div class="bar-label">${d.label}</div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="summary-card">
+      <h3>ACTIVIDAD POR DÍA</h3>
+      <div style="display:flex;gap:12px;margin-bottom:8px;font-size:11px;color:var(--muted)">
+        <span><span style="color:var(--pee)">■</span> Pipí</span>
+        <span><span style="color:var(--poo)">■</span> Caca</span>
+      </div>
+      <div class="bar-chart">${bars}</div>
+    </div>
+  `;
+}
+
+function renderMonthlyChart() {
+  const year = new Date().getFullYear();
+  const months = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  
+  const bars = months.map((m, i) => {
+    const start = `${year}-${String(i+1).padStart(2,'0')}-01`;
+    const end = new Date(year, i+1, 0).toISOString().split('T')[0];
+    const entries = getEntriesByRange(start, end);
+    return { label: m, pee: entries.filter(e=>e.type==='pee').length, poo: entries.filter(e=>e.type==='poo').length };
+  });
+
+  const maxVal = Math.max(...bars.map(d => d.pee + d.poo), 1);
+  const barsHtml = bars.map(d => {
+    const peeH = Math.round((d.pee / maxVal) * 60);
+    const pooH = Math.round((d.poo / maxVal) * 60);
+    return `<div class="bar-col"><div class="bar pee" style="height:${peeH}px"></div><div class="bar poo" style="height:${pooH}px"></div><div class="bar-label">${d.label}</div></div>`;
+  }).join('');
+
+  return `
+    <div class="summary-card">
+      <h3>ACTIVIDAD MENSUAL ${year}</h3>
+      <div style="display:flex;gap:12px;margin-bottom:8px;font-size:11px;color:var(--muted)">
+        <span><span style="color:var(--pee)">■</span> Pipí</span>
+        <span><span style="color:var(--poo)">■</span> Caca</span>
+      </div>
+      <div class="bar-chart">${barsHtml}</div>
+    </div>
+  `;
+}
+
+// ============ HISTORIAL ============
+function setHistFilter(filter, btn) {
+  document.querySelectorAll('.summary-period-selector .period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentHistFilter = filter;
+  renderHistorial();
+}
+
+function renderHistorial() {
+  let entries = [...db.entries];
+  if (currentHistFilter !== 'all') entries = entries.filter(e => e.type === currentHistFilter);
+  
+  const el = document.getElementById('historialList');
+  if (entries.length === 0) {
+    el.innerHTML = '<div class="empty-state"><div class="es-emoji">📋</div><p>Sin registros</p></div>';
+    return;
+  }
+
+  // Group by date
+  const groups = {};
+  entries.forEach(e => { if (!groups[e.date]) groups[e.date] = []; groups[e.date].push(e); });
+  
+  el.innerHTML = Object.keys(groups).sort().reverse().slice(0, 30).map(date => {
+    const label = formatDateLabel(date);
+    const items = groups[date].map(e => `
+      <div class="log-item">
+        <div class="log-emoji">${typeEmoji(e.type)}</div>
+        <div class="log-info">
+          <div class="log-type">${typeName(e.type)}${e.bristolType ? ` · Tipo ${e.bristolType}` : ''}${e.flow ? ` · ${flowLabel(e.flow)}` : ''}</div>
+          <div class="log-time">${e.time}</div>
+          ${e.note ? `<div class="log-note">${e.note}</div>` : ''}
+        </div>
+        <div class="delete-btn" onclick="deleteEntry(${e.id})">✕</div>
+      </div>
+    `).join('');
+    return `<p class="section-title" style="margin-top:16px">${label}</p>${items}`;
+  }).join('');
+}
+
+function formatDateLabel(dateStr) {
+  const today = todayStr();
+  const yesterday = new Date(); yesterday.setDate(yesterday.getDate()-1);
+  const yStr = yesterday.toISOString().split('T')[0];
+  if (dateStr === today) return 'HOY';
+  if (dateStr === yStr) return 'AYER';
+  return new Date(dateStr + 'T12:00').toLocaleDateString('es', {weekday:'long', day:'numeric', month:'long'}).toUpperCase();
+}
+
+// ============ CICLO ============
+function renderCycle() {
+  renderCalendar();
+  
+  const periodEntries = db.entries.filter(e => e.type === 'period');
+  const periodDays = [...new Set(periodEntries.map(e => e.date))].sort();
+  
+  if (periodDays.length === 0) {
+    document.getElementById('periodHistory').innerHTML = '<p style="color:var(--muted);font-size:13px">Aún no hay registros de ciclo</p>';
+    return;
+  }
+
+  // Find cycle starts (gaps > 15 days = new cycle)
+  const cycles = [];
+  let cycleStart = periodDays[0];
+  let cycleEnd = periodDays[0];
+  
+  for (let i = 1; i < periodDays.length; i++) {
+    const prev = new Date(periodDays[i-1]);
+    const curr = new Date(periodDays[i]);
+    const diff = (curr - prev) / (1000*60*60*24);
+    if (diff > 15) {
+      cycles.push({ start: cycleStart, end: cycleEnd, duration: daysBetween(cycleStart, cycleEnd) });
+      cycleStart = periodDays[i];
+    }
+    cycleEnd = periodDays[i];
+  }
+  cycles.push({ start: cycleStart, end: cycleEnd, duration: daysBetween(cycleStart, cycleEnd) });
+
+  // Avg cycle length
+  let avgCycleLen = 28;
+  if (cycles.length >= 2) {
+    const intervals = [];
+    for (let i = 1; i < cycles.length; i++) {
+      intervals.push(daysBetween(cycles[i-1].start, cycles[i].start));
+    }
+    avgCycleLen = Math.round(intervals.reduce((a,b) => a+b, 0) / intervals.length);
+  }
+
+  const lastCycle = cycles[cycles.length - 1];
+  const nextStart = new Date(lastCycle.start);
+  nextStart.setDate(nextStart.getDate() + avgCycleLen);
+  const today = new Date();
+  const dayOfCycle = Math.round((today - new Date(lastCycle.start)) / (1000*60*60*24)) + 1;
+
+  document.getElementById('avgCycle').textContent = `${avgCycleLen} días`;
+  document.getElementById('lastPeriod').textContent = new Date(lastCycle.start + 'T12:00').toLocaleDateString('es', {day:'numeric', month:'long'});
+  document.getElementById('nextPeriod').textContent = nextStart.toLocaleDateString('es', {day:'numeric', month:'long'});
+  document.getElementById('cycleDay').textContent = dayOfCycle > 0 ? `Día ${dayOfCycle}` : '—';
+
+  document.getElementById('periodHistory').innerHTML = cycles.reverse().map(c => `
+    <div class="summary-row">
+      <div class="sr-label">🌸 ${new Date(c.start + 'T12:00').toLocaleDateString('es', {day:'numeric', month:'short'})}</div>
+      <div class="sr-value period">${c.duration} días</div>
+    </div>
+  `).join('');
+}
+
+let calViewYear, calViewMonth;
+function renderCalendar() {
+  const now = new Date();
+  if (!calViewYear) calViewYear = now.getFullYear();
+  if (!calViewMonth) calViewMonth = now.getMonth();
+
+  const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('calMonthLabel').textContent = `${monthNames[calViewMonth]} ${calViewYear}`;
+
+  const firstDay = new Date(calViewYear, calViewMonth, 1).getDay();
+  const daysInMonth = new Date(calViewYear, calViewMonth + 1, 0).getDate();
+  const todayStr2 = todayStr();
+
+  const periodDates = new Set(db.entries.filter(e => e.type === 'period').map(e => e.date));
+  const peeDates = new Set(db.entries.filter(e => e.type === 'pee').map(e => e.date));
+
+  let html = ['L','M','X','J','V','S','D'].map(d => `<div class="cal-day-label">${d}</div>`).join('');
+  
+  const startOffset = firstDay === 0 ? 6 : firstDay - 1;
+  for (let i = 0; i < startOffset; i++) html += '<div class="cal-day"></div>';
+
+  for (let d = 1; d <= daysInMonth; d++) {
+    const ds = `${calViewYear}-${String(calViewMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    let cls = 'cal-day';
+    if (ds === todayStr2) cls += ' today';
+    if (periodDates.has(ds)) cls += ' period-day';
+    else if (peeDates.has(ds)) cls += ' pee-day';
+    html += `<div class="${cls}" onclick="calDayClick('${ds}')">${d}</div>`;
+  }
+
+  document.getElementById('calGrid').innerHTML = html;
+}
+
+function calNav(dir) {
+  calViewMonth += dir;
+  if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+  if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+  renderCalendar();
+}
+
+function calDayClick(dateStr) {
+  const entries = getEntriesByDate(dateStr);
+  if (entries.length === 0) return;
+  const summary = entries.map(e => `${typeEmoji(e.type)} ${typeName(e.type)} - ${e.time}${e.note ? ': '+e.note : ''}`).join('\n');
+  alert(summary);
+}
+
+// ============ SETTINGS ============
+function togglePeriodMode() {
+  db.settings.periodMode = !db.settings.periodMode;
+  saveDB();
+  applySettings();
+}
+
+function toggleNotif() {
+  db.settings.notif = !db.settings.notif;
+  saveDB();
+  applySettings();
+  if (db.settings.notif && 'Notification' in window) {
+    Notification.requestPermission();
+  }
+}
+
+function applySettings() {
+  const pm = db.settings.periodMode;
+  document.getElementById('periodToggle').classList.toggle('on', pm);
+  document.getElementById('notifToggle').classList.toggle('on', db.settings.notif);
+  
+  document.querySelectorAll('.period-register').forEach(el => el.style.display = pm ? '' : 'none');
+  document.querySelectorAll('.period-stat').forEach(el => el.style.display = pm ? '' : 'none');
+  document.querySelectorAll('.period-tab').forEach(el => el.style.display = pm ? '' : 'none');
+  document.querySelectorAll('.period-hist-filter').forEach(el => el.style.display = pm ? '' : 'none');
+  document.querySelectorAll('.nav-ciclo').forEach(el => el.style.display = pm ? '' : 'none');
+}
+
+function clearData() {
+  if (confirm('¿Borrar TODOS los datos? Esta acción no se puede deshacer.')) {
+    db.entries = [];
+    saveDB();
+    renderToday();
+    alert('Datos borrados.');
+  }
+}
+
+// ============ EXPORT ============
+function exportCSV() {
+  if (db.entries.length === 0) { alert('No hay datos para exportar.'); return; }
+  
+  const header = 'Fecha,Hora,Tipo,Detalle,Nota\n';
+  const rows = db.entries.map(e => {
+    const detail = e.bristolType ? `Tipo Bristol ${e.bristolType}` : e.flow ? `Flujo ${flowLabel(e.flow)}` : '';
+    return `${e.date},${e.time},${typeName(e.type)},${detail},"${(e.note||'').replace(/"/g,'""')}"`;
+  }).join('\n');
+  
+  const blob = new Blob(['\ufeff' + header + rows], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `flowlog_${todayStr()}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============ HELPERS ============
+function typeEmoji(t) { return { pee: '💧', poo: '💩', period: '🌸' }[t] || '?'; }
+function typeName(t) { return { pee: 'Pipí', poo: 'Caca', period: 'Menstruación' }[t] || t; }
+function flowLabel(f) { return ['','Ligero','Moderado','Abundante'][f] || ''; }
+
+// ============ INSTALL ============
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('visible');
+});
+document.getElementById('installBtn').addEventListener('click', async () => {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const { outcome } = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('installBanner').classList.remove('visible');
+});
+
+// ============ DATE DISPLAY ============
+function updateDate() {
+  const now = new Date();
+  const opts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  document.getElementById('headerDate').textContent = now.toLocaleDateString('es-MX', opts);
+}
+
+// ============ SERVICE WORKER ============
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+// ============ INIT ============
+updateDate();
+applySettings();
+renderToday();
+</script>
+</body>
+</html>
