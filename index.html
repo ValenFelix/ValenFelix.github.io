@@ -527,7 +527,21 @@ function renderCharts(stats) {
     </div>
   `).join('');
 
-  const colors = ['#00e676', '#4fc3f7', '#f5c842', '#ff5722', '#cd7f32', '#9c27b0', '#e91e63', '#b0bec5', '#26c6da', '#66bb6a', '#ffa726', '#ef5350'];
+  // Paleta derivada de los tokens del sistema: gold, green, blue, accent, bronze, silver + variantes con opacidad
+  const colors = [
+    '#f5c842',        // --gold
+    '#00e676',        // --green
+    '#4fc3f7',        // --blue
+    '#ff5722',        // --accent
+    '#cd7f32',        // --bronze
+    '#b0bec5',        // --silver
+    'rgba(245,200,66,0.55)',   // gold suave
+    'rgba(0,230,118,0.55)',    // green suave
+    'rgba(79,195,247,0.55)',   // blue suave
+    'rgba(255,87,34,0.55)',    // accent suave
+    'rgba(205,127,50,0.55)',   // bronze suave
+    'rgba(176,190,197,0.55)',  // silver suave
+  ];
 
   selectedQ.forEach((q, idx) => {
     const dataObj = stats[q];
@@ -545,8 +559,9 @@ function renderCharts(stats) {
         datasets: [{
           data: values,
           backgroundColor: colors,
-          borderWidth: 0,
-          hoverOffset: 4
+          borderColor: '#161b23',
+          borderWidth: 2,
+          hoverOffset: 6
         }]
       },
       options: {
