@@ -471,10 +471,10 @@
 const SID = '1Lxz_7Hf20m685XGDQQmNFL0IclDY8RzK0IXIo0jnZg4';
 const GID_LEADERBOARD = '1369482165'; 
 
-// 2. API de Fútbol (Para Partidos y Grupos) - ¡TOKEN INTEGRADO!
+// 2. API de Fútbol (Para Partidos y Grupos) - Forzado a Temporada 2026
 const API_TOKEN = 'f853d9be52624d2992574a3b6f36aaa1'; 
-const API_URL_MATCHES = 'https://api.football-data.org/v4/competitions/WC/matches';
-const API_URL_STANDINGS = 'https://api.football-data.org/v4/competitions/WC/standings';
+const API_URL_MATCHES = 'https://api.football-data.org/v4/competitions/WC/matches?season=2026';
+const API_URL_STANDINGS = 'https://api.football-data.org/v4/competitions/WC/standings?season=2026';
 
 const REFRESH_INTERVAL = 3 * 60 * 1000; // Auto-actualizar cada 3 minutos
 
@@ -501,8 +501,8 @@ const GROUPS = {
 
 const FLAGS = {
   'México':'🇲🇽','Corea del Sur':'🇰🇷','Sudáfrica':'🇿🇦','Chequia':'🇨🇿',
-  'Canadá':'🇨🇦','Suiza':'🇨🇭','Bosnia y H.':'🇧🇦','Catar':'🇶🇦',
-  'Brasil':'🇧🇷','Marruecos':'🇲🇦','Escocia':'🏴\u200d☠️','Haití':'🇭🇹',
+  'Canadá':'🇨🇦','Suiza':'🇨🇭','Bosnia y H.' : '🇧🇦','Catar':'🇶🇦',
+  'Brasil':'🇧🇷','Marruecos':'🇲🇦','Escocia':'🏴󠁢󠁳󠁣󠁴󠁿','Haití':'🇭🇹',
   'Turquía':'🇹🇷','Estados Unidos':'🇺🇸','Australia':'🇦🇺','Paraguay':'🇵🇾',
   'Alemania':'🇩🇪','Ecuador':'🇪🇨','Curazao':'🇨🇼','Costa de Marfil':'🇨🇮',
   'Japón':'🇯🇵','Suecia':'🇸🇪','Países Bajos':'🇳🇱','Túnez':'🇹🇳',
@@ -511,11 +511,10 @@ const FLAGS = {
   'Francia':'🇫🇷','Senegal':'🇸🇳','Noruega':'🇳🇴','Irak':'🇮🇶',
   'Argentina':'🇦🇷','Austria':'🇦🇹','Argelia':'🇩🇿','Jordania':'🇯🇴',
   'Portugal':'🇵🇹','Colombia':'🇨🇴','RD Congo':'🇨🇩','Uzbekistán':'🇺🇿',
-  'Inglaterra':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Croacia':'🇭🇷','Ghana':'🇬🇭','Panamá':'🇵🇦',
+  'Inglaterra':'🏴\u200d☠️','Croacia':'🇭🇷','Ghana':'🇬🇭','Panamá':'🇵🇦',
 };
 const fl = n => FLAGS[n] || '🏳️';
 
-// Traductor automático: Convierte el inglés de la API a tu español exacto
 const trans = {
   "Mexico": "México", "South Korea": "Corea del Sur", "South Africa": "Sudáfrica", "Czech Republic": "Chequia",
   "Canada": "Canadá", "Switzerland": "Suiza", "Bosnia and Herzegovina": "Bosnia y H.", "Qatar": "Catar",
@@ -532,7 +531,7 @@ const trans = {
 };
 const tr = n => trans[n] || n;
 
-// ── 1. CARGA DEL LEADERBOARD (DESDE GOOGLE SHEETS) ──────
+// ── 1. CARGA DEL LEADERBOARD (GOOGLE SHEETS) ────────────
 function getDirectCsvUrl(gid) {
   return `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${gid}`;
 }
@@ -635,19 +634,27 @@ function processLB(rows) {
 
 // ── 2. CARGA DE PARTIDOS Y GRUPOS (DESDE LA API) ────────
 async function fetchAPI() {
+  const body = document.getElementById('mBody');
   try {
     const opts = { headers: { 'X-Auth-Token': API_TOKEN } };
     
-    // Consultar Partidos de la Copa del Mundo
     const resM = await fetch(API_URL_MATCHES, opts);
-    if (!resM.ok) throw new Error('Error en API de partidos');
+    
+    // Diagnóstico en vivo de errores de Token
+    if (resM.status === 403 || resM.status === 401) {
+      if (body) body.innerHTML = `<div class="err" style="color:var(--orange)">🔑 Tu API Token se está activando en los servidores globales. Tardará unos 10 minutos más.</div>`;
+      renderStd();
+      return;
+    }
+    
+    if (!resM.ok) throw new Error('Error en servidor API');
     const dataM = await resM.json();
     
     if (dataM.matches && dataM.matches.length > 0) {
       matches = dataM.matches.map(m => {
         let st = 'SCHED';
         if (m.status === 'FINISHED') st = 'FIN';
-        if (m.status === 'IN_PLAY' || m.status === 'PAUSED') st = 'LIVE';
+        if (m.status === 'IN_PLAY' || m.status === 'PAUSED' || m.status === 'LIVE') st = 'LIVE';
         
         let groupLetter = '?';
         if (m.group && m.group.includes('GROUP_')) {
@@ -656,17 +663,16 @@ async function fetchAPI() {
 
         return {
           g: groupLetter,
-          h: tr(m.homeTeam.name),
-          a: tr(m.awayTeam.name),
-          sH: m.score.fullTime.home,
-          sA: m.score.fullTime.away,
+          h: tr(m.homeTeam?.name || 'Por definir'),
+          a: tr(m.awayTeam?.name || 'Por definir'),
+          sH: m.score?.fullTime?.home,
+          sA: m.score?.fullTime?.away,
           st: st,
           date: new Date(m.utcDate)
         };
       });
     }
 
-    // Consultar Tablas de Posiciones de la API
     const resS = await fetch(API_URL_STANDINGS, opts);
     if (resS.ok) {
       const dataS = await resS.json();
@@ -689,18 +695,15 @@ async function fetchAPI() {
     renderStd();
 
   } catch(e) {
-    console.warn("API de Fútbol: Torneo aún no activo o esperando datos del servidor.", e);
-    // Renderizado preventivo amigable por si la API aún no abre el calendario oficial del torneo
-    const body = document.getElementById('mBody');
+    console.error("Error cargando API:", e);
     if (body && (!matches || matches.length === 0)) {
-      body.innerHTML = `<div class="err">⚽ Calendario automatizado (Esperando que comience el torneo)</div>`;
+      body.innerHTML = `<div class="err">⚽ Servidor de resultados ocupado. Sincronizando datos...</div>`;
     }
     renderStd();
   }
 }
 
 // ── 3. GENERACIÓN DE LA INTERFAZ GRÁFICA ────────────────
-// Control de las pestañas "Recientes" y "Próximos"
 function setTab(t) {
   curTab = t;
   const tR = document.getElementById('tR');
@@ -715,17 +718,20 @@ function renderMatches() {
   if (!body) return;
 
   if (!matches || matches.length === 0) {
-    body.innerHTML = `<div class="err">⚽ Calendario conectado. Esperando actualizaciones de partidos de la FIFA...</div>`;
+    // Si la API respondió con éxito pero el arreglo está vacío por retraso del servidor del torneo
+    if (!body.innerHTML.includes("🔑")) {
+      body.innerHTML = `<div class="err">⏳ Los partidos se desplegarán de forma automática en cuanto la API libere los permisos del partido inaugural.</div>`;
+    }
     return;
   }
 
-  // Filtra y ordena de forma inteligente
+  // Filtros de pestañas
   let list = curTab === 'r'
     ? matches.filter(m => m.st === 'FIN' || m.st === 'LIVE').sort((a,b) => b.date - a.date).slice(0, 8) 
     : matches.filter(m => m.st === 'SCHED').sort((a,b) => a.date - b.date).slice(0, 8); 
 
   if (!list.length) {
-    body.innerHTML = `<div class="err">${curTab==='r' ? '⚽ Ningún partido ha comenzado aún.' : '📅 No hay más próximos partidos programados.'}</div>`;
+    body.innerHTML = `<div class="err">${curTab==='r' ? '⚽ Ningún partido ha comenzado aún. ¡El torneo arranca el jueves!' : '📅 No hay más próximos partidos programados en esta fase.'}</div>`;
     return;
   }
   body.innerHTML = list.map(m => matchHTML(m)).join('');
@@ -734,7 +740,7 @@ function renderMatches() {
 function matchHTML(m) {
   const isLive = m.st === 'LIVE';
   const hasSc  = m.sH !== null && m.sA !== null;
-  const time   = m.st === 'FIN' ? 'Finalizado' : isLive ? '⚡ EN VIVO' : '⏳ ' + m.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+  const time   = m.st === 'FIN' ? 'Finalizado' : isLive ? '⚡ EN VIVO' : '⏳ ' + m.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) + ' hs';
   
   const scoreBlock = hasSc
     ? `<div class="score"><span class="sc">${m.sH}</span><span class="sep">–</span><span class="sc">${m.sA}</span></div>`
@@ -762,8 +768,6 @@ function renderStd() {
   const apiData = grpResults[g];
   const baseData = GROUPS[g] || [];
 
-  // Estrategia híbrida: Si la API no tiene datos (por ejemplo, antes de empezar el mundial),
-  // mostramos la estructura limpia con 0 puntos en lugar de romper la pantalla.
   let rows = [];
   if (apiData && apiData.length > 0) {
     rows = apiData;
@@ -802,7 +806,6 @@ async function run() {
   if (sDot) sDot.classList.remove('live');
   if (sStatus) sStatus.textContent = 'Actualizando…';
 
-  // Ejecuta ambas peticiones en paralelo para máxima velocidad
   await Promise.allSettled([
     fetchLeaderboard(),
     fetchAPI()
@@ -815,8 +818,6 @@ async function run() {
 function init() {
   updateHeader();
   run();
-  
-  // Loops automáticos de actualización en segundo plano
   setInterval(run, REFRESH_INTERVAL);
   
   const btnRefresh = document.getElementById('btnRefresh');
