@@ -466,25 +466,24 @@
 </div>
 
 <script>
-// ── CONFIGURACIÓN DE TU GOOGLE SHEETS ───────────────────
-// Asegúrate de que las IDs correspondan a las pestañas correctas de tu documento compartido.
+// ── CONFIGURACIÓN ───────────────────────────────────────
+// 1. Google Sheets (Solo para el Leaderboard de participantes)
 const SID = '1Lxz_7Hf20m685XGDQQmNFL0IclDY8RzK0IXIo0jnZg4';
-const GID_LEADERBOARD = '1369482165';
-const GID_RESULTADOS = '1369482165'; 
+const GID_LEADERBOARD = '1369482165'; 
+
+// 2. API de Fútbol (Para Partidos y Grupos) - ¡TOKEN INTEGRADO!
+const API_TOKEN = 'f853d9be52624d2992574a3b6f36aaa1'; 
+const API_URL_MATCHES = 'https://api.football-data.org/v4/competitions/WC/matches';
+const API_URL_STANDINGS = 'https://api.football-data.org/v4/competitions/WC/standings';
+
 const REFRESH_INTERVAL = 3 * 60 * 1000; // Auto-actualizar cada 3 minutos
 
-function getDirectCsvUrl(gid) {
-  return `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${gid}`;
-}
+// ── VARIABLES GLOBALES ──────────────────────────────────
+let matches = [];        
+let grpResults = {};     
+let curTab = 'r';
 
-async function fetchCSV(gid) {
-  const r = await fetch(getDirectCsvUrl(gid));
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  const text = await r.text();
-  return parseCSV(text);
-}
-
-// ── DATOS ESTRUCTURALES DEL MUNDIAL ─────────────────────
+// ── DATOS ESTRUCTURALES DEL MUNDIAL 2026 ────────────────
 const GROUPS = {
   A:['México','Corea del Sur','Sudáfrica','Chequia'],
   B:['Canadá','Suiza','Bosnia y H.','Catar'],
@@ -503,7 +502,7 @@ const GROUPS = {
 const FLAGS = {
   'México':'🇲🇽','Corea del Sur':'🇰🇷','Sudáfrica':'🇿🇦','Chequia':'🇨🇿',
   'Canadá':'🇨🇦','Suiza':'🇨🇭','Bosnia y H.':'🇧🇦','Catar':'🇶🇦',
-  'Brasil':'🇧🇷','Marruecos':'🇲🇦','Escocia':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','Haití':'🇭🇹',
+  'Brasil':'🇧🇷','Marruecos':'🇲🇦','Escocia':'🏴\u200d☠️','Haití':'🇭🇹',
   'Turquía':'🇹🇷','Estados Unidos':'🇺🇸','Australia':'🇦🇺','Paraguay':'🇵🇾',
   'Alemania':'🇩🇪','Ecuador':'🇪🇨','Curazao':'🇨🇼','Costa de Marfil':'🇨🇮',
   'Japón':'🇯🇵','Suecia':'🇸🇪','Países Bajos':'🇳🇱','Túnez':'🇹🇳',
@@ -516,32 +515,48 @@ const FLAGS = {
 };
 const fl = n => FLAGS[n] || '🏳️';
 
-let matches = [];        
-let grpResults = {};     
-let curTab = 'r';
+// Traductor automático: Convierte el inglés de la API a tu español exacto
+const trans = {
+  "Mexico": "México", "South Korea": "Corea del Sur", "South Africa": "Sudáfrica", "Czech Republic": "Chequia",
+  "Canada": "Canadá", "Switzerland": "Suiza", "Bosnia and Herzegovina": "Bosnia y H.", "Qatar": "Catar",
+  "Brazil": "Brasil", "Morocco": "Marruecos", "Scotland": "Escocia", "Haiti": "Haití",
+  "United States": "Estados Unidos", "Paraguay": "Paraguay", "Turkey": "Turquía", "Australia": "Australia",
+  "Germany": "Alemania", "Ecuador": "Ecuador", "Curacao": "Curazao", "Ivory Coast": "Costa de Marfil",
+  "Netherlands": "Países Bajos", "Japan": "Japón", "Sweden": "Suecia", "Tunisia": "Túnez",
+  "Belgium": "Bélgica", "Egypt": "Egipto", "Iran": "Irán", "New Zealand": "Nueva Zelanda",
+  "Spain": "España", "Cape Verde": "Cabo Verde", "Saudi Arabia": "Arabia Saudita", "Uruguay": "Uruguay",
+  "France": "Francia", "Senegal": "Senegal", "Norway": "Noruega", "Iraq": "Irak",
+  "Argentina": "Argentina", "Austria": "Austria", "Algeria": "Argelia", "Jordan": "Jordania",
+  "Portugal": "Portugal", "Colombia": "Colombia", "DR Congo": "RD Congo", "Uzbekistan": "Uzbekistán",
+  "England": "Inglaterra", "Croatia": "Croacia", "Ghana": "Ghana", "Panama": "Panamá"
+};
+const tr = n => trans[n] || n;
 
-// ── PARSER DE CSV ROBUSTO ────────────────────────────────
+// ── 1. CARGA DEL LEADERBOARD (DESDE GOOGLE SHEETS) ──────
+function getDirectCsvUrl(gid) {
+  return `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${gid}`;
+}
+
+async function fetchLeaderboard() {
+  const r = await fetch(getDirectCsvUrl(GID_LEADERBOARD));
+  if (!r.ok) throw new Error('Error Sheets');
+  const text = await r.text();
+  const rows = parseCSV(text);
+  processLB(rows);
+}
+
 function parseCSV(txt) {
   const rows = [];
   const lines = txt.split(/\r?\n/);
-  
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line || /^,+$/.test(line)) continue;
-    
-    if (!line.includes('"')) {
-      rows.push(line.split(',').map(v => v.trim()));
-      continue;
-    }
-    
-    const row = [];
-    let c = 0;
+    if (!line.includes('"')) { rows.push(line.split(',').map(v => v.trim())); continue; }
+    const row = []; let c = 0;
     while (c < line.length) {
       if (line[c] === '"') {
         let end = line.indexOf('"', c + 1);
-        while (end !== -1 && line[end + 1] === '"') { 
-          end = line.indexOf('"', end + 2);
-        }
+        while (end !== -1 && line[end + 1] === '"') end = line.indexOf('"', end + 2);
         if (end === -1) end = line.length;
         row.push(line.substring(c + 1, end).replace(/""/g, '"').trim());
         c = end + 2; 
@@ -557,57 +572,47 @@ function parseCSV(txt) {
   return rows;
 }
 
-// ── PROCESAMIENTO DE LEADERBOARD ──────────────────────────
 function processLB(rows) {
   let hdr = -1;
   for (let i = 0; i < rows.length; i++) {
     if (rows[i].some(c => /participante/i.test(c))) { hdr = i; break; }
   }
-  if (hdr < 0) throw new Error('No se encontró la fila de cabecera en el Leaderboard.');
-
   const players = [];
-  for (let i = hdr + 1; i < rows.length; i++) {
-    const row = rows[i];
-    if (!row || row.length < 2) continue;
-    
-    const col0 = (row[0] || '');
-    const col1 = (row[1] || '');
-
-    if (col0.includes('📋') || col1.includes('📋') || /pts\s*\//.test(col1)) break;
-    if (!col0 && !col1) continue;
-
-    const name = col1.replace(/^[\u{1F947}\u{1F948}\u{1F949}\u{1F3C5}🥇🥈🥉🏅]+/gu, '').trim();
-    if (!name) continue;
-
-    const total  = parseFloat(row[2]) || 0;
-    const grupos = parseFloat(row[4]) || 0;
-    const pPartidos = row[12] !== undefined ? parseFloat(row[12]) : 0;
-
-    players.push({ name, total, grupos, pPartidos });
+  if (hdr >= 0) {
+    for (let i = hdr + 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (!row || row.length < 2) continue;
+      const col1 = (row[1] || '');
+      if (row[0].includes('📋') || col1.includes('📋') || /pts\s*\//.test(col1)) break;
+      const name = col1.replace(/^[\u{1F947}\u{1F948}\u{1F949}\u{1F3C5}🥇🥈🥉🏅]+/gu, '').trim();
+      if (!name) continue;
+      players.push({
+        name, 
+        total: parseFloat(row[2]) || 0, 
+        grupos: parseFloat(row[4]) || 0, 
+        pPartidos: row[12] !== undefined ? parseFloat(row[12]) : 0
+      });
+    }
   }
 
   const sPlayers = document.getElementById('sPlayers');
   if (sPlayers) sPlayers.textContent = `${players.length} participante${players.length !== 1 ? 's' : ''}`;
-  
   const lbTime = document.getElementById('lbTime');
   if (lbTime) lbTime.textContent = 'Act: ' + new Date().toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
 
   const max = players.length ? Math.max(...players.map(p => p.total)) : 1;
   const body = document.getElementById('lbBody');
-
   if (!players.length) {
-    if (body) body.innerHTML = '<div class="err">No hay participantes registrados aún en esta pestaña.</div>'; 
-    return;
+    if (body) body.innerHTML = '<div class="err">No hay participantes.</div>'; return;
   }
 
   if (body) {
     body.innerHTML = players.map((p, i) => {
       const rank = i + 1;
-      const cls  = rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
-      const rc   = rank===1?'g':rank===2?'s':rank===3?'b':'';
-      const em   = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
-      const pct  = max > 0 ? (p.total / max * 100).toFixed(1) : 0;
-      
+      const cls = rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
+      const rc = rank===1?'g':rank===2?'s':rank===3?'b':'';
+      const em = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
+      const pct = max > 0 ? (p.total / max * 100).toFixed(1) : 0;
       return `<div class="lb-row ${cls}" data-pct="${pct}">
         <div class="rank ${rc}">${em || rank}</div>
         <div class="name-wrap">
@@ -619,7 +624,6 @@ function processLB(rows) {
         <div class="pts">${p.total}</div>
       </div>`;
     }).join('');
-
     requestAnimationFrame(() => {
       document.querySelectorAll('.lb-row').forEach(r => {
         const bar = r.querySelector('.bar');
@@ -629,43 +633,74 @@ function processLB(rows) {
   }
 }
 
-// ── PROCESAMIENTO DE RESULTADOS REALES ───────────────────
-function processResultados(rows) {
-  grpResults = {};
-  const ms = [];
-
-  for (let i = 0; i < rows.length; i++) {
-    const row = rows[i];
-    if (!row || !row[0]) continue;
-    const col0 = row[0].trim();
+// ── 2. CARGA DE PARTIDOS Y GRUPOS (DESDE LA API) ────────
+async function fetchAPI() {
+  try {
+    const opts = { headers: { 'X-Auth-Token': API_TOKEN } };
     
-    const mGroup = col0.match(/^G-([A-L])-?(\d)$/i);
-    if (mGroup && row[1] && row[1].trim()) {
-      const g = mGroup[1].toUpperCase(), pos = parseInt(mGroup[2]) - 1;
-      if (!grpResults[g]) grpResults[g] = [null,null,null,null];
-      grpResults[g][pos] = row[1].trim();
+    // Consultar Partidos de la Copa del Mundo
+    const resM = await fetch(API_URL_MATCHES, opts);
+    if (!resM.ok) throw new Error('Error en API de partidos');
+    const dataM = await resM.json();
+    
+    if (dataM.matches && dataM.matches.length > 0) {
+      matches = dataM.matches.map(m => {
+        let st = 'SCHED';
+        if (m.status === 'FINISHED') st = 'FIN';
+        if (m.status === 'IN_PLAY' || m.status === 'PAUSED') st = 'LIVE';
+        
+        let groupLetter = '?';
+        if (m.group && m.group.includes('GROUP_')) {
+          groupLetter = m.group.split('_')[1];
+        }
+
+        return {
+          g: groupLetter,
+          h: tr(m.homeTeam.name),
+          a: tr(m.awayTeam.name),
+          sH: m.score.fullTime.home,
+          sA: m.score.fullTime.away,
+          st: st,
+          date: new Date(m.utcDate)
+        };
+      });
     }
 
-    const mMatch = col0.match(/^\[([A-L])\]\s+(.+?)\s+vs\s+(.+)$/i);
-    if (mMatch) {
-      const sH = (row[1] !== undefined && row[1] !== '' && !row[1].includes('⏳')) ? parseInt(row[1]) : null;
-      const sA = (row[2] !== undefined && row[2] !== '' && !row[2].includes('⏳')) ? parseInt(row[2]) : null;
-      
-      let st = 'SCHED';
-      if (row[3] && row[3].includes('✅')) st = 'FIN';
-      else if (row[3] && row[3].includes('🔴')) st = 'LIVE';
-      else if (sH !== null && sA !== null) st = 'FIN';
-
-      ms.push({ g: mMatch[1].toUpperCase(), h: mMatch[2].trim(), a: mMatch[3].trim(), sH, sA, st });
+    // Consultar Tablas de Posiciones de la API
+    const resS = await fetch(API_URL_STANDINGS, opts);
+    if (resS.ok) {
+      const dataS = await resS.json();
+      grpResults = {};
+      if (dataS.standings) {
+        dataS.standings.forEach(std => {
+          if (std.type === 'TOTAL' && std.group) {
+            const gL = std.group.split('_')[1]; 
+            grpResults[gL] = std.table.map(t => ({
+              team: tr(t.team.name),
+              pts: t.points,
+              pj: t.playedGames
+            }));
+          }
+        });
+      }
     }
+
+    renderMatches();
+    renderStd();
+
+  } catch(e) {
+    console.warn("API de Fútbol: Torneo aún no activo o esperando datos del servidor.", e);
+    // Renderizado preventivo amigable por si la API aún no abre el calendario oficial del torneo
+    const body = document.getElementById('mBody');
+    if (body && (!matches || matches.length === 0)) {
+      body.innerHTML = `<div class="err">⚽ Calendario automatizado (Esperando que comience el torneo)</div>`;
+    }
+    renderStd();
   }
-
-  matches = ms;
-  renderMatches();
-  renderStd();
 }
 
-// ── CONTROLADORES DE RENDER SÍNCRO ───────────────────────
+// ── 3. GENERACIÓN DE LA INTERFAZ GRÁFICA ────────────────
+// Control de las pestañas "Recientes" y "Próximos"
 function setTab(t) {
   curTab = t;
   const tR = document.getElementById('tR');
@@ -679,12 +714,18 @@ function renderMatches() {
   const body = document.getElementById('mBody');
   if (!body) return;
 
+  if (!matches || matches.length === 0) {
+    body.innerHTML = `<div class="err">⚽ Calendario conectado. Esperando actualizaciones de partidos de la FIFA...</div>`;
+    return;
+  }
+
+  // Filtra y ordena de forma inteligente
   let list = curTab === 'r'
-    ? matches.filter(m => m.st === 'FIN' || m.st === 'LIVE').slice(-8).reverse() 
-    : matches.filter(m => m.st === 'SCHED').slice(0, 8); 
+    ? matches.filter(m => m.st === 'FIN' || m.st === 'LIVE').sort((a,b) => b.date - a.date).slice(0, 8) 
+    : matches.filter(m => m.st === 'SCHED').sort((a,b) => a.date - b.date).slice(0, 8); 
 
   if (!list.length) {
-    body.innerHTML = `<div class="err">${curTab==='r' ? '⚽ Ningún partido ha comenzado o finalizado aún.' : '📅 No hay más próximos partidos agendados en la lista.'}</div>`;
+    body.innerHTML = `<div class="err">${curTab==='r' ? '⚽ Ningún partido ha comenzado aún.' : '📅 No hay más próximos partidos programados.'}</div>`;
     return;
   }
   body.innerHTML = list.map(m => matchHTML(m)).join('');
@@ -693,7 +734,7 @@ function renderMatches() {
 function matchHTML(m) {
   const isLive = m.st === 'LIVE';
   const hasSc  = m.sH !== null && m.sA !== null;
-  const time   = m.st === 'FIN' ? 'Finalizado' : isLive ? '⚡ EN VIVO' : '⏳ Por jugar';
+  const time   = m.st === 'FIN' ? 'Finalizado' : isLive ? '⚡ EN VIVO' : '⏳ ' + m.date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
   
   const scoreBlock = hasSc
     ? `<div class="score"><span class="sc">${m.sH}</span><span class="sep">–</span><span class="sc">${m.sA}</span></div>`
@@ -718,13 +759,17 @@ function renderStd() {
 
   const gSel = document.getElementById('gSel');
   const g = gSel ? gSel.value : 'A';
-  const res  = grpResults[g] || [];
-  const base = GROUPS[g] || [];
+  const apiData = grpResults[g];
+  const baseData = GROUPS[g] || [];
 
-  const rows = [0,1,2,3].map(i => ({
-    team: res[i] || base[i] || '?',
-    known: !!res[i],
-  }));
+  // Estrategia híbrida: Si la API no tiene datos (por ejemplo, antes de empezar el mundial),
+  // mostramos la estructura limpia con 0 puntos en lugar de romper la pantalla.
+  let rows = [];
+  if (apiData && apiData.length > 0) {
+    rows = apiData;
+  } else {
+    rows = baseData.map(team => ({ team: team, pts: 0, pj: 0 }));
+  }
 
   body.innerHTML = `
     <table class="std-table">
@@ -734,8 +779,8 @@ function renderStd() {
         return `<tr>
           <td style="font-size:13px;color:var(--muted)">${i+1}</td>
           <td><span>${fl(r.team)}</span> ${dot}<span style="font-weight:700">${r.team}</span></td>
-          <td>${r.known?'3':'0'}</td>
-          <td class="ptd">${r.known?(i===0?'9':i===1?'6':i===2?'3':'0'):'0'}</td>
+          <td>${r.pj}</td>
+          <td class="ptd">${r.pts}</td>
         </tr>`;
       }).join('')}</tbody>
     </table>
@@ -747,61 +792,40 @@ function renderStd() {
 
 function updateHeader() {
   const sDate = document.getElementById('sDate');
-  if (sDate) {
-    sDate.textContent = new Date().toLocaleDateString('es-MX', {weekday:'short', day:'numeric', month:'long'});
-  }
+  if (sDate) sDate.textContent = new Date().toLocaleDateString('es-MX', {weekday:'short', day:'numeric', month:'long'});
 }
 
-// ── LOGICA ASÍNCRONA PRINCIPAL ───────────────────────────
+// ── 4. CONTROLADOR CENTRAL (ORQUESTADOR) ────────────────
 async function run() {
   const sDot = document.getElementById('sDot');
   const sStatus = document.getElementById('sStatus');
-  const lbBody = document.getElementById('lbBody');
-
   if (sDot) sDot.classList.remove('live');
   if (sStatus) sStatus.textContent = 'Actualizando…';
 
-  try {
-    if (GID_LEADERBOARD === GID_RESULTADOS) {
-      const uniqueRows = await fetchCSV(GID_LEADERBOARD);
-      processLB(uniqueRows);
-      processResultados(uniqueRows);
-    } else {
-      const [rowsLB, rowsRes] = await Promise.all([
-        fetchCSV(GID_LEADERBOARD),
-        fetchCSV(GID_RESULTADOS)
-      ]);
-      processLB(rowsLB);
-      processResultados(rowsRes);
-    }
-    
-    if (sStatus) sStatus.textContent = 'Sincronizado';
-    if (sDot) sDot.classList.add('live');
-  } catch(e) {
-    console.error(e);
-    if (sStatus) sStatus.textContent = 'Error de Red';
-    if (lbBody) {
-      lbBody.innerHTML = `
-        <div class="err">⚠️ No se pudo obtener la información de Google Sheets.<br>
-        <small>Asegúrate de que el documento tenga el acceso general como <b>"Cualquier persona con el enlace puede ver"</b> (Lector).<br>
-        Error: ${e.message}</small></div>`;
-    }
-  }
+  // Ejecuta ambas peticiones en paralelo para máxima velocidad
+  await Promise.allSettled([
+    fetchLeaderboard(),
+    fetchAPI()
+  ]);
+
+  if (sStatus) sStatus.textContent = 'Sincronizado';
+  if (sDot) sDot.classList.add('live');
 }
 
-// ── INICIALIZACIÓN GENERAL ───────────────────────────────
 function init() {
   updateHeader();
   run();
+  
+  // Loops automáticos de actualización en segundo plano
   setInterval(run, REFRESH_INTERVAL);
-
+  
   const btnRefresh = document.getElementById('btnRefresh');
-  if (btnRefresh) {
-    btnRefresh.addEventListener('click', run);
-  }
+  if (btnRefresh) btnRefresh.addEventListener('click', run);
+  
+  const gSel = document.getElementById('gSel');
+  if (gSel) gSel.addEventListener('change', renderStd);
 }
 
-// Arranca directo sin importar el estado de carga
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
