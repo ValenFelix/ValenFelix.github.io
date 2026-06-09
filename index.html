@@ -467,21 +467,19 @@
 
 <script>
 // ── CONFIGURACIÓN ───────────────────────────────────────
-// 1. Google Sheets (Solo para el Leaderboard de participantes)
 const SID = '1Lxz_7Hf20m685XGDQQmNFL0IclDY8RzK0IXIo0jnZg4';
 const GID_LEADERBOARD = '1369482165'; 
 
-// 2. API de Fútbol (CORREGIDO: Ahora usa puente corsproxy.io para permitir conexiones desde el navegador)
 const API_TOKEN = 'f853d9be52624d2992574a3b6f36aaa1'; 
 const API_URL_MATCHES = 'https://corsproxy.io/?https://api.football-data.org/v4/competitions/WC/matches';
 const API_URL_STANDINGS = 'https://corsproxy.io/?https://api.football-data.org/v4/competitions/WC/standings';
 
-const REFRESH_INTERVAL = 3 * 60 * 1000; // Auto-actualizar cada 3 minutos
+const REFRESH_INTERVAL = 3 * 60 * 1000; 
 
 // ── VARIABLES GLOBALES ──────────────────────────────────
 let matches = [];        
 let grpResults = {};     
-let curTab = 'r'; // Inicia en 'r' (Recientes) para alinearse con el diseño de la web
+let curTab = 'r'; 
 
 // ── DATOS ESTRUCTURALES DEL MUNDIAL 2026 ────────────────
 const GROUPS = {
@@ -515,23 +513,26 @@ const FLAGS = {
 };
 const fl = n => FLAGS[n] || '🏳️';
 
+// Actualizado para atrapar variaciones en los nombres de Chequia y Bosnia
 const trans = {
-  "Mexico": "México", "South Korea": "Corea del Sur", "South Africa": "Sudáfrica", "Czech Republic": "Chequia",
-  "Canada": "Canadá", "Switzerland": "Suiza", "Bosnia and Herzegovina": "Bosnia y H.", "Qatar": "Catar",
-  "Brazil": "Brasil", "Morocco": "Marruecos", "Scotland": "Escocia", "Haiti": "Haití",
-  "United States": "Estados Unidos", "Paraguay": "Paraguay", "Turkey": "Turquía", "Australia": "Australia",
-  "Germany": "Alemania", "Ecuador": "Ecuador", "Curacao": "Curazao", "Ivory Coast": "Costa de Marfil",
+  "Mexico": "México", "South Korea": "Corea del Sur", "South Africa": "Sudáfrica", 
+  "Czech Republic": "Chequia", "Czechia": "Chequia",
+  "Canada": "Canadá", "Switzerland": "Suiza", 
+  "Bosnia and Herzegovina": "Bosnia y H.", "Bosnia & Herzegovina": "Bosnia y H.", "Bosnia-Herzegovina": "Bosnia y H.", 
+  "Qatar": "Catar", "Brazil": "Brasil", "Morocco": "Marruecos", "Scotland": "Escocia", "Haiti": "Haití",
+  "United States": "Estados Unidos", "USA": "Estados Unidos", "Paraguay": "Paraguay", "Turkey": "Turquía", "Türkiye": "Turquía", "Australia": "Australia",
+  "Germany": "Alemania", "Ecuador": "Ecuador", "Curacao": "Curazao", "Ivory Coast": "Costa de Marfil", "Côte d'Ivoire": "Costa de Marfil",
   "Netherlands": "Países Bajos", "Japan": "Japón", "Sweden": "Suecia", "Tunisia": "Túnez",
   "Belgium": "Bélgica", "Egypt": "Egipto", "Iran": "Irán", "New Zealand": "Nueva Zelanda",
   "Spain": "España", "Cape Verde": "Cabo Verde", "Saudi Arabia": "Arabia Saudita", "Uruguay": "Uruguay",
   "France": "Francia", "Senegal": "Senegal", "Norway": "Noruega", "Iraq": "Irak",
   "Argentina": "Argentina", "Austria": "Austria", "Algeria": "Argelia", "Jordan": "Jordania",
-  "Portugal": "Portugal", "Colombia": "Colombia", "DR Congo": "RD Congo", "Uzbekistan": "Uzbekistán",
+  "Portugal": "Portugal", "Colombia": "Colombia", "DR Congo": "RD Congo", "Congo DR": "RD Congo", "Uzbekistan": "Uzbekistán",
   "England": "Inglaterra", "Croatia": "Croacia", "Ghana": "Ghana", "Panama": "Panamá"
 };
 const tr = n => trans[n] || n;
 
-// ── 1. GENERADOR DE CALENDARIO DE RESPALDO AUTO-CALCULADO ──
+// ── 1. GENERADOR DE CALENDARIO DE RESPALDO ──
 function generateFallbackMatches() {
   const generated = [];
   const letters = Object.keys(GROUPS);
@@ -542,23 +543,17 @@ function generateFallbackMatches() {
     const baseDate = new Date('2026-06-11T14:00:00Z'); 
     baseDate.setDate(baseDate.getDate() + dayOffset);
     
-    const d1 = new Date(baseDate); d1.setHours(15 + (index % 2) * 3, 0, 0);
+    const d1 = new Date(baseDate); d1.setUTCHours(15 + (index % 2) * 3, 0, 0);
     generated.push({ g: letter, h: teams[0], a: teams[1], sH: null, sA: null, st: 'SCHED', date: d1 });
     
-    const d2 = new Date(baseDate); d2.setHours(18 + (index % 2) * 3, 0, 0);
+    const d2 = new Date(baseDate); d2.setUTCHours(18 + (index % 2) * 3, 0, 0);
     generated.push({ g: letter, h: teams[2], a: teams[3], sH: null, sA: null, st: 'SCHED', date: d2 });
-    
-    const d3 = new Date(baseDate); d3.setDate(d3.getDate() + 4); d3.setHours(16, 0, 0);
-    generated.push({ g: letter, h: teams[0], a: teams[2], sH: null, sA: null, st: 'SCHED', date: d3 });
-    
-    const d4 = new Date(baseDate); d4.setDate(d4.getDate() + 4); d4.setHours(19, 0, 0);
-    generated.push({ g: letter, h: teams[1], a: teams[3], sH: null, sA: null, st: 'SCHED', date: d4 });
   });
   
   matches = generated.sort((a, b) => a.date - b.date);
 }
 
-// ── 2. CARGA DEL LEADERBOARD Y CÁLCULO DE PREMIOS ────────
+// ── 2. CARGA DEL LEADERBOARD ────────
 function getDirectCsvUrl(gid) {
   return `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${gid}`;
 }
@@ -623,8 +618,13 @@ function processLB(rows) {
 
   const sPlayers = document.getElementById('sPlayers');
   if (sPlayers) sPlayers.textContent = `${players.length} participante${players.length !== 1 ? 's' : ''}`;
+  
+  // Forzar zona horaria de CDMX para la hora de actualización
   const lbTime = document.getElementById('lbTime');
-  if (lbTime) lbTime.textContent = 'Act: ' + new Date().toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
+  if (lbTime) {
+    const cdmxTime = new Date().toLocaleTimeString('es-MX', { timeZone: 'America/Mexico_City', hour:'2-digit', minute:'2-digit', hour12: true });
+    lbTime.textContent = 'Act: ' + cdmxTime + ' (CDMX)';
+  }
 
   const body = document.getElementById('lbBody');
 
@@ -639,11 +639,8 @@ function processLB(rows) {
       prizeBox = document.createElement('div');
       prizeBox.id = 'prizeBoxAuto';
       prizeBox.style.cssText = "margin: 0 auto 24px auto; font-size: 14px; background: rgba(255,255,255,0.06); padding: 16px; border-radius: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border: 1px solid rgba(255,255,255,0.1); text-align: center; max-width: 500px; width: 100%; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.2);";
-      
-      const lbContainer = body.closest('.card') || body.closest('.leaderboard-wrap') || body.closest('table') || body;
-      if (lbContainer && lbContainer.parentNode) {
-        lbContainer.parentNode.insertBefore(prizeBox, lbContainer);
-      }
+      const lbContainer = body.closest('.card') || body;
+      if (lbContainer && lbContainer.parentNode) lbContainer.parentNode.insertBefore(prizeBox, lbContainer);
     }
     prizeBox.innerHTML = `
       <div style="grid-column: span 3; font-weight: bold; color: #ffd700; font-size: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 4px;">💰 Bolsa Total: $${totalPool.toLocaleString('es-MX')} MXN</div>
@@ -736,11 +733,9 @@ async function fetchAPI() {
         });
       }
     }
-
   } catch(e) {
     generateFallbackMatches();
   }
-
   renderMatches();
   renderStd();
 }
@@ -774,9 +769,14 @@ function matchHTML(m) {
   const isLive = m.st === 'LIVE';
   const hasSc  = m.sH !== null && m.sA !== null;
   
-  const dateStr = m.date.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric' });
-  const timeStr = m.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  const timeLabel = m.st === 'FIN' ? 'Finalizado' : isLive ? '⚡ EN VIVO' : `⏳ ${dateStr} - ${timeStr} h`;
+  // Forzar zona horaria de CDMX para los partidos
+  const cdmxOptionsDate = { timeZone: 'America/Mexico_City', weekday: 'short', day: 'numeric' };
+  const cdmxOptionsTime = { timeZone: 'America/Mexico_City', hour: '2-digit', minute: '2-digit', hour12: true };
+  
+  const dateStr = m.date.toLocaleDateString('es-MX', cdmxOptionsDate);
+  const timeStr = m.date.toLocaleTimeString('es-MX', cdmxOptionsTime);
+  
+  const timeLabel = m.st === 'FIN' ? 'Finalizado' : isLive ? '⚡ EN VIVO' : `⏳ ${dateStr} - ${timeStr} (CDMX)`;
   
   const scoreBlock = hasSc
     ? `<div class="score"><span class="sc">${m.sH}</span><span class="sep">–</span><span class="sc">${m.sA}</span></div>`
@@ -832,7 +832,8 @@ function renderStd() {
 
 function updateHeader() {
   const sDate = document.getElementById('sDate');
-  if (sDate) sDate.textContent = new Date().toLocaleDateString('es-MX', {weekday:'short', day:'numeric', month:'long'});
+  // Forzar zona horaria de CDMX para la fecha del encabezado
+  if (sDate) sDate.textContent = new Date().toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City', weekday:'short', day:'numeric', month:'long'});
 }
 
 // ── 5. CONTROLADOR CENTRAL ──────────────────────────────
