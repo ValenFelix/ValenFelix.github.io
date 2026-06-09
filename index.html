@@ -476,12 +476,12 @@ const API_TOKEN = 'f853d9be52624d2992574a3b6f36aaa1';
 const API_URL_MATCHES = 'https://api.football-data.org/v4/competitions/WC/matches';
 const API_URL_STANDINGS = 'https://api.football-data.org/v4/competitions/WC/standings';
 
-const REFRESH_INTERVAL = 3 * 60 * 1000; // Auto-actualizar cada 3 minutes
+const REFRESH_INTERVAL = 3 * 60 * 1000; // Auto-actualizar cada 3 minutos
 
 // ── VARIABLES GLOBALES ──────────────────────────────────
 let matches = [];        
 let grpResults = {};     
-let curTab = 'u'; // Por defecto muestra "Próximos" ya que el mundial inicia el jueves
+let curTab = 'u'; // Por defecto muestra "Próximos"
 
 // ── DATOS ESTRUCTURALES DEL MUNDIAL 2026 ────────────────
 const GROUPS = {
@@ -538,20 +538,16 @@ function generateFallbackMatches() {
   
   letters.forEach((letter, index) => {
     const teams = GROUPS[letter];
-    // Distribuir los grupos a lo largo de los días (2 grupos por día empezando el Jueves 11)
     const dayOffset = Math.floor(index / 2); 
     const baseDate = new Date('2026-06-11T14:00:00Z'); 
     baseDate.setDate(baseDate.getDate() + dayOffset);
     
-    // Partido 1 (Selección 1 vs Selección 2)
     const d1 = new Date(baseDate); d1.setHours(15 + (index % 2) * 3, 0, 0);
     generated.push({ g: letter, h: teams[0], a: teams[1], sH: null, sA: null, st: 'SCHED', date: d1 });
     
-    // Partido 2 (Selección 3 vs Selección 4)
     const d2 = new Date(baseDate); d2.setHours(18 + (index % 2) * 3, 0, 0);
     generated.push({ g: letter, h: teams[2], a: teams[3], sH: null, sA: null, st: 'SCHED', date: d2 });
     
-    // Partidos de Jornadas Siguientes (Simulados en días posteriores)
     const d3 = new Date(baseDate); d3.setDate(d3.getDate() + 4); d3.setHours(16, 0, 0);
     generated.push({ g: letter, h: teams[0], a: teams[2], sH: null, sA: null, st: 'SCHED', date: d3 });
     
@@ -559,11 +555,10 @@ function generateFallbackMatches() {
     generated.push({ g: letter, h: teams[1], a: teams[3], sH: null, sA: null, st: 'SCHED', date: d4 });
   });
   
-  // Ordenar cronológicamente de forma global
   matches = generated.sort((a, b) => a.date - b.date);
 }
 
-// ── 2. CARGA DEL LEADERBOARD (GOOGLE SHEETS) ────────────
+// ── 2. CARGA DEL LEADERBOARD Y CÁLCULO DE PREMIOS ────────
 function getDirectCsvUrl(gid) {
   return `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${gid}`;
 }
@@ -631,6 +626,28 @@ function processLB(rows) {
   const lbTime = document.getElementById('lbTime');
   if (lbTime) lbTime.textContent = 'Act: ' + new Date().toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
 
+  // ── SISTEMA DE CÁLCULO DE PREMIOS EN VIVO ──
+  if (sPlayers) {
+    const totalPool = players.length * 400;
+    const p1 = totalPool * 0.50;
+    const p2 = totalPool * 0.30;
+    const p3 = totalPool * 0.20;
+
+    let prizeBox = document.getElementById('prizeBoxAuto');
+    if (!prizeBox) {
+      prizeBox = document.createElement('div');
+      prizeBox.id = 'prizeBoxAuto';
+      prizeBox.style.cssText = "margin: 12px 0; font-size: 13px; background: rgba(255,255,255,0.06); padding: 12px; border-radius: 8px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: center;";
+      sPlayers.parentNode.insertBefore(prizeBox, sPlayers.nextSibling);
+    }
+    prizeBox.innerHTML = `
+      <div style="grid-column: span 3; font-weight: bold; color: #ffd700; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 2px;">💰 Bolsa Total: $${totalPool.toLocaleString('es-MX')} MXN</div>
+      <div><div style="font-size:15px;">🥇</div><span style="font-size:11px;color:#aaa">1º (50%)</span><br><strong style="color:#fff">$${p1.toLocaleString('es-MX')}</strong></div>
+      <div><div style="font-size:15px;">🥈</div><span style="font-size:11px;color:#aaa">2º (30%)</span><br><strong style="color:#fff">$${p2.toLocaleString('es-MX')}</strong></div>
+      <div><div style="font-size:15px;">🥉</div><span style="font-size:11px;color:#aaa">3º (20%)</span><br><strong style="color:#fff">$${p3.toLocaleString('es-MX')}</strong></div>
+    `;
+  }
+
   const max = players.length ? Math.max(...players.map(p => p.total)) : 1;
   const body = document.getElementById('lbBody');
   if (!players.length) {
@@ -674,7 +691,6 @@ async function fetchAPI() {
     const dataM = await resM.json();
     
     if (dataM.matches && dataM.matches.length > 0) {
-      // Si la API tiene datos, los procesamos
       matches = dataM.matches.map(m => {
         let st = 'SCHED';
         if (m.status === 'FINISHED') st = 'FIN';
@@ -696,11 +712,9 @@ async function fetchAPI() {
         };
       });
     } else {
-      // Si la API responde un arreglo vacío, se activa el motor de respaldo
       generateFallbackMatches();
     }
 
-    // Obtener posiciones de grupos
     const resS = await fetch(API_URL_STANDINGS, opts);
     if (resS.ok) {
       const dataS = await resS.json();
@@ -720,7 +734,6 @@ async function fetchAPI() {
     }
 
   } catch(e) {
-    console.warn("Usando sistema de calendario local auto-calculado.");
     generateFallbackMatches();
   }
 
@@ -728,7 +741,7 @@ async function fetchAPI() {
   renderStd();
 }
 
-// ── 4. RENDERIZADO DE LA COMPONENTES ─────────────────────
+// ── 4. RENDERIZADO DE COMPONENTES ───────────────────────
 function setTab(t) {
   curTab = t;
   const tR = document.getElementById('tR');
@@ -742,10 +755,10 @@ function renderMatches() {
   const body = document.getElementById('mBody');
   if (!body) return;
 
-  // Filtrar según pestaña activa (Muestra hasta 12 partidos para ver la cartelera completa)
+  // Modificado: Muestra un máximo de 8 Recientes y EXACTAMENTE los siguientes 4 Próximos
   let list = curTab === 'r'
     ? matches.filter(m => m.st === 'FIN' || m.st === 'LIVE').sort((a,b) => b.date - a.date).slice(0, 8) 
-    : matches.filter(m => m.st === 'SCHED').sort((a,b) => a.date - b.date).slice(0, 12); 
+    : matches.filter(m => m.st === 'SCHED').sort((a,b) => a.date - b.date).slice(0, 4); 
 
   if (!list.length) {
     body.innerHTML = `<div class="err">${curTab==='r' ? '⚽ Ningún partido ha comenzado. ¡La Copa inicia este jueves!' : '📅 No hay más partidos programados.'}</div>`;
@@ -758,7 +771,6 @@ function matchHTML(m) {
   const isLive = m.st === 'LIVE';
   const hasSc  = m.sH !== null && m.sA !== null;
   
-  // Formato ultra-profesional de fecha: "jue 11 - 15:00 h"
   const dateStr = m.date.toLocaleDateString('es-MX', { weekday: 'short', day: 'numeric' });
   const timeStr = m.date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   const timeLabel = m.st === 'FIN' ? 'Finalizado' : isLive ? '⚡ EN VIVO' : `⏳ ${dateStr} - ${timeStr} h`;
