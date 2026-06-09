@@ -110,6 +110,13 @@
     }
     @media(max-width: 850px) { .wrap { grid-template-columns: 1fr; } }
 
+    /* SECCIÓN GRÁFICOS — ancho completo debajo del grid */
+    .charts-section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 16px 30px;
+    }
+
     .eyebrow-sm {
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 11px;
@@ -240,11 +247,15 @@
     .pick-a { font-size: 15px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 6px;}
 
     /* ─── CHARTS SECTION ─── */
+    /* Grid de 3 columnas en pantallas grandes, 1 en móvil */
     .charts-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 20px;
       padding: 20px;
+    }
+    @media(max-width: 850px) {
+      .charts-grid { grid-template-columns: 1fr; }
     }
     .chart-box {
       background: rgba(255,255,255,0.02);
@@ -261,7 +272,13 @@
       margin-bottom: 12px;
       letter-spacing: 0.5px;
       text-transform: uppercase;
-      min-height: 36px; /* Alinear alturas */
+      min-height: 36px;
+    }
+    /* Altura mayor para que la leyenda debajo no aplaste la dona */
+    .chart-canvas-wrap {
+      position: relative;
+      height: 280px;
+      width: 100%;
     }
     canvas { max-width: 100%; height: auto !important; }
   </style>
@@ -301,18 +318,6 @@
       </div>
     </div>
 
-    <div>
-      <div class="eyebrow-sm">Tendencias de la Familia</div>
-      <div class="card">
-        <div class="card-head">
-          <span class="card-title">📊 Favoritos del Torneo</span>
-        </div>
-        <div id="chartsContainer" class="charts-grid">
-          <div class="err">⏳ Analizando las respuestas de la familia...</div>
-        </div>
-      </div>
-    </div>
-
   </div>
 
   <div style="display:flex;flex-direction:column;gap:24px">
@@ -347,6 +352,19 @@
   </div>
 </div>
 
+<!-- ── GRÁFICOS: fuera del grid, ancho completo ── -->
+<div class="charts-section">
+  <div class="eyebrow-sm">Tendencias de la Quiniela</div>
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title">📊 Favoritos del Torneo</span>
+    </div>
+    <div id="chartsContainer" class="charts-grid">
+      <div class="err">⏳ Analizando las respuestas...</div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="playerModal" onclick="if(event.target===this) closePlayerCard()">
   <div class="fifa-card" id="fcContent"></div>
 </div>
@@ -368,7 +386,7 @@ let matches = [];
 let grpResults = {};     
 let curTab = 'r'; 
 let formPicks = {}; 
-let chartInstances = {}; // Guarda los gráficos para no duplicarlos
+let chartInstances = {};
 
 // ── DATOS ESTRUCTURALES ─────────────────────────────────
 const GROUPS = {
@@ -412,7 +430,6 @@ const trans = {
 };
 const tr = n => trans[n] || n;
 
-// Configuración global de Chart.js para que combine con la web
 Chart.defaults.color = '#8a9ab0';
 Chart.defaults.font.family = "'Barlow Condensed', sans-serif";
 
@@ -448,7 +465,7 @@ async function fetchDatosFormulario() {
     }
 
     formPicks = {};
-    const globalStats = {}; // Aquí guardaremos los votos generales para los gráficos
+    const globalStats = {};
 
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
@@ -462,8 +479,6 @@ async function fetchDatosFormulario() {
           const answer = row[j] ? row[j].trim() : '';
           if (answer !== '') {
             picks.push({ q: headers[j], a: answer });
-            
-            // Si la pregunta NO es sobre un partido específico (no tiene corchetes '[')
             if (!headers[j].includes('[')) {
               if (!globalStats[headers[j]]) globalStats[headers[j]] = {};
               globalStats[headers[j]][answer] = (globalStats[headers[j]][answer] || 0) + 1;
@@ -474,7 +489,6 @@ async function fetchDatosFormulario() {
       formPicks[pName] = picks;
     }
 
-    // Dibujar Gráficos Automáticos
     renderCharts(globalStats);
 
   } catch (e) { 
@@ -492,7 +506,6 @@ function renderCharts(stats) {
     return;
   }
 
-  // Filtrar inteligentemente cuáles preguntas son interesantes para graficar
   let selectedQ = [];
   const keywords = ['campeón', 'ganador', 'goleador', 'sorpresa', 'decepción', 'revelación', 'final'];
   
@@ -502,28 +515,22 @@ function renderCharts(stats) {
     }
   });
 
-  // Si no encontró palabras clave, toma las primeras 3 globales al azar
   if (selectedQ.length === 0) selectedQ = allQuestions.slice(0, 3);
-  else selectedQ = selectedQ.slice(0, 3); // Máximo 3 gráficos para que se vea limpio
+  else selectedQ = selectedQ.slice(0, 3);
 
-  // Generar HTML para los canvas
   container.innerHTML = selectedQ.map((q, idx) => `
     <div class="chart-box">
       <div class="chart-title">${q}</div>
-      <div style="position: relative; height: 180px; width: 100%;">
+      <div class="chart-canvas-wrap">
         <canvas id="chart${idx}"></canvas>
       </div>
     </div>
   `).join('');
 
-  // Paleta de colores vibrantes para los pedazos de la dona
-  const colors = ['#00e676', '#4fc3f7', '#f5c842', '#ff5722', '#cd7f32', '#9c27b0', '#e91e63', '#b0bec5'];
+  const colors = ['#00e676', '#4fc3f7', '#f5c842', '#ff5722', '#cd7f32', '#9c27b0', '#e91e63', '#b0bec5', '#26c6da', '#66bb6a', '#ffa726', '#ef5350'];
 
-  // Crear cada gráfico
   selectedQ.forEach((q, idx) => {
     const dataObj = stats[q];
-    
-    // Ordenar de mayor a menor votos
     const sortedAnswers = Object.entries(dataObj).sort((a, b) => b[1] - a[1]);
     const labels = sortedAnswers.map(item => item[0]);
     const values = sortedAnswers.map(item => item[1]);
@@ -545,11 +552,16 @@ function renderCharts(stats) {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '65%', // Grosor de la dona
+        cutout: '60%',
         plugins: {
           legend: {
-            position: 'right',
-            labels: { color: '#e8edf2', font: { size: 12, family: "'Barlow Condensed', sans-serif" }, boxWidth: 12 }
+            position: 'bottom',  /* ← leyenda abajo para que no se corte */
+            labels: {
+              color: '#e8edf2',
+              font: { size: 12, family: "'Barlow Condensed', sans-serif" },
+              boxWidth: 12,
+              padding: 10
+            }
           },
           tooltip: {
             backgroundColor: 'rgba(0,0,0,0.8)',
@@ -570,7 +582,7 @@ function renderCharts(stats) {
   });
 }
 
-// ── 2. APERTURA DEL MODAL FICHA FIFA ────────────────────
+// ── 2. MODAL FICHA FIFA ────────────────────
 function openPlayerCard(rawName, pts, rank, gPts, pPts) {
   const modal = document.getElementById('playerModal');
   const content = document.getElementById('fcContent');
