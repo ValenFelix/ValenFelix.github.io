@@ -10,6 +10,8 @@
   <meta property="og:type" content="website">
   <meta name="theme-color" content="#0a0c10">
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap');
 
@@ -92,20 +94,9 @@
       color: var(--dim);
       font-weight: 500;
     }
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--muted);
-    }
-    .dot.live {
-      background: var(--accent);
-      animation: pulse 1.5s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: .3; }
-    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+    .dot.live { background: var(--accent); animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
 
     /* MAIN LAYOUT */
     .wrap {
@@ -117,9 +108,7 @@
       gap: 24px;
       align-items: start;
     }
-    @media(max-width: 850px) {
-      .wrap { grid-template-columns: 1fr; }
-    }
+    @media(max-width: 850px) { .wrap { grid-template-columns: 1fr; } }
 
     .eyebrow-sm {
       font-family: 'Barlow Condensed', sans-serif;
@@ -141,151 +130,53 @@
       box-shadow: 0 4px 20px rgba(0,0,0,0.25);
     }
     .card-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 16px 20px;
-      border-bottom: 1px solid var(--border);
-      background: rgba(255, 255, 255, 0.01);
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 20px; border-bottom: 1px solid var(--border); background: rgba(255, 255, 255, 0.01);
     }
-    .card-title {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 19px;
-      font-weight: 800;
-      letter-spacing: 0.5px;
-    }
+    .card-title { font-family: 'Barlow Condensed', sans-serif; font-size: 19px; font-weight: 800; letter-spacing: 0.5px; }
 
     /* LEADERBOARD */
     .lb-cols {
-      display: grid;
-      grid-template-columns: 45px 1fr 55px 55px 60px;
-      padding: 8px 20px;
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--muted);
-      border-bottom: 1px solid var(--border);
-      background: var(--surface);
+      display: grid; grid-template-columns: 45px 1fr 55px 55px 60px; padding: 8px 20px;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted);
+      border-bottom: 1px solid var(--border); background: var(--surface);
     }
     .lb-cols span:nth-child(n+3) { text-align: right; }
     
     .lb-row {
-      display: grid;
-      grid-template-columns: 45px 1fr 55px 55px 60px;
-      align-items: center;
-      padding: 12px 20px;
-      border-bottom: 1px solid var(--border);
-      transition: all .2s ease;
-      cursor: pointer; /* Hace que parezca un botón */
+      display: grid; grid-template-columns: 45px 1fr 55px 55px 60px; align-items: center;
+      padding: 12px 20px; border-bottom: 1px solid var(--border); transition: all .2s ease; cursor: pointer;
     }
     .lb-row:last-child { border-bottom: none; }
-    .lb-row:hover { 
-      background: rgba(255,255,255, .04); 
-      transform: translateY(-2px); 
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    }
+    .lb-row:hover { background: rgba(255,255,255, .04); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
     .lb-row.r1 { background: rgba(245,200,66, 0.03); }
     .lb-row.r2 { background: rgba(176,190,197, 0.02); }
     .lb-row.r3 { background: rgba(205,127,50, 0.02); }
     
-    .rank {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 18px;
-      font-weight: 900;
-      color: var(--muted);
-    }
-    .rank.g { color: var(--gold); }
-    .rank.s { color: var(--silver); }
-    .rank.b { color: var(--bronze); }
+    .rank { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 900; color: var(--muted); }
+    .rank.g { color: var(--gold); } .rank.s { color: var(--silver); } .rank.b { color: var(--bronze); }
     
     .name-wrap { min-width: 0; padding-right: 12px; }
-    .name {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 17px;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      line-height: 1.2;
-    }
-    .bar-bg {
-      height: 4px;
-      background: var(--border);
-      border-radius: 2px;
-      margin-top: 5px;
-      overflow: hidden;
-    }
-    .bar {
-      height: 100%;
-      background: var(--green);
-      border-radius: 2px;
-      width: 0;
-      transition: width 1s cubic-bezier(.4, 0, .2, 1);
-    }
-    .r1 .bar { background: var(--gold); }
-    .r2 .bar { background: var(--silver); }
-    .r3 .bar { background: var(--bronze); }
+    .name { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+    .bar-bg { height: 4px; background: var(--border); border-radius: 2px; margin-top: 5px; overflow: hidden; }
+    .bar { height: 100%; background: var(--green); border-radius: 2px; width: 0; transition: width 1s cubic-bezier(.4, 0, .2, 1); }
+    .r1 .bar { background: var(--gold); } .r2 .bar { background: var(--silver); } .r3 .bar { background: var(--bronze); }
     
-    .pts {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 23px;
-      font-weight: 900;
-      text-align: right;
-      line-height: 1;
-    }
+    .pts { font-family: 'Barlow Condensed', sans-serif; font-size: 23px; font-weight: 900; text-align: right; line-height: 1; }
     .r1 .pts { color: var(--gold); }
-    .sub {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 15px;
-      font-weight: 600;
-      color: var(--dim);
-      text-align: right;
-    }
+    .sub { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 600; color: var(--dim); text-align: right; }
 
     /* MATCHES & TABS */
-    .tabs {
-      display: flex;
-      gap: 4px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 3px;
-    }
-    .tab {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .5px;
-      text-transform: uppercase;
-      padding: 5px 12px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      background: transparent;
-      color: var(--muted);
-      transition: background .15s, color .15s;
-    }
+    .tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 3px; }
+    .tab { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; padding: 5px 12px; border-radius: 6px; border: none; cursor: pointer; background: transparent; color: var(--muted); transition: background .15s, color .15s; }
     .tab.on { background: var(--border); color: var(--text); }
     
     .match { padding: 14px 20px; border-bottom: 1px solid var(--border); }
     .match:last-child { border-bottom: none; }
     .match:hover { background: rgba(255,255,255, .01); }
-    
     .match-meta { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
-    .grp-tag {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--muted);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 2px 6px;
-    }
+    .grp-tag { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; }
     .mt { font-size: 12px; color: var(--dim); }
     .mt.live-t { color: var(--accent); font-weight: 600; animation: pulse 1.5s infinite; }
     
@@ -302,12 +193,8 @@
     .vs { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: 1px; padding: 0 6px; }
 
     /* STANDINGS */
-    .grp-sel {
-      background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text);
-      font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 600; padding: 4px 10px; outline: none;
-    }
+    .grp-sel { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 600; padding: 4px 10px; outline: none; }
     .grp-sel option { background: var(--card); }
-    
     .std-table { width: 100%; border-collapse: collapse; }
     .std-table thead tr { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); background: var(--surface); }
     .std-table th, .std-table td { padding: 9px 12px; text-align: center; }
@@ -319,7 +206,6 @@
     .qdot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--green); margin-right: 6px; vertical-align: middle; margin-bottom: 2px; }
     .qdot.maybe { background: var(--blue); }
     .legend { padding: 10px 20px 14px; font-size: 12px; color: var(--muted); display: flex; gap: 14px; background: rgba(0,0,0,0.1); }
-
     .err { padding: 24px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6; }
 
     /* ─── MODAL FICHA FIFA ─── */
@@ -330,48 +216,54 @@
       opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
     }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
-    
     .fifa-card {
-      width: 92%; max-width: 420px;
-      background: linear-gradient(135deg, #1e2430 0%, #0d1117 100%);
-      border-radius: 16px; padding: 24px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+      width: 92%; max-width: 420px; background: linear-gradient(135deg, #1e2430 0%, #0d1117 100%);
+      border-radius: 16px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.7);
       position: relative; transform: scale(0.9); transition: transform 0.3s cubic-bezier(.4,0,.2,1);
       max-height: 85vh; display: flex; flex-direction: column;
     }
     .modal-overlay.active .fifa-card { transform: scale(1); }
-    
-    .close-btn {
-      position: absolute; top: 12px; right: 16px;
-      font-size: 28px; color: var(--muted); cursor: pointer;
-      background: none; border: none; line-height: 1; transition: color 0.2s;
-    }
+    .close-btn { position: absolute; top: 12px; right: 16px; font-size: 28px; color: var(--muted); cursor: pointer; background: none; border: none; line-height: 1; transition: color 0.2s; }
     .close-btn:hover { color: #fff; }
-    
-    .fc-header {
-      display: flex; align-items: center; gap: 20px;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-      padding-bottom: 18px; margin-bottom: 16px;
-    }
+    .fc-header { display: flex; align-items: center; gap: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 18px; margin-bottom: 16px; }
     .fc-rank { font-size: 56px; font-weight: 900; font-family: 'Barlow Condensed', sans-serif; line-height: 0.8; }
     .fc-info h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; margin: 0 0 6px 0; color: var(--text); line-height: 1; }
-    
     .fc-stats { display: flex; gap: 16px; }
     .fc-stat { display: flex; flex-direction: column; background: rgba(255,255,255,0.04); padding: 6px 12px; border-radius: 8px; }
     .fc-stat .val { font-size: 18px; font-weight: 800; color: var(--text); font-family: 'Barlow Condensed', sans-serif; }
     .fc-stat .lbl { font-size: 10px; text-transform: uppercase; color: var(--dim); letter-spacing: 0.5px; }
-    
     .fc-body { overflow-y: auto; padding-right: 8px; flex-grow: 1; }
     .fc-body::-webkit-scrollbar { width: 4px; }
     .fc-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
-    
-    .pick-row {
-      background: rgba(255,255,255,0.03); border-radius: 8px;
-      padding: 12px 14px; margin-bottom: 10px;
-      border-left: 3px solid var(--dim);
-    }
+    .pick-row { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; border-left: 3px solid var(--dim); }
     .pick-q { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; font-weight: 600; }
     .pick-a { font-size: 15px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 6px;}
+
+    /* ─── CHARTS SECTION ─── */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .chart-box {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+    }
+    .chart-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      min-height: 36px; /* Alinear alturas */
+    }
+    canvas { max-width: 100%; height: auto !important; }
   </style>
 </head>
 <body>
@@ -390,21 +282,37 @@
 </header>
 
 <div class="wrap">
-  <div>
-    <div class="eyebrow-sm">Clasificación General</div>
-    <div class="card">
-      <div class="card-head">
-        <span class="card-title">🏆 Tabla de Líderes</span>
-        <span id="lbTime" style="font-size:11px;color:var(--muted)">—</span>
-      </div>
-      <div class="lb-cols">
-        <span>#</span><span>Participante</span>
-        <span>Grupos</span><span>Partidos</span><span>Total</span>
-      </div>
-      <div id="lbBody">
-        <div class="err">⏳ Conectando directamente con la base de datos de Google Sheets…</div>
+  <div style="display:flex;flex-direction:column;gap:24px">
+    
+    <div>
+      <div class="eyebrow-sm">Clasificación General</div>
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">🏆 Tabla de Líderes</span>
+          <span id="lbTime" style="font-size:11px;color:var(--muted)">—</span>
+        </div>
+        <div class="lb-cols">
+          <span>#</span><span>Participante</span>
+          <span>Grupos</span><span>Partidos</span><span>Total</span>
+        </div>
+        <div id="lbBody">
+          <div class="err">⏳ Conectando con Google Sheets…</div>
+        </div>
       </div>
     </div>
+
+    <div>
+      <div class="eyebrow-sm">Tendencias de la Familia</div>
+      <div class="card">
+        <div class="card-head">
+          <span class="card-title">📊 Favoritos del Torneo</span>
+        </div>
+        <div id="chartsContainer" class="charts-grid">
+          <div class="err">⏳ Analizando las respuestas de la familia...</div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <div style="display:flex;flex-direction:column;gap:24px">
@@ -440,15 +348,14 @@
 </div>
 
 <div class="modal-overlay" id="playerModal" onclick="if(event.target===this) closePlayerCard()">
-  <div class="fifa-card" id="fcContent">
-    </div>
+  <div class="fifa-card" id="fcContent"></div>
 </div>
 
 <script>
 // ── CONFIGURACIÓN ───────────────────────────────────────
 const SID = '1Lxz_7Hf20m685XGDQQmNFL0IclDY8RzK0IXIo0jnZg4';
 const GID_LEADERBOARD = '1369482165'; 
-const GID_DATOS = '0'; // Pestaña de Datos_Formulario
+const GID_DATOS = '0'; 
 
 const API_TOKEN = 'f853d9be52624d2992574a3b6f36aaa1'; 
 const API_URL_MATCHES = 'https://corsproxy.io/?https://api.football-data.org/v4/competitions/WC/matches';
@@ -460,7 +367,8 @@ const REFRESH_INTERVAL = 3 * 60 * 1000;
 let matches = [];        
 let grpResults = {};     
 let curTab = 'r'; 
-let formPicks = {}; // Almacenará las predicciones de cada usuario
+let formPicks = {}; 
+let chartInstances = {}; // Guarda los gráficos para no duplicarlos
 
 // ── DATOS ESTRUCTURALES ─────────────────────────────────
 const GROUPS = {
@@ -504,6 +412,10 @@ const trans = {
 };
 const tr = n => trans[n] || n;
 
+// Configuración global de Chart.js para que combine con la web
+Chart.defaults.color = '#8a9ab0';
+Chart.defaults.font.family = "'Barlow Condensed', sans-serif";
+
 function generateFallbackMatches() {
   const generated = [];
   const letters = Object.keys(GROUPS);
@@ -512,7 +424,6 @@ function generateFallbackMatches() {
     const dayOffset = Math.floor(index / 2); 
     const baseDate = new Date('2026-06-11T14:00:00Z'); 
     baseDate.setDate(baseDate.getDate() + dayOffset);
-    
     const d1 = new Date(baseDate); d1.setUTCHours(15 + (index % 2) * 3, 0, 0);
     generated.push({ g: letter, h: teams[0], a: teams[1], sH: null, sA: null, st: 'SCHED', date: d1 });
     const d2 = new Date(baseDate); d2.setUTCHours(18 + (index % 2) * 3, 0, 0);
@@ -521,7 +432,7 @@ function generateFallbackMatches() {
   matches = generated.sort((a, b) => a.date - b.date);
 }
 
-// ── NUEVO: CARGA DE FORMULARIO (PREDICCIONES) ───────────
+// ── 1. CARGA Y CÁLCULO DE PREDICCIONES (GRÁFICOS) ───────
 async function fetchDatosFormulario() {
   try {
     const r = await fetch(`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${GID_DATOS}`);
@@ -531,33 +442,135 @@ async function fetchDatosFormulario() {
     if (rows.length < 2) return;
 
     const headers = rows[0];
-    let nameIdx = 1; // Busca qué columna tiene el "Nombre"
+    let nameIdx = 1;
     for(let i=0; i<headers.length; i++){
       if(headers[i].toLowerCase().includes('nombre') || headers[i].toLowerCase().includes('participante')) nameIdx = i;
     }
 
     formPicks = {};
+    const globalStats = {}; // Aquí guardaremos los votos generales para los gráficos
+
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       if (!row[nameIdx]) continue;
-      const pName = row[nameIdx].trim().toLowerCase(); // Normaliza nombre para matchear fácil
+      const pName = row[nameIdx].trim().toLowerCase();
       
       let picks = [];
       for (let j = 0; j < headers.length; j++) {
         const h = headers[j].toLowerCase();
-        // Ignora metadatos
-        if (j !== nameIdx && !h.includes('marca temporal') && !h.includes('puntuación') && !h.includes('dirección de correo')) {
-          if (row[j] && row[j].trim() !== '') {
-            picks.push({ q: headers[j], a: row[j].trim() });
+        if (j !== nameIdx && !h.includes('marca temporal') && !h.includes('puntuación') && !h.includes('correo')) {
+          const answer = row[j] ? row[j].trim() : '';
+          if (answer !== '') {
+            picks.push({ q: headers[j], a: answer });
+            
+            // Si la pregunta NO es sobre un partido específico (no tiene corchetes '[')
+            if (!headers[j].includes('[')) {
+              if (!globalStats[headers[j]]) globalStats[headers[j]] = {};
+              globalStats[headers[j]][answer] = (globalStats[headers[j]][answer] || 0) + 1;
+            }
           }
         }
       }
       formPicks[pName] = picks;
     }
-  } catch (e) { console.error('Error cargando Fichas', e); }
+
+    // Dibujar Gráficos Automáticos
+    renderCharts(globalStats);
+
+  } catch (e) { 
+    console.error('Error cargando Formulario', e); 
+    document.getElementById('chartsContainer').innerHTML = '<div class="err">No se pudieron cargar las tendencias.</div>';
+  }
 }
 
-// ── APERTURA DEL MODAL FICHA FIFA ───────────────────────
+function renderCharts(stats) {
+  const container = document.getElementById('chartsContainer');
+  const allQuestions = Object.keys(stats);
+  
+  if(allQuestions.length === 0) {
+    container.innerHTML = '<div class="err">No hay suficientes datos globales para graficar.</div>';
+    return;
+  }
+
+  // Filtrar inteligentemente cuáles preguntas son interesantes para graficar
+  let selectedQ = [];
+  const keywords = ['campeón', 'ganador', 'goleador', 'sorpresa', 'decepción', 'revelación', 'final'];
+  
+  allQuestions.forEach(q => {
+    if (keywords.some(k => q.toLowerCase().includes(k))) {
+      selectedQ.push(q);
+    }
+  });
+
+  // Si no encontró palabras clave, toma las primeras 3 globales al azar
+  if (selectedQ.length === 0) selectedQ = allQuestions.slice(0, 3);
+  else selectedQ = selectedQ.slice(0, 3); // Máximo 3 gráficos para que se vea limpio
+
+  // Generar HTML para los canvas
+  container.innerHTML = selectedQ.map((q, idx) => `
+    <div class="chart-box">
+      <div class="chart-title">${q}</div>
+      <div style="position: relative; height: 180px; width: 100%;">
+        <canvas id="chart${idx}"></canvas>
+      </div>
+    </div>
+  `).join('');
+
+  // Paleta de colores vibrantes para los pedazos de la dona
+  const colors = ['#00e676', '#4fc3f7', '#f5c842', '#ff5722', '#cd7f32', '#9c27b0', '#e91e63', '#b0bec5'];
+
+  // Crear cada gráfico
+  selectedQ.forEach((q, idx) => {
+    const dataObj = stats[q];
+    
+    // Ordenar de mayor a menor votos
+    const sortedAnswers = Object.entries(dataObj).sort((a, b) => b[1] - a[1]);
+    const labels = sortedAnswers.map(item => item[0]);
+    const values = sortedAnswers.map(item => item[1]);
+
+    const ctx = document.getElementById('chart' + idx);
+    if(chartInstances[idx]) chartInstances[idx].destroy();
+    
+    chartInstances[idx] = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: values,
+          backgroundColor: colors,
+          borderWidth: 0,
+          hoverOffset: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '65%', // Grosor de la dona
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: { color: '#e8edf2', font: { size: 12, family: "'Barlow Condensed', sans-serif" }, boxWidth: 12 }
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0,0,0,0.8)',
+            titleFont: { family: "'Barlow Condensed', sans-serif", size: 14 },
+            bodyFont: { family: "'Barlow Condensed', sans-serif", size: 13 },
+            callbacks: {
+              label: function(context) {
+                let label = context.label || '';
+                if (label) label += ': ';
+                label += context.parsed + (context.parsed === 1 ? ' voto' : ' votos');
+                return label;
+              }
+            }
+          }
+        }
+      }
+    });
+  });
+}
+
+// ── 2. APERTURA DEL MODAL FICHA FIFA ────────────────────
 function openPlayerCard(rawName, pts, rank, gPts, pPts) {
   const modal = document.getElementById('playerModal');
   const content = document.getElementById('fcContent');
@@ -565,27 +578,20 @@ function openPlayerCard(rawName, pts, rank, gPts, pPts) {
   const normName = rawName.trim().toLowerCase();
   const picks = formPicks[normName] || [];
 
-  // Define colores de la ficha basados en la posición
-  let rColor = 'var(--muted)';
-  let borderColor = 'var(--border)';
+  let rColor = 'var(--muted)'; let borderColor = 'var(--border)';
   if(rank === 1) { rColor = 'var(--gold)'; borderColor = 'var(--gold)'; }
   if(rank === 2) { rColor = 'var(--silver)'; borderColor = 'var(--silver)'; }
   if(rank === 3) { rColor = 'var(--bronze)'; borderColor = 'var(--bronze)'; }
 
-  // Modifica el borde superior de la tarjeta dinámicamente
   content.style.borderTop = `4px solid ${borderColor}`;
 
-  // Formatea las predicciones para que se vean amigables
   let picksHTML = '';
   if (picks.length === 0) {
-     picksHTML = '<div class="err">No se encontraron predicciones detalladas para este jugador aún.</div>';
+     picksHTML = '<div class="err">Aún no se procesan las predicciones para este jugador.</div>';
   } else {
      picksHTML = picks.map(p => {
-        // Limpia el texto de la pregunta quitando el "[A]" o "[Grupo A]" si lo tiene
         let cleanQ = p.q.replace(/\[.*?\]\s*/g, '');
-        // Si la respuesta es un país, le intenta poner bandera
         let answerFlag = FLAGS[p.a] ? `<span style="font-size:18px">${FLAGS[p.a]}</span> ` : '';
-        
         return `<div class="pick-row" style="border-left-color: ${borderColor}">
                    <div class="pick-q">${cleanQ}</div>
                    <div class="pick-a">${answerFlag}${p.a}</div>
@@ -613,15 +619,10 @@ function openPlayerCard(rawName, pts, rank, gPts, pPts) {
   `;
   modal.classList.add('active');
 }
+function closePlayerCard() { document.getElementById('playerModal').classList.remove('active'); }
 
-function closePlayerCard() {
-  document.getElementById('playerModal').classList.remove('active');
-}
-
-// ── LEADERBOARD ─────────────────────────────────────────
-function getDirectCsvUrl(gid) {
-  return `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${gid}`;
-}
+// ── 3. LEADERBOARD ──────────────────────────────────────
+function getDirectCsvUrl(gid) { return `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${gid}`; }
 
 async function fetchLeaderboard() {
   const r = await fetch(getDirectCsvUrl(GID_LEADERBOARD));
@@ -632,8 +633,7 @@ async function fetchLeaderboard() {
 }
 
 function parseCSV(txt) {
-  const rows = [];
-  const lines = txt.split(/\r?\n/);
+  const rows = []; const lines = txt.split(/\r?\n/);
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     if (!line || /^,+$/.test(line)) continue;
@@ -660,9 +660,7 @@ function parseCSV(txt) {
 
 function processLB(rows) {
   let hdr = -1;
-  for (let i = 0; i < rows.length; i++) {
-    if (rows[i].some(c => /participante/i.test(c))) { hdr = i; break; }
-  }
+  for (let i = 0; i < rows.length; i++) { if (rows[i].some(c => /participante/i.test(c))) { hdr = i; break; } }
   const players = [];
   if (hdr >= 0) {
     for (let i = hdr + 1; i < rows.length; i++) {
@@ -672,12 +670,7 @@ function processLB(rows) {
       if (row[0].includes('📋') || col1.includes('📋') || /pts\s*\//.test(col1)) break;
       const name = col1.replace(/^[\u{1F947}\u{1F948}\u{1F949}\u{1F3C5}🥇🥈🥉🏅]+/gu, '').trim();
       if (!name) continue;
-      players.push({
-        name, 
-        total: parseFloat(row[2]) || 0, 
-        grupos: parseFloat(row[4]) || 0, 
-        pPartidos: row[12] !== undefined ? parseFloat(row[12]) : 0
-      });
+      players.push({ name, total: parseFloat(row[2]) || 0, grupos: parseFloat(row[4]) || 0, pPartidos: row[12] !== undefined ? parseFloat(row[12]) : 0 });
     }
   }
 
@@ -691,15 +684,13 @@ function processLB(rows) {
   }
 
   const body = document.getElementById('lbBody');
-
   if (body) {
     const totalPool = players.length * 400;
     const p1 = totalPool * 0.50; const p2 = totalPool * 0.30; const p3 = totalPool * 0.20;
 
     let prizeBox = document.getElementById('prizeBoxAuto');
     if (!prizeBox) {
-      prizeBox = document.createElement('div');
-      prizeBox.id = 'prizeBoxAuto';
+      prizeBox = document.createElement('div'); prizeBox.id = 'prizeBoxAuto';
       prizeBox.style.cssText = "margin: 0 auto 24px auto; font-size: 14px; background: rgba(255,255,255,0.06); padding: 16px; border-radius: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border: 1px solid rgba(255,255,255,0.1); text-align: center; max-width: 500px; width: 100%; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.2);";
       const lbContainer = body.closest('.card') || body;
       if (lbContainer && lbContainer.parentNode) lbContainer.parentNode.insertBefore(prizeBox, lbContainer);
@@ -713,40 +704,25 @@ function processLB(rows) {
   }
 
   const max = players.length ? Math.max(...players.map(p => p.total)) : 1;
-  if (!players.length) {
-    if (body) body.innerHTML = '<div class="err">No hay participantes.</div>'; return;
-  }
+  if (!players.length) { if (body) body.innerHTML = '<div class="err">No hay participantes.</div>'; return; }
 
   if (body) {
     body.innerHTML = players.map((p, i) => {
-      const rank = i + 1;
-      const cls = rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
-      const rc = rank===1?'g':rank===2?'s':rank===3?'b':'';
-      const em = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
+      const rank = i + 1; const cls = rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
+      const rc = rank===1?'g':rank===2?'s':rank===3?'b':''; const em = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
       const pct = max > 0 ? (p.total / max * 100).toFixed(1) : 0;
-      
-      // La fila ahora es un botón que llama a openPlayerCard()
       return `<div class="lb-row ${cls}" title="Ver Ficha de Jugador" onclick="openPlayerCard('${p.name.replace(/'/g, "\\'")}', ${p.total}, ${rank}, ${p.grupos}, ${p.pPartidos})">
         <div class="rank ${rc}">${em || rank}</div>
-        <div class="name-wrap">
-          <div class="name">${p.name}</div>
-          <div class="bar-bg"><div class="bar"></div></div>
-        </div>
-        <div class="sub">${p.grupos > 0 ? p.grupos : '—'}</div>
-        <div class="sub">${p.pPartidos > 0 ? p.pPartidos : '—'}</div>
+        <div class="name-wrap"><div class="name">${p.name}</div><div class="bar-bg"><div class="bar"></div></div></div>
+        <div class="sub">${p.grupos > 0 ? p.grupos : '—'}</div><div class="sub">${p.pPartidos > 0 ? p.pPartidos : '—'}</div>
         <div class="pts">${p.total}</div>
       </div>`;
     }).join('');
-    requestAnimationFrame(() => {
-      document.querySelectorAll('.lb-row').forEach(r => {
-        const bar = r.querySelector('.bar');
-        if (bar) bar.style.width = r.dataset.pct + '%';
-      });
-    });
+    requestAnimationFrame(() => { document.querySelectorAll('.lb-row').forEach(r => { const bar = r.querySelector('.bar'); if (bar) bar.style.width = r.dataset.pct + '%'; }); });
   }
 }
 
-// ── API PARTIDOS ────────────────────────────────────────
+// ── 4. API PARTIDOS ─────────────────────────────────────
 async function fetchAPI() {
   try {
     const opts = { headers: { 'X-Auth-Token': API_TOKEN } };
@@ -756,12 +732,8 @@ async function fetchAPI() {
     
     if (dataM.matches && dataM.matches.length > 0) {
       matches = dataM.matches.map(m => {
-        let st = 'SCHED';
-        if (m.status === 'FINISHED') st = 'FIN';
-        if (m.status === 'IN_PLAY' || m.status === 'PAUSED') st = 'LIVE';
-        let groupLetter = '?';
-        if (m.group && m.group.includes('GROUP_')) groupLetter = m.group.split('_')[1];
-
+        let st = 'SCHED'; if (m.status === 'FINISHED') st = 'FIN'; if (m.status === 'IN_PLAY' || m.status === 'PAUSED') st = 'LIVE';
+        let groupLetter = '?'; if (m.group && m.group.includes('GROUP_')) groupLetter = m.group.split('_')[1];
         return {
           g: groupLetter, h: tr(m.homeTeam?.name), a: tr(m.awayTeam?.name),
           sH: m.score?.fullTime?.home !== undefined ? m.score.fullTime.home : null,
@@ -773,8 +745,7 @@ async function fetchAPI() {
 
     const resS = await fetch(API_URL_STANDINGS, opts);
     if (resS.ok) {
-      const dataS = await resS.json();
-      grpResults = {};
+      const dataS = await resS.json(); grpResults = {};
       if (dataS.standings) {
         dataS.standings.forEach(std => {
           if (std.type === 'TOTAL' && std.group) {
@@ -788,24 +759,15 @@ async function fetchAPI() {
   renderMatches(); renderStd();
 }
 
-// ── RENDERIZADO ─────────────────────────────────────────
+// ── RENDERIZADO TABLAS LATERALES ────────────────────────
 function setTab(t) {
-  curTab = t;
-  document.getElementById('tR').classList.toggle('on', t==='r');
-  document.getElementById('tU').classList.toggle('on', t==='u');
-  renderMatches();
+  curTab = t; document.getElementById('tR').classList.toggle('on', t==='r'); document.getElementById('tU').classList.toggle('on', t==='u'); renderMatches();
 }
 
 function renderMatches() {
-  const body = document.getElementById('mBody');
-  if (!body) return;
-  let list = curTab === 'r'
-    ? matches.filter(m => m.st === 'FIN' || m.st === 'LIVE').sort((a,b) => b.date - a.date).slice(0, 8) 
-    : matches.filter(m => m.st === 'SCHED').sort((a,b) => a.date - b.date).slice(0, 4); 
-  if (!list.length) {
-    body.innerHTML = `<div class="err">${curTab==='r' ? '⚽ Ningún partido ha comenzado. ¡La Copa inicia este jueves!' : '📅 No hay más partidos programados.'}</div>`;
-    return;
-  }
+  const body = document.getElementById('mBody'); if (!body) return;
+  let list = curTab === 'r' ? matches.filter(m => m.st === 'FIN' || m.st === 'LIVE').sort((a,b) => b.date - a.date).slice(0, 8) : matches.filter(m => m.st === 'SCHED').sort((a,b) => a.date - b.date).slice(0, 4); 
+  if (!list.length) { body.innerHTML = `<div class="err">${curTab==='r' ? '⚽ Ningún partido ha comenzado. ¡La Copa inicia este jueves!' : '📅 No hay más partidos programados.'}</div>`; return; }
   body.innerHTML = list.map(m => matchHTML(m)).join('');
 }
 
@@ -817,64 +779,34 @@ function matchHTML(m) {
   const timeStr = m.date.toLocaleTimeString('es-MX', cdmxOptionsTime);
   const timeLabel = m.st === 'FIN' ? 'Finalizado' : isLive ? '⚡ EN VIVO' : `⏳ ${dateStr} - ${timeStr} (CDMX)`;
   const scoreBlock = hasSc ? `<div class="score"><span class="sc">${m.sH}</span><span class="sep">–</span><span class="sc">${m.sA}</span></div>` : `<span class="vs">VS</span>`;
-  return `<div class="match">
-    <div class="match-meta"><span class="grp-tag">Grupo ${m.g}</span><span class="mt ${isLive?'live-t':''}">${timeLabel}</span></div>
-    <div class="teams">
-      <div class="team"><span class="fl">${fl(m.h)}</span><span class="tn">${m.h}</span></div>
-      ${scoreBlock}
-      <div class="team away"><span class="fl">${fl(m.a)}</span><span class="tn">${m.a}</span></div>
-    </div>
-  </div>`;
+  return `<div class="match"><div class="match-meta"><span class="grp-tag">Grupo ${m.g}</span><span class="mt ${isLive?'live-t':''}">${timeLabel}</span></div><div class="teams"><div class="team"><span class="fl">${fl(m.h)}</span><span class="tn">${m.h}</span></div>${scoreBlock}<div class="team away"><span class="fl">${fl(m.a)}</span><span class="tn">${m.a}</span></div></div></div>`;
 }
 
 function renderStd() {
-  const body = document.getElementById('stdBody');
-  if (!body) return;
+  const body = document.getElementById('stdBody'); if (!body) return;
   const g = document.getElementById('gSel') ? document.getElementById('gSel').value : 'A';
   const apiData = grpResults[g]; const baseData = GROUPS[g] || [];
   let rows = (apiData && apiData.length > 0) ? apiData : baseData.map(team => ({ team: team, pts: 0, pj: 0 }));
-  body.innerHTML = `<table class="std-table">
-    <thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>Pts</th></tr></thead>
-    <tbody>${rows.map((r,i) => {
-      const dot = i<2 ? `<span class="qdot"></span>` : i===2 ? `<span class="qdot maybe"></span>` : '';
-      return `<tr><td style="font-size:13px;color:var(--muted)">${i+1}</td>
-        <td><span>${fl(r.team)}</span> ${dot}<span style="font-weight:700">${r.team}</span></td>
-        <td>${r.pj}</td><td class="ptd">${r.pts}</td></tr>`;
-    }).join('')}</tbody></table>
-    <div class="legend"><span><span class="qdot" style="display:inline-block"></span>Clasifica</span><span><span class="qdot maybe" style="display:inline-block"></span>Posible 3ro</span></div>`;
+  body.innerHTML = `<table class="std-table"><thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>Pts</th></tr></thead><tbody>${rows.map((r,i) => { const dot = i<2 ? `<span class="qdot"></span>` : i===2 ? `<span class="qdot maybe"></span>` : ''; return `<tr><td style="font-size:13px;color:var(--muted)">${i+1}</td><td><span>${fl(r.team)}</span> ${dot}<span style="font-weight:700">${r.team}</span></td><td>${r.pj}</td><td class="ptd">${r.pts}</td></tr>`; }).join('')}</tbody></table><div class="legend"><span><span class="qdot" style="display:inline-block"></span>Clasifica</span><span><span class="qdot maybe" style="display:inline-block"></span>Posible 3ro</span></div>`;
 }
 
-function updateHeader() {
-  const sDate = document.getElementById('sDate');
-  if (sDate) sDate.textContent = new Date().toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City', weekday:'short', day:'numeric', month:'long'});
-}
+function updateHeader() { const sDate = document.getElementById('sDate'); if (sDate) sDate.textContent = new Date().toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City', weekday:'short', day:'numeric', month:'long'}); }
 
 // ── CONTROLADOR CENTRAL ─────────────────────────────────
 async function run() {
-  const sDot = document.getElementById('sDot');
-  const sStatus = document.getElementById('sStatus');
-  if (sDot) sDot.classList.remove('live');
-  if (sStatus) sStatus.textContent = 'Actualizando…';
+  const sDot = document.getElementById('sDot'); const sStatus = document.getElementById('sStatus');
+  if (sDot) sDot.classList.remove('live'); if (sStatus) sStatus.textContent = 'Actualizando…';
 
-  // Ahora consulta las 3 fuentes simultáneamente
-  await Promise.allSettled([
-    fetchLeaderboard(),
-    fetchAPI(),
-    fetchDatosFormulario() // Extrae los datos para las Fichas
-  ]);
+  await Promise.allSettled([ fetchLeaderboard(), fetchAPI(), fetchDatosFormulario() ]);
 
-  if (sStatus) sStatus.textContent = 'Sincronizado';
-  if (sDot) sDot.classList.add('live');
+  if (sStatus) sStatus.textContent = 'Sincronizado'; if (sDot) sDot.classList.add('live');
 }
 
 function init() {
-  updateHeader();
-  run();
-  setInterval(run, REFRESH_INTERVAL);
+  updateHeader(); run(); setInterval(run, REFRESH_INTERVAL);
   if (document.getElementById('btnRefresh')) document.getElementById('btnRefresh').addEventListener('click', run);
   if (document.getElementById('gSel')) document.getElementById('gSel').addEventListener('change', renderStd);
 }
-
 if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
 </script>
 </body>
