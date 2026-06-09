@@ -177,10 +177,15 @@
       align-items: center;
       padding: 12px 20px;
       border-bottom: 1px solid var(--border);
-      transition: background .15s;
+      transition: all .2s ease;
+      cursor: pointer; /* Hace que parezca un botón */
     }
     .lb-row:last-child { border-bottom: none; }
-    .lb-row:hover { background: rgba(255,255,255, .02); }
+    .lb-row:hover { 
+      background: rgba(255,255,255, .04); 
+      transform: translateY(-2px); 
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
     .lb-row.r1 { background: rgba(245,200,66, 0.03); }
     .lb-row.r2 { background: rgba(176,190,197, 0.02); }
     .lb-row.r3 { background: rgba(205,127,50, 0.02); }
@@ -262,24 +267,13 @@
       color: var(--muted);
       transition: background .15s, color .15s;
     }
-    .tab.on {
-      background: var(--border);
-      color: var(--text);
-    }
+    .tab.on { background: var(--border); color: var(--text); }
     
-    .match {
-      padding: 14px 20px;
-      border-bottom: 1px solid var(--border);
-    }
+    .match { padding: 14px 20px; border-bottom: 1px solid var(--border); }
     .match:last-child { border-bottom: none; }
     .match:hover { background: rgba(255,255,255, .01); }
     
-    .match-meta {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 8px;
-      align-items: center;
-    }
+    .match-meta { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
     .grp-tag {
       font-family: 'Barlow Condensed', sans-serif;
       font-size: 10px;
@@ -293,111 +287,91 @@
       padding: 2px 6px;
     }
     .mt { font-size: 12px; color: var(--dim); }
-    .mt.live-t {
-      color: var(--accent);
-      font-weight: 600;
-      animation: pulse 1.5s infinite;
-    }
+    .mt.live-t { color: var(--accent); font-weight: 600; animation: pulse 1.5s infinite; }
     
-    .teams {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      gap: 8px;
-    }
+    .teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
     .team { display: flex; align-items: center; gap: 6px; min-width: 0; }
     .team.away { flex-direction: row-reverse; }
     .fl { font-size: 18px; line-height: 1; flex-shrink: 0; }
-    .tn {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    .tn { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .team.away .tn { text-align: right; }
     
     .score { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
-    .sc {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 22px;
-      font-weight: 900;
-      width: 22px;
-      text-align: center;
-      line-height: 1;
-    }
+    .sc { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; width: 22px; text-align: center; line-height: 1; }
     .sep { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; color: var(--muted); }
-    .vs {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 12px;
-      font-weight: 700;
-      color: var(--muted);
-      letter-spacing: 1px;
-      padding: 0 6px;
-    }
+    .vs { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: 1px; padding: 0 6px; }
 
     /* STANDINGS */
     .grp-sel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 14px;
-      font-weight: 600;
-      padding: 4px 10px;
-      cursor: pointer;
-      outline: none;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text);
+      font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 600; padding: 4px 10px; outline: none;
     }
     .grp-sel option { background: var(--card); }
     
     .std-table { width: 100%; border-collapse: collapse; }
-    .std-table thead tr {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: var(--muted);
-      background: var(--surface);
-    }
+    .std-table thead tr { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); background: var(--surface); }
     .std-table th, .std-table td { padding: 9px 12px; text-align: center; }
     .std-table th:first-child, .std-table td:first-child { text-align: left; padding-left: 20px; }
     .std-table td { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; color: var(--dim); }
     .std-table td:first-child { font-weight: 700; color: var(--text); }
     .std-table tbody tr { border-top: 1px solid var(--border); }
-    .std-table tbody tr:hover { background: rgba(255,255,255, .01); }
-    
     .ptd { font-weight: 900 !important; color: var(--text) !important; }
-    .qdot {
-      display: inline-block;
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--green);
-      margin-right: 6px;
-      vertical-align: middle;
-      margin-bottom: 2px;
-    }
+    .qdot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--green); margin-right: 6px; vertical-align: middle; margin-bottom: 2px; }
     .qdot.maybe { background: var(--blue); }
-    .legend {
-      padding: 10px 20px 14px;
-      font-size: 12px;
-      color: var(--muted);
-      display: flex;
-      gap: 14px;
-      background: rgba(0,0,0,0.1);
-    }
+    .legend { padding: 10px 20px 14px; font-size: 12px; color: var(--muted); display: flex; gap: 14px; background: rgba(0,0,0,0.1); }
 
-    /* STATES */
-    .err {
-      padding: 24px;
-      text-align: center;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.6;
+    .err { padding: 24px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6; }
+
+    /* ─── MODAL FICHA FIFA ─── */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
+      z-index: 1000; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
     }
+    .modal-overlay.active { opacity: 1; pointer-events: auto; }
+    
+    .fifa-card {
+      width: 92%; max-width: 420px;
+      background: linear-gradient(135deg, #1e2430 0%, #0d1117 100%);
+      border-radius: 16px; padding: 24px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.7);
+      position: relative; transform: scale(0.9); transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+      max-height: 85vh; display: flex; flex-direction: column;
+    }
+    .modal-overlay.active .fifa-card { transform: scale(1); }
+    
+    .close-btn {
+      position: absolute; top: 12px; right: 16px;
+      font-size: 28px; color: var(--muted); cursor: pointer;
+      background: none; border: none; line-height: 1; transition: color 0.2s;
+    }
+    .close-btn:hover { color: #fff; }
+    
+    .fc-header {
+      display: flex; align-items: center; gap: 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 18px; margin-bottom: 16px;
+    }
+    .fc-rank { font-size: 56px; font-weight: 900; font-family: 'Barlow Condensed', sans-serif; line-height: 0.8; }
+    .fc-info h2 { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; margin: 0 0 6px 0; color: var(--text); line-height: 1; }
+    
+    .fc-stats { display: flex; gap: 16px; }
+    .fc-stat { display: flex; flex-direction: column; background: rgba(255,255,255,0.04); padding: 6px 12px; border-radius: 8px; }
+    .fc-stat .val { font-size: 18px; font-weight: 800; color: var(--text); font-family: 'Barlow Condensed', sans-serif; }
+    .fc-stat .lbl { font-size: 10px; text-transform: uppercase; color: var(--dim); letter-spacing: 0.5px; }
+    
+    .fc-body { overflow-y: auto; padding-right: 8px; flex-grow: 1; }
+    .fc-body::-webkit-scrollbar { width: 4px; }
+    .fc-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+    
+    .pick-row {
+      background: rgba(255,255,255,0.03); border-radius: 8px;
+      padding: 12px 14px; margin-bottom: 10px;
+      border-left: 3px solid var(--dim);
+    }
+    .pick-q { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; font-weight: 600; }
+    .pick-a { font-size: 15px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 6px;}
   </style>
 </head>
 <body>
@@ -465,10 +439,16 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="playerModal" onclick="if(event.target===this) closePlayerCard()">
+  <div class="fifa-card" id="fcContent">
+    </div>
+</div>
+
 <script>
 // ── CONFIGURACIÓN ───────────────────────────────────────
 const SID = '1Lxz_7Hf20m685XGDQQmNFL0IclDY8RzK0IXIo0jnZg4';
 const GID_LEADERBOARD = '1369482165'; 
+const GID_DATOS = '0'; // Pestaña de Datos_Formulario
 
 const API_TOKEN = 'f853d9be52624d2992574a3b6f36aaa1'; 
 const API_URL_MATCHES = 'https://corsproxy.io/?https://api.football-data.org/v4/competitions/WC/matches';
@@ -480,21 +460,16 @@ const REFRESH_INTERVAL = 3 * 60 * 1000;
 let matches = [];        
 let grpResults = {};     
 let curTab = 'r'; 
+let formPicks = {}; // Almacenará las predicciones de cada usuario
 
-// ── DATOS ESTRUCTURALES DEL MUNDIAL 2026 ────────────────
+// ── DATOS ESTRUCTURALES ─────────────────────────────────
 const GROUPS = {
-  A:['México','Corea del Sur','Sudáfrica','Chequia'],
-  B:['Canadá','Suiza','Bosnia y H.','Catar'],
-  C:['Brasil','Marruecos','Escocia','Haití'],
-  D:['Estados Unidos','Paraguay','Turquía','Australia'],
-  E:['Alemania','Ecuador','Curazao','Costa de Marfil'],
-  F:['Países Bajos','Japón','Suecia','Túnez'],
-  G:['Bélgica','Egipto','Irán','Nueva Zelanda'],
-  H:['España','Cabo Verde','Arabia Saudita','Uruguay'],
-  I:['Francia','Senegal','Noruega','Irak'],
-  J:['Argentina','Austria','Argelia','Jordania'],
-  K:['Portugal','Colombia','RD Congo','Uzbekistán'],
-  L:['Inglaterra','Croacia','Ghana','Panamá'],
+  A:['México','Corea del Sur','Sudáfrica','Chequia'], B:['Canadá','Suiza','Bosnia y H.','Catar'],
+  C:['Brasil','Marruecos','Escocia','Haití'], D:['Estados Unidos','Paraguay','Turquía','Australia'],
+  E:['Alemania','Ecuador','Curazao','Costa de Marfil'], F:['Países Bajos','Japón','Suecia','Túnez'],
+  G:['Bélgica','Egipto','Irán','Nueva Zelanda'], H:['España','Cabo Verde','Arabia Saudita','Uruguay'],
+  I:['Francia','Senegal','Noruega','Irak'], J:['Argentina','Austria','Argelia','Jordania'],
+  K:['Portugal','Colombia','RD Congo','Uzbekistán'], L:['Inglaterra','Croacia','Ghana','Panamá'],
 };
 
 const FLAGS = {
@@ -513,12 +488,9 @@ const FLAGS = {
 };
 const fl = n => FLAGS[n] || '🏳️';
 
-// Actualizado para atrapar variaciones en los nombres de Chequia y Bosnia
 const trans = {
-  "Mexico": "México", "South Korea": "Corea del Sur", "South Africa": "Sudáfrica", 
-  "Czech Republic": "Chequia", "Czechia": "Chequia",
-  "Canada": "Canadá", "Switzerland": "Suiza", 
-  "Bosnia and Herzegovina": "Bosnia y H.", "Bosnia & Herzegovina": "Bosnia y H.", "Bosnia-Herzegovina": "Bosnia y H.", 
+  "Mexico": "México", "South Korea": "Corea del Sur", "South Africa": "Sudáfrica", "Czech Republic": "Chequia", "Czechia": "Chequia",
+  "Canada": "Canadá", "Switzerland": "Suiza", "Bosnia and Herzegovina": "Bosnia y H.", "Bosnia & Herzegovina": "Bosnia y H.", "Bosnia-Herzegovina": "Bosnia y H.", 
   "Qatar": "Catar", "Brazil": "Brasil", "Morocco": "Marruecos", "Scotland": "Escocia", "Haiti": "Haití",
   "United States": "Estados Unidos", "USA": "Estados Unidos", "Paraguay": "Paraguay", "Turkey": "Turquía", "Türkiye": "Turquía", "Australia": "Australia",
   "Germany": "Alemania", "Ecuador": "Ecuador", "Curacao": "Curazao", "Ivory Coast": "Costa de Marfil", "Côte d'Ivoire": "Costa de Marfil",
@@ -532,11 +504,9 @@ const trans = {
 };
 const tr = n => trans[n] || n;
 
-// ── 1. GENERADOR DE CALENDARIO DE RESPALDO ──
 function generateFallbackMatches() {
   const generated = [];
   const letters = Object.keys(GROUPS);
-  
   letters.forEach((letter, index) => {
     const teams = GROUPS[letter];
     const dayOffset = Math.floor(index / 2); 
@@ -545,15 +515,110 @@ function generateFallbackMatches() {
     
     const d1 = new Date(baseDate); d1.setUTCHours(15 + (index % 2) * 3, 0, 0);
     generated.push({ g: letter, h: teams[0], a: teams[1], sH: null, sA: null, st: 'SCHED', date: d1 });
-    
     const d2 = new Date(baseDate); d2.setUTCHours(18 + (index % 2) * 3, 0, 0);
     generated.push({ g: letter, h: teams[2], a: teams[3], sH: null, sA: null, st: 'SCHED', date: d2 });
   });
-  
   matches = generated.sort((a, b) => a.date - b.date);
 }
 
-// ── 2. CARGA DEL LEADERBOARD ────────
+// ── NUEVO: CARGA DE FORMULARIO (PREDICCIONES) ───────────
+async function fetchDatosFormulario() {
+  try {
+    const r = await fetch(`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${GID_DATOS}`);
+    if (!r.ok) return;
+    const text = await r.text();
+    const rows = parseCSV(text);
+    if (rows.length < 2) return;
+
+    const headers = rows[0];
+    let nameIdx = 1; // Busca qué columna tiene el "Nombre"
+    for(let i=0; i<headers.length; i++){
+      if(headers[i].toLowerCase().includes('nombre') || headers[i].toLowerCase().includes('participante')) nameIdx = i;
+    }
+
+    formPicks = {};
+    for (let i = 1; i < rows.length; i++) {
+      const row = rows[i];
+      if (!row[nameIdx]) continue;
+      const pName = row[nameIdx].trim().toLowerCase(); // Normaliza nombre para matchear fácil
+      
+      let picks = [];
+      for (let j = 0; j < headers.length; j++) {
+        const h = headers[j].toLowerCase();
+        // Ignora metadatos
+        if (j !== nameIdx && !h.includes('marca temporal') && !h.includes('puntuación') && !h.includes('dirección de correo')) {
+          if (row[j] && row[j].trim() !== '') {
+            picks.push({ q: headers[j], a: row[j].trim() });
+          }
+        }
+      }
+      formPicks[pName] = picks;
+    }
+  } catch (e) { console.error('Error cargando Fichas', e); }
+}
+
+// ── APERTURA DEL MODAL FICHA FIFA ───────────────────────
+function openPlayerCard(rawName, pts, rank, gPts, pPts) {
+  const modal = document.getElementById('playerModal');
+  const content = document.getElementById('fcContent');
+  
+  const normName = rawName.trim().toLowerCase();
+  const picks = formPicks[normName] || [];
+
+  // Define colores de la ficha basados en la posición
+  let rColor = 'var(--muted)';
+  let borderColor = 'var(--border)';
+  if(rank === 1) { rColor = 'var(--gold)'; borderColor = 'var(--gold)'; }
+  if(rank === 2) { rColor = 'var(--silver)'; borderColor = 'var(--silver)'; }
+  if(rank === 3) { rColor = 'var(--bronze)'; borderColor = 'var(--bronze)'; }
+
+  // Modifica el borde superior de la tarjeta dinámicamente
+  content.style.borderTop = `4px solid ${borderColor}`;
+
+  // Formatea las predicciones para que se vean amigables
+  let picksHTML = '';
+  if (picks.length === 0) {
+     picksHTML = '<div class="err">No se encontraron predicciones detalladas para este jugador aún.</div>';
+  } else {
+     picksHTML = picks.map(p => {
+        // Limpia el texto de la pregunta quitando el "[A]" o "[Grupo A]" si lo tiene
+        let cleanQ = p.q.replace(/\[.*?\]\s*/g, '');
+        // Si la respuesta es un país, le intenta poner bandera
+        let answerFlag = FLAGS[p.a] ? `<span style="font-size:18px">${FLAGS[p.a]}</span> ` : '';
+        
+        return `<div class="pick-row" style="border-left-color: ${borderColor}">
+                   <div class="pick-q">${cleanQ}</div>
+                   <div class="pick-a">${answerFlag}${p.a}</div>
+                </div>`;
+     }).join('');
+  }
+
+  content.innerHTML = `
+    <button class="close-btn" onclick="closePlayerCard()">×</button>
+    <div class="fc-header">
+      <div class="fc-rank" style="color: ${rColor}">${rank}</div>
+      <div class="fc-info">
+        <h2>${rawName}</h2>
+        <div class="fc-stats">
+          <div class="fc-stat"><span class="val">${pts}</span><span class="lbl">Total</span></div>
+          <div class="fc-stat"><span class="val">${gPts}</span><span class="lbl">Grupos</span></div>
+          <div class="fc-stat"><span class="val">${pPts}</span><span class="lbl">Partidos</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="fc-body">
+      <div style="font-size:12px; color:${borderColor}; margin-bottom:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase;">Predicciones Oficiales</div>
+      ${picksHTML}
+    </div>
+  `;
+  modal.classList.add('active');
+}
+
+function closePlayerCard() {
+  document.getElementById('playerModal').classList.remove('active');
+}
+
+// ── LEADERBOARD ─────────────────────────────────────────
 function getDirectCsvUrl(gid) {
   return `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${gid}`;
 }
@@ -619,20 +684,17 @@ function processLB(rows) {
   const sPlayers = document.getElementById('sPlayers');
   if (sPlayers) sPlayers.textContent = `${players.length} participante${players.length !== 1 ? 's' : ''}`;
   
-  // Forzar zona horaria de CDMX para la hora de actualización
   const lbTime = document.getElementById('lbTime');
   if (lbTime) {
     const cdmxTime = new Date().toLocaleTimeString('es-MX', { timeZone: 'America/Mexico_City', hour:'2-digit', minute:'2-digit', hour12: true });
-    lbTime.textContent = 'Act: ' + cdmxTime;
+    lbTime.textContent = 'Act: ' + cdmxTime + ' (CDMX)';
   }
 
   const body = document.getElementById('lbBody');
 
   if (body) {
     const totalPool = players.length * 400;
-    const p1 = totalPool * 0.50;
-    const p2 = totalPool * 0.30;
-    const p3 = totalPool * 0.20;
+    const p1 = totalPool * 0.50; const p2 = totalPool * 0.30; const p3 = totalPool * 0.20;
 
     let prizeBox = document.getElementById('prizeBoxAuto');
     if (!prizeBox) {
@@ -662,7 +724,9 @@ function processLB(rows) {
       const rc = rank===1?'g':rank===2?'s':rank===3?'b':'';
       const em = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
       const pct = max > 0 ? (p.total / max * 100).toFixed(1) : 0;
-      return `<div class="lb-row ${cls}" data-pct="${pct}">
+      
+      // La fila ahora es un botón que llama a openPlayerCard()
+      return `<div class="lb-row ${cls}" title="Ver Ficha de Jugador" onclick="openPlayerCard('${p.name.replace(/'/g, "\\'")}', ${p.total}, ${rank}, ${p.grupos}, ${p.pPartidos})">
         <div class="rank ${rc}">${em || rank}</div>
         <div class="name-wrap">
           <div class="name">${p.name}</div>
@@ -682,12 +746,11 @@ function processLB(rows) {
   }
 }
 
-// ── 3. CONEXIÓN API / FALLBACK AUTOMÁTICO ──────────────
+// ── API PARTIDOS ────────────────────────────────────────
 async function fetchAPI() {
   try {
     const opts = { headers: { 'X-Auth-Token': API_TOKEN } };
     const resM = await fetch(API_URL_MATCHES, opts);
-    
     if (!resM.ok) throw new Error('API en espera');
     const dataM = await resM.json();
     
@@ -696,25 +759,17 @@ async function fetchAPI() {
         let st = 'SCHED';
         if (m.status === 'FINISHED') st = 'FIN';
         if (m.status === 'IN_PLAY' || m.status === 'PAUSED') st = 'LIVE';
-        
         let groupLetter = '?';
-        if (m.group && m.group.includes('GROUP_')) {
-          groupLetter = m.group.split('_')[1];
-        }
+        if (m.group && m.group.includes('GROUP_')) groupLetter = m.group.split('_')[1];
 
         return {
-          g: groupLetter,
-          h: tr(m.homeTeam?.name),
-          a: tr(m.awayTeam?.name),
+          g: groupLetter, h: tr(m.homeTeam?.name), a: tr(m.awayTeam?.name),
           sH: m.score?.fullTime?.home !== undefined ? m.score.fullTime.home : null,
           sA: m.score?.fullTime?.away !== undefined ? m.score.fullTime.away : null,
-          st: st,
-          date: new Date(m.utcDate)
+          st: st, date: new Date(m.utcDate)
         };
       });
-    } else {
-      generateFallbackMatches();
-    }
+    } else { generateFallbackMatches(); }
 
     const resS = await fetch(API_URL_STANDINGS, opts);
     if (resS.ok) {
@@ -724,40 +779,29 @@ async function fetchAPI() {
         dataS.standings.forEach(std => {
           if (std.type === 'TOTAL' && std.group) {
             const gL = std.group.split('_')[1]; 
-            grpResults[gL] = std.table.map(t => ({
-              team: tr(t.team.name),
-              pts: t.points,
-              pj: t.playedGames
-            }));
+            grpResults[gL] = std.table.map(t => ({ team: tr(t.team.name), pts: t.points, pj: t.playedGames }));
           }
         });
       }
     }
-  } catch(e) {
-    generateFallbackMatches();
-  }
-  renderMatches();
-  renderStd();
+  } catch(e) { generateFallbackMatches(); }
+  renderMatches(); renderStd();
 }
 
-// ── 4. RENDERIZADO DE COMPONENTES ───────────────────────
+// ── RENDERIZADO ─────────────────────────────────────────
 function setTab(t) {
   curTab = t;
-  const tR = document.getElementById('tR');
-  const tU = document.getElementById('tU');
-  if (tR) tR.classList.toggle('on', t==='r');
-  if (tU) tU.classList.toggle('on', t==='u');
+  document.getElementById('tR').classList.toggle('on', t==='r');
+  document.getElementById('tU').classList.toggle('on', t==='u');
   renderMatches();
 }
 
 function renderMatches() {
   const body = document.getElementById('mBody');
   if (!body) return;
-
   let list = curTab === 'r'
     ? matches.filter(m => m.st === 'FIN' || m.st === 'LIVE').sort((a,b) => b.date - a.date).slice(0, 8) 
     : matches.filter(m => m.st === 'SCHED').sort((a,b) => a.date - b.date).slice(0, 4); 
-
   if (!list.length) {
     body.innerHTML = `<div class="err">${curTab==='r' ? '⚽ Ningún partido ha comenzado. ¡La Copa inicia este jueves!' : '📅 No hay más partidos programados.'}</div>`;
     return;
@@ -766,27 +810,15 @@ function renderMatches() {
 }
 
 function matchHTML(m) {
-  const isLive = m.st === 'LIVE';
-  const hasSc  = m.sH !== null && m.sA !== null;
-  
-  // Forzar zona horaria de CDMX para los partidos
+  const isLive = m.st === 'LIVE'; const hasSc = m.sH !== null && m.sA !== null;
   const cdmxOptionsDate = { timeZone: 'America/Mexico_City', weekday: 'short', day: 'numeric' };
   const cdmxOptionsTime = { timeZone: 'America/Mexico_City', hour: '2-digit', minute: '2-digit', hour12: true };
-  
   const dateStr = m.date.toLocaleDateString('es-MX', cdmxOptionsDate);
   const timeStr = m.date.toLocaleTimeString('es-MX', cdmxOptionsTime);
-  
   const timeLabel = m.st === 'FIN' ? 'Finalizado' : isLive ? '⚡ EN VIVO' : `⏳ ${dateStr} - ${timeStr} (CDMX)`;
-  
-  const scoreBlock = hasSc
-    ? `<div class="score"><span class="sc">${m.sH}</span><span class="sep">–</span><span class="sc">${m.sA}</span></div>`
-    : `<span class="vs">VS</span>`;
-    
+  const scoreBlock = hasSc ? `<div class="score"><span class="sc">${m.sH}</span><span class="sep">–</span><span class="sc">${m.sA}</span></div>` : `<span class="vs">VS</span>`;
   return `<div class="match">
-    <div class="match-meta">
-      <span class="grp-tag">Grupo ${m.g}</span>
-      <span class="mt ${isLive?'live-t':''}">${timeLabel}</span>
-    </div>
+    <div class="match-meta"><span class="grp-tag">Grupo ${m.g}</span><span class="mt ${isLive?'live-t':''}">${timeLabel}</span></div>
     <div class="teams">
       <div class="team"><span class="fl">${fl(m.h)}</span><span class="tn">${m.h}</span></div>
       ${scoreBlock}
@@ -798,54 +830,37 @@ function matchHTML(m) {
 function renderStd() {
   const body = document.getElementById('stdBody');
   if (!body) return;
-
-  const gSel = document.getElementById('gSel');
-  const g = gSel ? gSel.value : 'A';
-  const apiData = grpResults[g];
-  const baseData = GROUPS[g] || [];
-
-  let rows = [];
-  if (apiData && apiData.length > 0) {
-    rows = apiData;
-  } else {
-    rows = baseData.map(team => ({ team: team, pts: 0, pj: 0 }));
-  }
-
-  body.innerHTML = `
-    <table class="std-table">
-      <thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>Pts</th></tr></thead>
-      <tbody>${rows.map((r,i) => {
-        const dot = i<2 ? `<span class="qdot"></span>` : i===2 ? `<span class="qdot maybe"></span>` : '';
-        return `<tr>
-          <td style="font-size:13px;color:var(--muted)">${i+1}</td>
-          <td><span>${fl(r.team)}</span> ${dot}<span style="font-weight:700">${r.team}</span></td>
-          <td>${r.pj}</td>
-          <td class="ptd">${r.pts}</td>
-        </tr>`;
-      }).join('')}</tbody>
-    </table>
-    <div class="legend">
-      <span><span class="qdot" style="display:inline-block"></span>Clasifica</span>
-      <span><span class="qdot maybe" style="display:inline-block"></span>Posible 3ro</span>
-    </div>`;
+  const g = document.getElementById('gSel') ? document.getElementById('gSel').value : 'A';
+  const apiData = grpResults[g]; const baseData = GROUPS[g] || [];
+  let rows = (apiData && apiData.length > 0) ? apiData : baseData.map(team => ({ team: team, pts: 0, pj: 0 }));
+  body.innerHTML = `<table class="std-table">
+    <thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>Pts</th></tr></thead>
+    <tbody>${rows.map((r,i) => {
+      const dot = i<2 ? `<span class="qdot"></span>` : i===2 ? `<span class="qdot maybe"></span>` : '';
+      return `<tr><td style="font-size:13px;color:var(--muted)">${i+1}</td>
+        <td><span>${fl(r.team)}</span> ${dot}<span style="font-weight:700">${r.team}</span></td>
+        <td>${r.pj}</td><td class="ptd">${r.pts}</td></tr>`;
+    }).join('')}</tbody></table>
+    <div class="legend"><span><span class="qdot" style="display:inline-block"></span>Clasifica</span><span><span class="qdot maybe" style="display:inline-block"></span>Posible 3ro</span></div>`;
 }
 
 function updateHeader() {
   const sDate = document.getElementById('sDate');
-  // Forzar zona horaria de CDMX para la fecha del encabezado
   if (sDate) sDate.textContent = new Date().toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City', weekday:'short', day:'numeric', month:'long'});
 }
 
-// ── 5. CONTROLADOR CENTRAL ──────────────────────────────
+// ── CONTROLADOR CENTRAL ─────────────────────────────────
 async function run() {
   const sDot = document.getElementById('sDot');
   const sStatus = document.getElementById('sStatus');
   if (sDot) sDot.classList.remove('live');
   if (sStatus) sStatus.textContent = 'Actualizando…';
 
+  // Ahora consulta las 3 fuentes simultáneamente
   await Promise.allSettled([
     fetchLeaderboard(),
-    fetchAPI()
+    fetchAPI(),
+    fetchDatosFormulario() // Extrae los datos para las Fichas
   ]);
 
   if (sStatus) sStatus.textContent = 'Sincronizado';
@@ -856,19 +871,11 @@ function init() {
   updateHeader();
   run();
   setInterval(run, REFRESH_INTERVAL);
-  
-  const btnRefresh = document.getElementById('btnRefresh');
-  if (btnRefresh) btnRefresh.addEventListener('click', run);
-  
-  const gSel = document.getElementById('gSel');
-  if (gSel) gSel.addEventListener('change', renderStd);
+  if (document.getElementById('btnRefresh')) document.getElementById('btnRefresh').addEventListener('click', run);
+  if (document.getElementById('gSel')) document.getElementById('gSel').addEventListener('change', renderStd);
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
-}
+if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
 </script>
 </body>
 </html>
