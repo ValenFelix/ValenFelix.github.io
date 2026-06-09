@@ -11,13 +11,13 @@
   <meta name="theme-color" content="#0a0c10">
 
   <!-- PWA -->
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="/ValenFelix-github-io/manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Quiniela 2026">
-  <link rel="apple-touch-icon" href="icon-192.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="icon-180.png">
+  <link rel="apple-touch-icon" href="/ValenFelix-github-io/icon-192.jpg">
+  <link rel="apple-touch-icon" sizes="180x180" href="/ValenFelix-github-io/icon-180.jpg">
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -848,7 +848,7 @@ if (document.readyState === 'loading') { document.addEventListener('DOMContentLo
 // ── SERVICE WORKER ──────────────────────────────────────
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
+    navigator.serviceWorker.register('/ValenFelix-github-io/sw.js', { scope: '/ValenFelix-github-io/' })
       .catch(err => console.warn('SW no registrado:', err));
   });
 }
