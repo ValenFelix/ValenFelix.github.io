@@ -481,7 +481,7 @@ const REFRESH_INTERVAL = 3 * 60 * 1000; // Auto-actualizar cada 3 minutos
 // ── VARIABLES GLOBALES ──────────────────────────────────
 let matches = [];        
 let grpResults = {};     
-let curTab = 'u'; // Por defecto muestra "Próximos"
+let curTab = 'r'; // CORREGIDO: Inicia en 'r' (Recientes) para alinearse con el diseño inicial de la web
 
 // ── DATOS ESTRUCTURALES DEL MUNDIAL 2026 ────────────────
 const GROUPS = {
@@ -626,8 +626,10 @@ function processLB(rows) {
   const lbTime = document.getElementById('lbTime');
   if (lbTime) lbTime.textContent = 'Act: ' + new Date().toLocaleTimeString('es-MX', {hour:'2-digit', minute:'2-digit'});
 
-  // ── SISTEMA DE CÁLCULO DE PREMIOS EN VIVO ──
-  if (sPlayers) {
+  const body = document.getElementById('lbBody');
+
+  // ── CORREGIDO: UBICACIÓN Y ESTILO DE LA CALCULADORA DE PREMIOS ──
+  if (body) {
     const totalPool = players.length * 400;
     const p1 = totalPool * 0.50;
     const p2 = totalPool * 0.30;
@@ -637,19 +639,24 @@ function processLB(rows) {
     if (!prizeBox) {
       prizeBox = document.createElement('div');
       prizeBox.id = 'prizeBoxAuto';
-      prizeBox.style.cssText = "margin: 12px 0; font-size: 13px; background: rgba(255,255,255,0.06); padding: 12px; border-radius: 8px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; border: 1px solid rgba(255,255,255,0.1); text-align: center;";
-      sPlayers.parentNode.insertBefore(prizeBox, sPlayers.nextSibling);
+      // Estilo de bloque independiente perfectamente centrado y adaptativo
+      prizeBox.style.cssText = "margin: 0 auto 24px auto; font-size: 14px; background: rgba(255,255,255,0.06); padding: 16px; border-radius: 12px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; border: 1px solid rgba(255,255,255,0.1); text-align: center; max-width: 500px; width: 100%; box-sizing: border-box; box-shadow: 0 4px 15px rgba(0,0,0,0.2);";
+      
+      // Busca la tarjeta o contenedor de la clasificación general para inyectarse justo arriba
+      const lbContainer = body.closest('.card') || body.closest('.leaderboard-wrap') || body.closest('table') || body;
+      if (lbContainer && lbContainer.parentNode) {
+        lbContainer.parentNode.insertBefore(prizeBox, lbContainer);
+      }
     }
     prizeBox.innerHTML = `
-      <div style="grid-column: span 3; font-weight: bold; color: #ffd700; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 6px; margin-bottom: 2px;">💰 Bolsa Total: $${totalPool.toLocaleString('es-MX')} MXN</div>
-      <div><div style="font-size:15px;">🥇</div><span style="font-size:11px;color:#aaa">1º (50%)</span><br><strong style="color:#fff">$${p1.toLocaleString('es-MX')}</strong></div>
-      <div><div style="font-size:15px;">🥈</div><span style="font-size:11px;color:#aaa">2º (30%)</span><br><strong style="color:#fff">$${p2.toLocaleString('es-MX')}</strong></div>
-      <div><div style="font-size:15px;">🥉</div><span style="font-size:11px;color:#aaa">3º (20%)</span><br><strong style="color:#fff">$${p3.toLocaleString('es-MX')}</strong></div>
+      <div style="grid-column: span 3; font-weight: bold; color: #ffd700; font-size: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px; margin-bottom: 4px;">💰 Bolsa Total: $${totalPool.toLocaleString('es-MX')} MXN</div>
+      <div><div style="font-size:16px;">🥇</div><span style="font-size:11px;color:#aaa">1º (50%)</span><br><strong style="color:#fff; font-size:14px;">$${p1.toLocaleString('es-MX')}</strong></div>
+      <div><div style="font-size:16px;">🥈</div><span style="font-size:11px;color:#aaa">2º (30%)</span><br><strong style="color:#fff; font-size:14px;">$${p2.toLocaleString('es-MX')}</strong></div>
+      <div><div style="font-size:16px;">🥉</div><span style="font-size:11px;color:#aaa">3º (20%)</span><br><strong style="color:#fff; font-size:14px;">$${p3.toLocaleString('es-MX')}</strong></div>
     `;
   }
 
   const max = players.length ? Math.max(...players.map(p => p.total)) : 1;
-  const body = document.getElementById('lbBody');
   if (!players.length) {
     if (body) body.innerHTML = '<div class="err">No hay participantes.</div>'; return;
   }
@@ -755,7 +762,6 @@ function renderMatches() {
   const body = document.getElementById('mBody');
   if (!body) return;
 
-  // Modificado: Muestra un máximo de 8 Recientes y EXACTAMENTE los siguientes 4 Próximos
   let list = curTab === 'r'
     ? matches.filter(m => m.st === 'FIN' || m.st === 'LIVE').sort((a,b) => b.date - a.date).slice(0, 8) 
     : matches.filter(m => m.st === 'SCHED').sort((a,b) => a.date - b.date).slice(0, 4); 
