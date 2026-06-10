@@ -31,11 +31,7 @@
       --accent:  #ff5722;
     }
 
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       background: var(--bg);
@@ -47,6 +43,48 @@
       padding-bottom: 60px;
     }
 
+    /* ── NAV TABS (top switcher) ── */
+    .main-nav {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      padding: 10px 16px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .main-tab {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 8px 22px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      background: transparent;
+      color: var(--muted);
+      transition: all .2s;
+    }
+    .main-tab:hover { color: var(--text); border-color: var(--dim); }
+    .main-tab.on {
+      background: var(--card);
+      color: var(--text);
+      border-color: var(--gold);
+      box-shadow: 0 0 12px rgba(245,200,66,0.15);
+    }
+    .main-tab.games-tab.on {
+      border-color: var(--green);
+      box-shadow: 0 0 12px rgba(0,230,118,0.15);
+    }
+
+    /* SECTIONS */
+    .section { display: none; }
+    .section.active { display: block; }
+
     /* HEADER */
     header {
       background: linear-gradient(160deg, #0d1520 0%, #0a0c10 100%);
@@ -56,120 +94,57 @@
     }
     .eyebrow {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      color: var(--green);
-      margin-bottom: 8px;
-      opacity: .9;
+      font-size: 13px; font-weight: 700; letter-spacing: 3px;
+      text-transform: uppercase; color: var(--green); margin-bottom: 8px; opacity: .9;
     }
     h1 {
       font-family: 'Barlow Condensed', sans-serif;
-      font-size: clamp(34px, 8vw, 56px);
-      font-weight: 900;
-      line-height: 1;
-      color: var(--text);
-      letter-spacing: -0.5px;
+      font-size: clamp(34px, 8vw, 56px); font-weight: 900; line-height: 1;
+      color: var(--text); letter-spacing: -0.5px;
     }
     h1 span { color: var(--gold); }
-    
-    .meta {
-      margin-top: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+    .meta { margin-top: 16px; display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
     .pill {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      padding: 6px 14px;
-      font-size: 13px;
-      color: var(--dim);
-      font-weight: 500;
+      display: flex; align-items: center; gap: 6px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 100px; padding: 6px 14px; font-size: 13px; color: var(--dim); font-weight: 500;
     }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
     .dot.live { background: var(--accent); animation: pulse 1.5s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
 
     /* MAIN LAYOUT */
-    .wrap {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 30px 16px;
-      display: grid;
-      grid-template-columns: 1fr 380px;
-      gap: 24px;
-      align-items: start;
-    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 30px 16px; display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
     @media(max-width: 850px) { .wrap { grid-template-columns: 1fr; } }
 
-    /* SECCIÓN GRÁFICOS — ancho completo debajo del grid */
-    .charts-section {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 16px 30px;
-    }
+    .charts-section { max-width: 1100px; margin: 0 auto; padding: 0 16px 30px; }
 
     .eyebrow-sm {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 2.5px;
-      text-transform: uppercase;
-      color: var(--muted);
-      margin-bottom: 12px;
-      padding-left: 2px;
+      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 12px; padding-left: 2px;
     }
 
     /* CARDS */
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.25);
-    }
-    .card-head {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 20px; border-bottom: 1px solid var(--border); background: rgba(255, 255, 255, 0.01);
-    }
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.25); }
+    .card-head { display: flex; justify-content: space-between; align-items: center; padding: 16px 20px; border-bottom: 1px solid var(--border); background: rgba(255, 255, 255, 0.01); }
     .card-title { font-family: 'Barlow Condensed', sans-serif; font-size: 19px; font-weight: 800; letter-spacing: 0.5px; }
 
     /* LEADERBOARD */
-    .lb-cols {
-      display: grid; grid-template-columns: 45px 1fr 55px 55px 60px; padding: 8px 20px;
-      font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700;
-      letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted);
-      border-bottom: 1px solid var(--border); background: var(--surface);
-    }
+    .lb-cols { display: grid; grid-template-columns: 45px 1fr 55px 55px 60px; padding: 8px 20px; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--border); background: var(--surface); }
     .lb-cols span:nth-child(n+3) { text-align: right; }
-    
-    .lb-row {
-      display: grid; grid-template-columns: 45px 1fr 55px 55px 60px; align-items: center;
-      padding: 12px 20px; border-bottom: 1px solid var(--border); transition: all .2s ease; cursor: pointer;
-    }
+    .lb-row { display: grid; grid-template-columns: 45px 1fr 55px 55px 60px; align-items: center; padding: 12px 20px; border-bottom: 1px solid var(--border); transition: all .2s ease; cursor: pointer; }
     .lb-row:last-child { border-bottom: none; }
     .lb-row:hover { background: rgba(255,255,255, .04); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
     .lb-row.r1 { background: rgba(245,200,66, 0.03); }
     .lb-row.r2 { background: rgba(176,190,197, 0.02); }
     .lb-row.r3 { background: rgba(205,127,50, 0.02); }
-    
     .rank { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 900; color: var(--muted); }
     .rank.g { color: var(--gold); } .rank.s { color: var(--silver); } .rank.b { color: var(--bronze); }
-    
     .name-wrap { min-width: 0; padding-right: 12px; }
     .name { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
     .bar-bg { height: 4px; background: var(--border); border-radius: 2px; margin-top: 5px; overflow: hidden; }
     .bar { height: 100%; background: var(--green); border-radius: 2px; width: 0; transition: width 1s cubic-bezier(.4, 0, .2, 1); }
     .r1 .bar { background: var(--gold); } .r2 .bar { background: var(--silver); } .r3 .bar { background: var(--bronze); }
-    
     .pts { font-family: 'Barlow Condensed', sans-serif; font-size: 23px; font-weight: 900; text-align: right; line-height: 1; }
     .r1 .pts { color: var(--gold); }
     .sub { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 600; color: var(--dim); text-align: right; }
@@ -178,7 +153,6 @@
     .tabs { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 3px; }
     .tab { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; padding: 5px 12px; border-radius: 6px; border: none; cursor: pointer; background: transparent; color: var(--muted); transition: background .15s, color .15s; }
     .tab.on { background: var(--border); color: var(--text); }
-    
     .match { padding: 14px 20px; border-bottom: 1px solid var(--border); }
     .match:last-child { border-bottom: none; }
     .match:hover { background: rgba(255,255,255, .01); }
@@ -186,14 +160,12 @@
     .grp-tag { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 2px 6px; }
     .mt { font-size: 12px; color: var(--dim); }
     .mt.live-t { color: var(--accent); font-weight: 600; animation: pulse 1.5s infinite; }
-    
     .teams { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 8px; }
     .team { display: flex; align-items: center; gap: 6px; min-width: 0; }
     .team.away { flex-direction: row-reverse; }
     .fl { font-size: 18px; line-height: 1; flex-shrink: 0; }
     .tn { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .team.away .tn { text-align: right; }
-    
     .score { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
     .sc { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 900; width: 22px; text-align: center; line-height: 1; }
     .sep { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; color: var(--muted); }
@@ -215,20 +187,10 @@
     .legend { padding: 10px 20px 14px; font-size: 12px; color: var(--muted); display: flex; gap: 14px; background: rgba(0,0,0,0.1); }
     .err { padding: 24px; text-align: center; color: var(--muted); font-size: 13px; line-height: 1.6; }
 
-    /* ─── MODAL FICHA FIFA ─── */
-    .modal-overlay {
-      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.85); backdrop-filter: blur(8px);
-      z-index: 1000; display: flex; align-items: center; justify-content: center;
-      opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
-    }
+    /* MODAL FICHA FIFA */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
     .modal-overlay.active { opacity: 1; pointer-events: auto; }
-    .fifa-card {
-      width: 92%; max-width: 420px; background: linear-gradient(135deg, #1e2430 0%, #0d1117 100%);
-      border-radius: 16px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.7);
-      position: relative; transform: scale(0.9); transition: transform 0.3s cubic-bezier(.4,0,.2,1);
-      max-height: 85vh; display: flex; flex-direction: column;
-    }
+    .fifa-card { width: 92%; max-width: 420px; background: linear-gradient(135deg, #1e2430 0%, #0d1117 100%); border-radius: 16px; padding: 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.7); position: relative; transform: scale(0.9); transition: transform 0.3s cubic-bezier(.4,0,.2,1); max-height: 85vh; display: flex; flex-direction: column; }
     .modal-overlay.active .fifa-card { transform: scale(1); }
     .close-btn { position: absolute; top: 12px; right: 16px; font-size: 28px; color: var(--muted); cursor: pointer; background: none; border: none; line-height: 1; transition: color 0.2s; }
     .close-btn:hover { color: #fff; }
@@ -244,43 +206,183 @@
     .fc-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
     .pick-row { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; border-left: 3px solid var(--dim); }
     .pick-q { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; font-weight: 600; }
-    .pick-a { font-size: 15px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 6px;}
+    .pick-a { font-size: 15px; font-weight: 700; color: var(--text); display: flex; align-items: center; gap: 6px; }
 
-    /* ─── CHARTS SECTION ─── */
-    /* Grid de 3 columnas en pantallas grandes, 1 en móvil */
-    .charts-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-      padding: 20px;
-    }
-    @media(max-width: 850px) {
-      .charts-grid { grid-template-columns: 1fr; }
-    }
-    .chart-box {
-      background: rgba(255,255,255,0.02);
-      border: 1px solid rgba(255,255,255,0.05);
-      border-radius: 12px;
-      padding: 16px;
-      text-align: center;
-    }
-    .chart-title {
-      font-family: 'Barlow Condensed', sans-serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--gold);
-      margin-bottom: 12px;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-      min-height: 36px;
-    }
-    /* Altura mayor para que la leyenda debajo no aplaste la dona */
-    .chart-canvas-wrap {
-      position: relative;
-      height: 280px;
-      width: 100%;
-    }
+    /* CHARTS */
+    .charts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; padding: 20px; }
+    @media(max-width: 850px) { .charts-grid { grid-template-columns: 1fr; } }
+    .chart-box { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 12px; padding: 16px; text-align: center; }
+    .chart-title { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; color: var(--gold); margin-bottom: 12px; letter-spacing: 0.5px; text-transform: uppercase; min-height: 36px; }
+    .chart-canvas-wrap { position: relative; height: 280px; width: 100%; }
     canvas { max-width: 100%; height: auto !important; }
+
+    /* ══════════════════════════════════════════
+       MINI JUEGOS SECTION
+    ══════════════════════════════════════════ */
+    .games-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 30px 16px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    /* Game selector */
+    .game-selector {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+    @media(max-width: 600px) { .game-selector { grid-template-columns: 1fr; } }
+
+    .game-pick-btn {
+      background: var(--card);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      cursor: pointer;
+      transition: all .25s;
+      text-align: center;
+      color: var(--text);
+    }
+    .game-pick-btn:hover { border-color: var(--green); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,230,118,0.1); }
+    .game-pick-btn.selected { border-color: var(--green); background: rgba(0,230,118,0.05); }
+    .game-pick-btn .game-icon { font-size: 36px; margin-bottom: 8px; }
+    .game-pick-btn .game-name { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; letter-spacing: .5px; }
+    .game-pick-btn .game-desc { font-size: 12px; color: var(--dim); margin-top: 4px; }
+
+    /* Game canvas area */
+    .game-arena {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .game-arena-head {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 20px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.01);
+    }
+    .game-arena-title { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 800; }
+    .game-score-pill {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800;
+      background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 4px 14px;
+      color: var(--green);
+    }
+
+    .game-canvas-wrap {
+      position: relative;
+      background: #0a1a0e;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    #gameCanvas {
+      display: block;
+      cursor: crosshair;
+      touch-action: none;
+      image-rendering: pixelated;
+    }
+
+    .game-controls {
+      display: flex; gap: 10px; justify-content: center; padding: 16px 20px;
+      border-top: 1px solid var(--border); background: rgba(255,255,255,0.01);
+      flex-wrap: wrap;
+    }
+    .btn-game {
+      font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 800;
+      letter-spacing: .5px; text-transform: uppercase;
+      padding: 9px 24px; border-radius: 8px; border: none; cursor: pointer;
+      transition: all .2s;
+    }
+    .btn-primary { background: var(--green); color: #000; }
+    .btn-primary:hover { background: #00ff88; box-shadow: 0 0 12px rgba(0,230,118,0.4); }
+    .btn-secondary { background: var(--border); color: var(--text); }
+    .btn-secondary:hover { background: var(--muted); }
+    .btn-danger { background: var(--accent); color: #fff; }
+    .btn-danger:hover { background: #ff7043; }
+
+    /* Instructions overlay */
+    .game-msg {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: rgba(10,26,14,0.92);
+      font-family: 'Barlow Condensed', sans-serif;
+      text-align: center;
+      padding: 24px;
+      gap: 10px;
+      pointer-events: none;
+    }
+    .game-msg.hidden { display: none; }
+    .game-msg .gm-emoji { font-size: 52px; }
+    .game-msg .gm-title { font-size: 32px; font-weight: 900; color: var(--text); }
+    .game-msg .gm-sub { font-size: 16px; color: var(--dim); max-width: 300px; line-height: 1.4; }
+    .game-msg .gm-score { font-size: 44px; font-weight: 900; color: var(--gold); }
+
+    /* LEADERBOARD DE JUEGOS */
+    .games-lb-section { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+    @media(max-width: 600px) { .games-lb-section { grid-template-columns: 1fr; } }
+
+    .games-lb-card {
+      background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+    }
+    .games-lb-head {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,0.01);
+    }
+    .games-lb-head .glh-icon { font-size: 20px; }
+    .games-lb-head .glh-title { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 800; }
+    .lb-row-game {
+      display: grid; grid-template-columns: 32px 1fr auto;
+      align-items: center; padding: 10px 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .lb-row-game:last-child { border-bottom: none; }
+    .lb-row-game .grk { font-family: 'Barlow Condensed', sans-serif; font-size: 20px; font-weight: 900; color: var(--muted); }
+    .lb-row-game .grk.gold { color: var(--gold); }
+    .lb-row-game .grk.silver { color: var(--silver); }
+    .lb-row-game .grk.bronze { color: var(--bronze); }
+    .lb-row-game .gnm { font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 700; }
+    .lb-row-game .gsc { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 900; color: var(--green); }
+    .lb-empty { padding: 20px; text-align: center; color: var(--muted); font-size: 13px; }
+
+    /* RECORD MODAL */
+    .record-modal-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
+      z-index: 2000; display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none; transition: opacity 0.3s;
+    }
+    .record-modal-overlay.active { opacity: 1; pointer-events: auto; }
+    .record-modal {
+      background: linear-gradient(135deg, #1a2a1a 0%, #0d1117 100%);
+      border: 2px solid var(--gold);
+      border-radius: 20px; padding: 32px 28px;
+      width: 92%; max-width: 380px;
+      text-align: center;
+      box-shadow: 0 0 40px rgba(245,200,66,0.2);
+      transform: scale(0.85); transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+    }
+    .record-modal-overlay.active .record-modal { transform: scale(1); }
+    .rm-trophy { font-size: 54px; margin-bottom: 8px; }
+    .rm-title { font-family: 'Barlow Condensed', sans-serif; font-size: 30px; font-weight: 900; color: var(--gold); margin-bottom: 4px; }
+    .rm-sub { font-size: 14px; color: var(--dim); margin-bottom: 20px; line-height: 1.5; }
+    .rm-score { font-family: 'Barlow Condensed', sans-serif; font-size: 48px; font-weight: 900; color: var(--green); margin-bottom: 20px; }
+    .rm-input {
+      width: 100%; background: var(--surface); border: 2px solid var(--border);
+      border-radius: 10px; color: var(--text); font-family: 'Barlow Condensed', sans-serif;
+      font-size: 20px; font-weight: 700; padding: 12px 16px; outline: none; text-align: center;
+      transition: border-color .2s;
+    }
+    .rm-input:focus { border-color: var(--gold); }
+    .rm-actions { display: flex; gap: 10px; margin-top: 14px; }
+    .rm-btn {
+      flex: 1; font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 800;
+      letter-spacing: .5px; text-transform: uppercase; padding: 12px; border-radius: 10px; border: none; cursor: pointer; transition: all .2s;
+    }
+    .rm-btn.confirm { background: var(--gold); color: #000; }
+    .rm-btn.confirm:hover { background: #ffe066; }
+    .rm-btn.skip { background: var(--border); color: var(--dim); }
+    .rm-btn.skip:hover { color: var(--text); }
   </style>
 </head>
 <body>
@@ -298,97 +400,183 @@
   </div>
 </header>
 
-<div class="wrap">
-  <div style="display:flex;flex-direction:column;gap:24px">
-    
-    <div>
-      <div class="eyebrow-sm">Clasificación General</div>
-      <div class="card">
-        <div class="card-head">
-          <span class="card-title">🏆 Tabla de Líderes</span>
-          <span id="lbTime" style="font-size:11px;color:var(--muted)">—</span>
-        </div>
-        <div class="lb-cols">
-          <span>#</span><span>Participante</span>
-          <span>Grupos</span><span>Partidos</span><span>Total</span>
-        </div>
-        <div id="lbBody">
-          <div class="err">⏳ Conectando con Google Sheets…</div>
-        </div>
-      </div>
-    </div>
+<nav class="main-nav">
+  <button class="main-tab on" id="navQuiniela" onclick="switchSection('quiniela')">🏆 Quiniela</button>
+  <button class="main-tab games-tab" id="navGames" onclick="switchSection('games')">🎮 Mini Juegos</button>
+</nav>
 
-  </div>
+<div class="section active" id="secQuiniela">
 
-  <div style="display:flex;flex-direction:column;gap:24px">
-    <div>
-      <div class="eyebrow-sm">Resultados del Torneo</div>
-      <div class="card">
-        <div class="card-head">
-          <span class="card-title">⚽ Partidos</span>
-          <div class="tabs">
-            <button class="tab on" id="tR" onclick="setTab('r')">Recientes</button>
-            <button class="tab" id="tU" onclick="setTab('u')">Próximos</button>
+  <div class="wrap">
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div>
+        <div class="eyebrow-sm">Clasificación General</div>
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">🏆 Tabla de Líderes</span>
+            <span id="lbTime" style="font-size:11px;color:var(--muted)">—</span>
+          </div>
+          <div class="lb-cols">
+            <span>#</span><span>Participante</span>
+            <span>Grupos</span><span>Partidos</span><span>Total</span>
+          </div>
+          <div id="lbBody">
+            <div class="err">⏳ Conectando con Google Sheets…</div>
           </div>
         </div>
-        <div id="mBody"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:24px">
+      <div>
+        <div class="eyebrow-sm">Resultados del Torneo</div>
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">⚽ Partidos</span>
+            <div class="tabs">
+              <button class="tab on" id="tR" onclick="setTab('r')">Recientes</button>
+              <button class="tab" id="tU" onclick="setTab('u')">Próximos</button>
+            </div>
+          </div>
+          <div id="mBody"></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="eyebrow-sm">Posiciones de Grupo Reales</div>
+        <div class="card">
+          <div class="card-head">
+            <span class="card-title">Grupo</span>
+            <select class="grp-sel" id="gSel" onchange="renderStd()">
+              <option>A</option><option>B</option><option>C</option><option>D</option>
+              <option>E</option><option>F</option><option>G</option><option>H</option>
+              <option>I</option><option>J</option><option>K</option><option>L</option>
+            </select>
+          </div>
+          <div id="stdBody"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="charts-section">
+    <div class="eyebrow-sm">Tendencias de la Quiniela</div>
+    <div class="card">
+      <div class="card-head">
+        <span class="card-title">📊 Favoritos del Torneo</span>
+      </div>
+      <div id="chartsContainer" class="charts-grid">
+        <div class="err">⏳ Analizando las respuestas...</div>
+      </div>
+    </div>
+  </div>
+
+</div><div class="section" id="secGames">
+  <div class="games-wrap">
+
+    <div>
+      <div class="eyebrow-sm">Elige tu juego</div>
+      <div class="game-selector">
+        <button class="game-pick-btn selected" id="btnCabezazo" onclick="selectGame('cabezazo')">
+          <div class="game-icon">🤸</div>
+          <div class="game-name">Cabezazo</div>
+          <div class="game-desc">Mantén el balón en el aire con tu cabeza.</div>
+        </button>
+        <button class="game-pick-btn" id="btnMilanesas" onclick="selectGame('milanesas')">
+          <div class="game-icon">🥩</div>
+          <div class="game-name">Atrapa la Milanesa</div>
+          <div class="game-desc">Ayuda a Messi a cachar todas las milanesas. ¡Si cae una, pierdes!</div>
+        </button>
+      </div>
+    </div>
+
+    <div class="game-arena">
+      <div class="game-arena-head">
+        <span class="game-arena-title" id="gameTitle">🤸 Cabezazo</span>
+        <span class="game-score-pill" id="gameLiveScore">0</span>
+      </div>
+      <div class="game-canvas-wrap" id="gameCanvasWrap" style="height:340px;">
+        <canvas id="gameCanvas" width="600" height="340"></canvas>
+        <div class="game-msg" id="gameMsg">
+          <div class="gm-emoji">🤸</div>
+          <div class="gm-title">CABEZAZO</div>
+          <div class="gm-sub">Mueve el ratón (o toca) para mover al jugador.<br>¡No dejes caer el balón!</div>
+        </div>
+      </div>
+      <div class="game-controls">
+        <button class="btn-game btn-primary" id="btnStart" onclick="startGame()">▶ JUGAR</button>
+        <button class="btn-game btn-secondary" id="btnRestart" onclick="restartGame()" style="display:none">↺ REINICIAR</button>
       </div>
     </div>
 
     <div>
-      <div class="eyebrow-sm">Posiciones de Grupo Reales</div>
-      <div class="card">
-        <div class="card-head">
-          <span class="card-title">Grupo</span>
-          <select class="grp-sel" id="gSel" onchange="renderStd()">
-            <option>A</option><option>B</option><option>C</option><option>D</option>
-            <option>E</option><option>F</option><option>G</option><option>H</option>
-            <option>I</option><option>J</option><option>K</option><option>L</option>
-          </select>
+      <div class="eyebrow-sm">🏅 Récords de Mini Juegos</div>
+      <div class="games-lb-section">
+        <div class="games-lb-card" id="lbCabezazoCard">
+          <div class="games-lb-head">
+            <span class="glh-icon">🤸</span>
+            <span class="glh-title">Top 3 — Cabezazo</span>
+          </div>
+          <div id="lbCabezazoBody"><div class="lb-empty">Aún no hay récords. ¡Sé el primero!</div></div>
         </div>
-        <div id="stdBody"></div>
+        <div class="games-lb-card" id="lbMilanesasCard">
+          <div class="games-lb-head">
+            <span class="glh-icon">🥩</span>
+            <span class="glh-title">Top 3 — Milanesas</span>
+          </div>
+          <div id="lbMilanesasBody"><div class="lb-empty">Aún no hay récords. ¡Sé el primero!</div></div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- ── GRÁFICOS: fuera del grid, ancho completo ── -->
-<div class="charts-section">
-  <div class="eyebrow-sm">Tendencias de la Quiniela</div>
-  <div class="card">
-    <div class="card-head">
-      <span class="card-title">📊 Favoritos del Torneo</span>
-    </div>
-    <div id="chartsContainer" class="charts-grid">
-      <div class="err">⏳ Analizando las respuestas...</div>
-    </div>
   </div>
-</div>
-
-<div class="modal-overlay" id="playerModal" onclick="if(event.target===this) closePlayerCard()">
+</div><div class="modal-overlay" id="playerModal" onclick="if(event.target===this) closePlayerCard()">
   <div class="fifa-card" id="fcContent"></div>
 </div>
 
-<script>
-// ── CONFIGURACIÓN ───────────────────────────────────────
-const SID = '1Lxz_7Hf20m685XGDQQmNFL0IclDY8RzK0IXIo0jnZg4';
-const GID_LEADERBOARD = '1369482165'; 
-const GID_DATOS = '0'; 
+<div class="record-modal-overlay" id="recordModal">
+  <div class="record-modal">
+    <div class="rm-trophy">🏆</div>
+    <div class="rm-title">¡NUEVO RÉCORD!</div>
+    <div class="rm-sub" id="rmSub">Rompiste el récord. Ingresa tu nombre para quedar en la historia.</div>
+    <div class="rm-score" id="rmScoreDisplay">0</div>
+    <input class="rm-input" id="rmNameInput" type="text" placeholder="Tu nombre" maxlength="20" autocomplete="off">
+    <div class="rm-actions">
+      <button class="rm-btn skip" onclick="saveRecord(false)">Omitir</button>
+      <button class="rm-btn confirm" onclick="saveRecord(true)">Guardar 🎯</button>
+    </div>
+  </div>
+</div>
 
-const API_TOKEN = 'f853d9be52624d2992574a3b6f36aaa1'; 
+<script>
+// ══════════════════════════════════════════════════════
+//  CONFIGURACIÓN QUINIELA
+// ══════════════════════════════════════════════════════
+const SID = '1Lxz_7Hf20m685XGDQQmNFL0IclDY8RzK0IXIo0jnZg4';
+const GID_LEADERBOARD = '1369482165';
+const GID_DATOS = '0';
+const API_TOKEN = 'f853d9be52624d2992574a3b6f36aaa1';
 const API_URL_MATCHES = 'https://corsproxy.io/?https://api.football-data.org/v4/competitions/WC/matches';
 const API_URL_STANDINGS = 'https://corsproxy.io/?https://api.football-data.org/v4/competitions/WC/standings';
+const REFRESH_INTERVAL = 3 * 60 * 1000;
 
-const REFRESH_INTERVAL = 3 * 60 * 1000; 
-
-// ── VARIABLES GLOBALES ──────────────────────────────────
-let matches = [];        
-let grpResults = {};     
-let curTab = 'r'; 
-let formPicks = {}; 
+let matches = [];
+let grpResults = {};
+let curTab = 'r';
+let formPicks = {};
 let chartInstances = {};
 
-// ── DATOS ESTRUCTURALES ─────────────────────────────────
+// ── SECTION SWITCHER ──────────────────────────────────
+function switchSection(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('on'));
+  document.getElementById('sec' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('active');
+  document.getElementById('nav' + name.charAt(0).toUpperCase() + name.slice(1)).classList.add('on');
+}
+
+// ══════════════════════════════════════════════════════
+//  DATOS ESTRUCTURALES
+// ══════════════════════════════════════════════════════
 const GROUPS = {
   A:['México','Corea del Sur','Sudáfrica','Chequia'], B:['Canadá','Suiza','Bosnia y H.','Catar'],
   C:['Brasil','Marruecos','Escocia','Haití'], D:['Estados Unidos','Paraguay','Turquía','Australia'],
@@ -397,49 +585,473 @@ const GROUPS = {
   I:['Francia','Senegal','Noruega','Irak'], J:['Argentina','Austria','Argelia','Jordania'],
   K:['Portugal','Colombia','RD Congo','Uzbekistán'], L:['Inglaterra','Croacia','Ghana','Panamá'],
 };
-
 const FLAGS = {
-  'México':'🇲🇽','Corea del Sur':'🇰🇷','Sudáfrica':'🇿🇦','Chequia':'🇨🇿',
-  'Canadá':'🇨🇦','Suiza':'🇨🇭','Bosnia y H.':'🇧🇦','Catar':'🇶🇦',
-  'Brasil':'🇧🇷','Marruecos':'🇲🇦','Escocia':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','Haití':'🇭🇹',
-  'Turquía':'🇹🇷','Estados Unidos':'🇺🇸','Australia':'🇦🇺','Paraguay':'🇵🇾',
-  'Alemania':'🇩🇪','Ecuador':'🇪🇨','Curazao':'🇨🇼','Costa de Marfil':'🇨🇮',
-  'Japón':'🇯🇵','Suecia':'🇸🇪','Países Bajos':'🇳🇱','Túnez':'🇹🇳',
-  'Bélgica':'🇧🇪','Egipto':'🇪🇬','Irán':'🇮🇷','Nueva Zelanda':'🇳🇿',
-  'España':'🇪🇸','Cabo Verde':'🇨🇻','Arabia Saudita':'🇸🇦','Uruguay':'🇺🇾',
-  'Francia':'🇫🇷','Senegal':'🇸🇳','Noruega':'🇳🇴','Irak':'🇮🇶',
-  'Argentina':'🇦🇷','Austria':'🇦🇹','Argelia':'🇩🇿','Jordania':'🇯🇴',
-  'Portugal':'🇵🇹','Colombia':'🇨🇴','RD Congo':'🇨🇩','Uzbekistán':'🇺🇿',
-  'Inglaterra':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Croacia':'🇭🇷','Ghana':'🇬🇭','Panamá':'🇵🇦',
+  'México':'🇲🇽','Corea del Sur':'🇰🇷','Sudáfrica':'🇿🇦','Chequia':'🇨🇿','Canadá':'🇨🇦','Suiza':'🇨🇭','Bosnia y H.':'🇧🇦','Catar':'🇶🇦',
+  'Brasil':'🇧🇷','Marruecos':'🇲🇦','Escocia':'🏴󠁧󠁢󠁳󠁣󠁴󠁿','Haití':'🇭🇹','Turquía':'🇹🇷','Estados Unidos':'🇺🇸','Australia':'🇦🇺','Paraguay':'🇵🇾',
+  'Alemania':'🇩🇪','Ecuador':'🇪🇨','Curazao':'🇨🇼','Costa de Marfil':'🇨🇮','Japón':'🇯🇵','Suecia':'🇸🇪','Países Bajos':'🇳🇱','Túnez':'🇹🇳',
+  'Bélgica':'🇧🇪','Egipto':'🇪🇬','Irán':'🇮🇷','Nueva Zelanda':'🇳🇿','España':'🇪🇸','Cabo Verde':'🇨🇻','Arabia Saudita':'🇸🇦','Uruguay':'🇺🇾',
+  'Francia':'🇫🇷','Senegal':'🇸🇳','Noruega':'🇳🇴','Irak':'🇮🇶','Argentina':'🇦🇷','Austria':'🇦🇹','Argelia':'🇩🇿','Jordania':'🇯🇴',
+  'Portugal':'🇵🇹','Colombia':'🇨🇴','RD Congo':'🇨🇩','Uzbekistán':'🇺🇿','Inglaterra':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Croacia':'🇭🇷','Ghana':'🇬🇭','Panamá':'🇵🇦',
 };
 const fl = n => FLAGS[n] || '🏳️';
-
 const trans = {
-  "Mexico": "México", "South Korea": "Corea del Sur", "South Africa": "Sudáfrica", "Czech Republic": "Chequia", "Czechia": "Chequia",
-  "Canada": "Canadá", "Switzerland": "Suiza", "Bosnia and Herzegovina": "Bosnia y H.", "Bosnia & Herzegovina": "Bosnia y H.", "Bosnia-Herzegovina": "Bosnia y H.", 
-  "Qatar": "Catar", "Brazil": "Brasil", "Morocco": "Marruecos", "Scotland": "Escocia", "Haiti": "Haití",
-  "United States": "Estados Unidos", "USA": "Estados Unidos", "Paraguay": "Paraguay", "Turkey": "Turquía", "Türkiye": "Turquía", "Australia": "Australia",
-  "Germany": "Alemania", "Ecuador": "Ecuador", "Curacao": "Curazao", "Ivory Coast": "Costa de Marfil", "Côte d'Ivoire": "Costa de Marfil",
-  "Netherlands": "Países Bajos", "Japan": "Japón", "Sweden": "Suecia", "Tunisia": "Túnez",
-  "Belgium": "Bélgica", "Egypt": "Egipto", "Iran": "Irán", "New Zealand": "Nueva Zelanda",
-  "Spain": "España", "Cape Verde": "Cabo Verde", "Saudi Arabia": "Arabia Saudita", "Uruguay": "Uruguay",
-  "France": "Francia", "Senegal": "Senegal", "Norway": "Noruega", "Iraq": "Irak",
-  "Argentina": "Argentina", "Austria": "Austria", "Algeria": "Argelia", "Jordan": "Jordania",
-  "Portugal": "Portugal", "Colombia": "Colombia", "DR Congo": "RD Congo", "Congo DR": "RD Congo", "Uzbekistan": "Uzbekistán",
-  "England": "Inglaterra", "Croatia": "Croacia", "Ghana": "Ghana", "Panama": "Panamá"
+  "Mexico":"México","South Korea":"Corea del Sur","South Africa":"Sudáfrica","Czech Republic":"Chequia","Czechia":"Chequia",
+  "Canada":"Canadá","Switzerland":"Suiza","Bosnia and Herzegovina":"Bosnia y H.","Bosnia & Herzegovina":"Bosnia y H.","Bosnia-Herzegovina":"Bosnia y H.","Qatar":"Catar",
+  "Brazil":"Brasil","Morocco":"Marruecos","Scotland":"Escocia","Haiti":"Haití","United States":"Estados Unidos","USA":"Estados Unidos",
+  "Paraguay":"Paraguay","Turkey":"Turquía","Türkiye":"Turquía","Australia":"Australia","Germany":"Alemania","Ecuador":"Ecuador",
+  "Curacao":"Curazao","Ivory Coast":"Costa de Marfil","Côte d'Ivoire":"Costa de Marfil","Netherlands":"Países Bajos","Japan":"Japón",
+  "Sweden":"Suecia","Tunisia":"Túnez","Belgium":"Bélgica","Egypt":"Egipto","Iran":"Irán","New Zealand":"Nueva Zelanda",
+  "Spain":"España","Cape Verde":"Cabo Verde","Saudi Arabia":"Arabia Saudita","Uruguay":"Uruguay","France":"Francia","Senegal":"Senegal",
+  "Norway":"Noruega","Iraq":"Irak","Argentina":"Argentina","Austria":"Austria","Algeria":"Argelia","Jordan":"Jordania",
+  "Portugal":"Portugal","Colombia":"Colombia","DR Congo":"RD Congo","Congo DR":"RD Congo","Uzbekistan":"Uzbekistán",
+  "England":"Inglaterra","Croatia":"Croacia","Ghana":"Ghana","Panama":"Panamá"
 };
 const tr = n => trans[n] || n;
 
 Chart.defaults.color = '#8a9ab0';
 Chart.defaults.font.family = "'Barlow Condensed', sans-serif";
 
+// ══════════════════════════════════════════════════════
+//  MINI JUEGOS — SISTEMA DE RÉCORDS
+// ══════════════════════════════════════════════════════
+const RECORDS_KEY = 'quiniela_mxwc26_records';
+let pendingRecord = null; // { game, score }
+
+function loadRecords() {
+  try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || { cabezazo: [], milanesas: [] }; }
+  catch { return { cabezazo: [], milanesas: [] }; }
+}
+function saveRecords(data) {
+  try { localStorage.setItem(RECORDS_KEY, JSON.stringify(data)); } catch {}
+}
+
+function isRecord(game, score) {
+  const recs = loadRecords();
+  const list = recs[game] || [];
+  if (list.length < 3) return true;
+  return score > list[list.length - 1].score;
+}
+
+function commitRecord(game, score, name) {
+  const recs = loadRecords();
+  recs[game] = recs[game] || [];
+  recs[game].push({ name, score, date: new Date().toLocaleDateString('es-MX') });
+  recs[game].sort((a, b) => b.score - a.score);
+  recs[game] = recs[game].slice(0, 3);
+  saveRecords(recs);
+  renderGameLeaderboards();
+}
+
+function checkAndPromptRecord(game, score) {
+  if (isRecord(game, score)) {
+    pendingRecord = { game, score };
+    document.getElementById('rmScoreDisplay').textContent = score;
+    const gameLabel = game === 'cabezazo' ? 'Cabezazo 🤸' : 'Milanesas 🥩';
+    document.getElementById('rmSub').textContent = `¡Nuevo récord en ${gameLabel}! Ingresa tu nombre.`;
+    document.getElementById('rmNameInput').value = '';
+    document.getElementById('recordModal').classList.add('active');
+    setTimeout(() => document.getElementById('rmNameInput').focus(), 300);
+  }
+}
+
+function saveRecord(doSave) {
+  document.getElementById('recordModal').classList.remove('active');
+  if (pendingRecord) {
+    const name = doSave
+      ? (document.getElementById('rmNameInput').value.trim() || 'Anónimo')
+      : 'Anónimo';
+    if (doSave || document.getElementById('rmNameInput').value.trim()) {
+      commitRecord(pendingRecord.game, pendingRecord.score, name);
+    } else {
+      // skip with "Anónimo" only if name typed
+      if (!doSave) commitRecord(pendingRecord.game, pendingRecord.score, '—');
+    }
+    pendingRecord = null;
+  }
+}
+
+document.getElementById('rmNameInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') saveRecord(true);
+});
+
+function renderGameLeaderboards() {
+  const recs = loadRecords();
+  const medals = ['gold', 'silver', 'bronze'];
+  const emojis = ['🥇', '🥈', '🥉'];
+
+  ['cabezazo', 'milanesas'].forEach(game => {
+    const idMap = { cabezazo: 'lbCabezazoBody', milanesas: 'lbMilanesasBody' };
+    const bodyEl = document.getElementById(idMap[game]);
+    if (!bodyEl) return;
+    const list = recs[game] || [];
+    if (!list.length) {
+      bodyEl.innerHTML = '<div class="lb-empty">Aún no hay récords. ¡Sé el primero!</div>';
+      return;
+    }
+    bodyEl.innerHTML = list.map((r, i) => `
+      <div class="lb-row-game">
+        <span class="grk ${medals[i]}">${emojis[i]}</span>
+        <span class="gnm">${r.name}</span>
+        <span class="gsc">${r.score}</span>
+      </div>
+    `).join('');
+  });
+}
+
+// ══════════════════════════════════════════════════════
+//  MINI JUEGO: CABEZAZO (Keepie-uppie)
+// ══════════════════════════════════════════════════════
+const HEAD = {
+  running: false, animFrame: null, score: 0,
+  ball: { x: 300, y: 200, vx: 1.0, vy: 0, r: 16 },
+  player: { x: 300, y: 285, w: 60, h: 20, targetX: 300 },
+  gravity: 0.055,   // muy ligero — se siente globo de playa
+  bounces: 0,
+  canvas: null, ctx: null,
+  mouseX: 300,
+
+  init(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.reset();
+    this.render();
+  },
+
+  reset() {
+    this.running = false; this.score = 0; this.bounces = 0;
+    this.gravity = 0.055;
+    this.ball = { x: 300, y: 200, vx: 1.0, vy: 0, r: 16 };
+    this.player.x = 300; this.player.targetX = 300;
+    if (this.animFrame) { cancelAnimationFrame(this.animFrame); this.animFrame = null; }
+    this.updateUI();
+    const msg = document.getElementById('gameMsg');
+    msg.innerHTML = `<div class="gm-emoji">🤸</div><div class="gm-title">CABEZAZO</div><div class="gm-sub">Mueve el ratón (o toca) para mover al jugador.<br>¡No dejes caer el balón!</div>`;
+    msg.classList.remove('hidden');
+    document.getElementById('btnStart').style.display = '';
+    document.getElementById('btnRestart').style.display = 'none';
+    this.render();
+  },
+
+  start() {
+    this.running = true;
+    document.getElementById('gameMsg').classList.add('hidden');
+    document.getElementById('btnStart').style.display = 'none';
+    document.getElementById('btnRestart').style.display = '';
+    this.loop();
+  },
+
+  loop() {
+    if (!this.running) return;
+    this.update();
+    this.render();
+    this.animFrame = requestAnimationFrame(() => this.loop());
+  },
+
+  update() {
+    const b = this.ball, p = this.player, W = 600, H = 340;
+    // Ball physics
+    b.vy += this.gravity;
+    b.x += b.vx; b.y += b.vy;
+    // Wall bounce (slight energy loss for realism)
+    if (b.x - b.r < 0)  { b.x = b.r;     b.vx =  Math.abs(b.vx) * 0.9; }
+    if (b.x + b.r > W)  { b.x = W - b.r; b.vx = -Math.abs(b.vx) * 0.9; }
+    // Player follow mouse smoothly
+    p.x += (this.mouseX - p.x) * 0.15;
+    p.x = Math.max(p.w/2, Math.min(W - p.w/2, p.x));
+    // Head collision
+    const headCY = p.y - 14;
+    const headR  = 22; 
+    const dx = b.x - p.x;
+    const dy = b.y - headCY;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    if (dist < b.r + headR && b.vy > 0) {
+      b.vy = -7.5;                           
+      b.vx += dx * 0.06;                     
+      b.vx = Math.max(-5, Math.min(5, b.vx));
+      b.y = headCY - b.r - headR - 1;        
+      this.score++;
+      this.bounces++;
+      this.updateUI();
+      if (this.bounces % 10 === 0) {
+        this.gravity = Math.min(0.18, this.gravity + 0.008);
+      }
+    }
+    // Ground = game over
+    if (b.y - b.r > H) { this.end(); }
+  },
+
+  end() {
+    this.running = false;
+    if (this.animFrame) cancelAnimationFrame(this.animFrame);
+    const msg = document.getElementById('gameMsg');
+    const stars = this.score >= 50 ? '⭐⭐⭐' : this.score >= 25 ? '⭐⭐' : this.score >= 8 ? '⭐' : '';
+    msg.innerHTML = `<div class="gm-score">${this.score}</div><div class="gm-title">${stars || '😮'} toque${this.score !== 1 ? 's' : ''}</div><div class="gm-sub">¡Inténtalo de nuevo!</div>`;
+    msg.classList.remove('hidden');
+    document.getElementById('gameLiveScore').textContent = this.score;
+    checkAndPromptRecord('cabezazo', this.score);
+  },
+
+  updateUI() { document.getElementById('gameLiveScore').textContent = this.score; },
+
+  setMouse(ex, ey) {
+    if (!this.running) return;
+    const rect = this.canvas.getBoundingClientRect();
+    this.mouseX = (ex - rect.left) * (this.canvas.width / rect.width);
+  },
+
+  render() {
+    const c = this.ctx, W = 600, H = 340;
+    // Sky + grass
+    c.fillStyle = '#0a1a0e'; c.fillRect(0, 0, W, H);
+    for (let i = 0; i < 8; i++) {
+      c.fillStyle = i % 2 === 0 ? 'rgba(0,0,0,0.08)' : 'transparent';
+      c.fillRect(i * 75, 0, 75, H);
+    }
+    // Ground line
+    c.strokeStyle = 'rgba(255,255,255,0.15)'; c.lineWidth = 2;
+    c.beginPath(); c.moveTo(0, H - 5); c.lineTo(W, H - 5); c.stroke();
+
+    // Difficulty bar
+    const diff = Math.min(1, (this.gravity - 0.25) / 0.25);
+    if (diff > 0) {
+      c.fillStyle = `rgba(255,87,34,${diff * 0.6})`; c.fillRect(0, 0, W * diff, 4);
+    }
+
+    // Player (head shape)
+    const p = this.player;
+    // Body
+    c.fillStyle = '#1565c0';
+    c.beginPath(); c.roundRect(p.x - 12, p.y, 24, 40, 4); c.fill();
+    // Head
+    c.fillStyle = '#ffcc80'; c.beginPath(); c.arc(p.x, p.y - 14, 18, 0, Math.PI * 2); c.fill();
+    // Hair
+    c.fillStyle = '#5d4037'; c.beginPath(); c.arc(p.x, p.y - 20, 18, Math.PI, 0); c.fill();
+    // Eyes
+    c.fillStyle = '#333'; c.beginPath(); c.arc(p.x - 6, p.y - 14, 3, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(p.x + 6, p.y - 14, 3, 0, Math.PI * 2); c.fill();
+
+    // Ball
+    const b = this.ball;
+    c.fillStyle = '#ffffff'; c.beginPath(); c.arc(b.x, b.y, b.r, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#333'; c.lineWidth = 1.5; c.beginPath(); c.arc(b.x, b.y, b.r, 0, Math.PI * 2); c.stroke();
+    // Pentagon pattern
+    c.fillStyle = '#333'; c.beginPath(); c.arc(b.x, b.y, b.r * 0.45, 0, Math.PI * 2); c.fill();
+
+    // Score
+    c.fillStyle = 'rgba(0,0,0,0.6)'; c.beginPath(); c.roundRect(W/2 - 50, 10, 100, 30, 6); c.fill();
+    c.fillStyle = '#00e676'; c.font = 'bold 18px "Barlow Condensed", sans-serif'; c.textAlign = 'center';
+    c.fillText(`TOQUES: ${this.score}`, W/2, 29);
+  }
+};
+
+// ══════════════════════════════════════════════════════
+//  MINI JUEGO: ATRAPA LA MILANESA
+// ══════════════════════════════════════════════════════
+const MILA = {
+  running: false, animFrame: null, score: 0,
+  items: [], spawnTimer: 0, spawnRate: 60, speedMultiplier: 1,
+  player: { x: 300, y: 300, w: 80, h: 20 }, // Messi (su área de atrape)
+  canvas: null, ctx: null,
+  mouseX: 300,
+
+  init(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.reset();
+  },
+
+  reset() {
+    this.running = false; this.score = 0;
+    this.items = []; this.spawnTimer = 0; this.spawnRate = 70; this.speedMultiplier = 1;
+    this.player.x = 300;
+    if (this.animFrame) { cancelAnimationFrame(this.animFrame); this.animFrame = null; }
+    document.getElementById('gameLiveScore').textContent = '0';
+    const msg = document.getElementById('gameMsg');
+    msg.innerHTML = `<div class="gm-emoji">🐐</div><div class="gm-title">LAS MILANESAS</div><div class="gm-sub">Mueve el ratón o el dedo para atraparlas.<br>¡Si se te cae una al piso, pierdes!</div>`;
+    msg.classList.remove('hidden');
+    document.getElementById('btnStart').style.display = '';
+    document.getElementById('btnRestart').style.display = 'none';
+    this.render();
+  },
+
+  start() {
+    this.running = true;
+    document.getElementById('gameMsg').classList.add('hidden');
+    document.getElementById('btnStart').style.display = 'none';
+    document.getElementById('btnRestart').style.display = '';
+    this.loop();
+  },
+
+  loop() {
+    if (!this.running) return;
+    this.update();
+    this.render();
+    this.animFrame = requestAnimationFrame(() => this.loop());
+  },
+
+  update() {
+    const p = this.player, W = 600, H = 340;
+    
+    // Movimiento suavizado del jugador
+    p.x += (this.mouseX - p.x) * 0.2;
+    p.x = Math.max(p.w/2, Math.min(W - p.w/2, p.x));
+
+    // Instanciar nuevas milanesas (Spawning)
+    this.spawnTimer++;
+    if (this.spawnTimer >= this.spawnRate) {
+      this.spawnTimer = 0;
+      this.items.push({
+        x: 30 + Math.random() * (W - 60),
+        y: -20,
+        r: 15,
+        speed: (2 + Math.random() * 2) * this.speedMultiplier,
+        rotation: Math.random() * Math.PI * 2,
+        rotSpeed: (Math.random() - 0.5) * 0.1
+      });
+      // Aumentar dificultad progresivamente
+      if (this.spawnRate > 25) this.spawnRate -= 1.5;
+      this.speedMultiplier += 0.02;
+    }
+
+    // Actualizar posiciones y chequear colisiones
+    for (let i = this.items.length - 1; i >= 0; i--) {
+      let item = this.items[i];
+      item.y += item.speed;
+      item.rotation += item.rotSpeed;
+
+      // Colisión con el jugador (caja delimitadora simple)
+      if (item.y + item.r > p.y - 10 && item.y - item.r < p.y + p.h && 
+          item.x + item.r > p.x - p.w/2 && item.x - item.r < p.x + p.w/2) {
+        this.items.splice(i, 1); // ¡Atrapada!
+        this.score++;
+        document.getElementById('gameLiveScore').textContent = this.score;
+        continue;
+      }
+
+      // Si toca el piso, fin del juego
+      if (item.y > H + item.r) {
+        this.end();
+        return;
+      }
+    }
+  },
+
+  end() {
+    this.running = false;
+    if (this.animFrame) cancelAnimationFrame(this.animFrame);
+    const msg = document.getElementById('gameMsg');
+    const stars = this.score >= 40 ? '🐐🐐🐐' : this.score >= 20 ? '⭐⭐' : this.score >= 5 ? '⭐' : '';
+    msg.innerHTML = `<div class="gm-score">${this.score}</div><div class="gm-title">${stars || '😭'}</div><div class="gm-sub">¡Se te cayó la milanesa! Inténtalo de nuevo.</div>`;
+    msg.classList.remove('hidden');
+    checkAndPromptRecord('milanesas', this.score);
+  },
+
+  setMouse(ex, ey) {
+    if (!this.running) return;
+    const rect = this.canvas.getBoundingClientRect();
+    this.mouseX = (ex - rect.left) * (this.canvas.width / rect.width);
+  },
+
+  render() {
+    const c = this.ctx, W = 600, H = 340;
+    
+    // Fondo de cocina/cancha abstracto
+    c.fillStyle = '#161b23'; c.fillRect(0, 0, W, H);
+    c.strokeStyle = '#1f2733'; c.lineWidth = 2;
+    for(let i=0; i<W; i+=40) { c.beginPath(); c.moveTo(i,0); c.lineTo(i,H); c.stroke(); }
+    for(let i=0; i<H; i+=40) { c.beginPath(); c.moveTo(0,i); c.lineTo(W,i); c.stroke(); }
+
+    // Jugador (Messi simplificado: camiseta argentina y un plato/manos)
+    const p = this.player;
+    // Brazos/Plato
+    c.fillStyle = '#b0bec5'; 
+    c.beginPath(); c.roundRect(p.x - p.w/2, p.y - 10, p.w, 12, 6); c.fill();
+    // Cuerpo
+    c.fillStyle = '#4fc3f7'; c.fillRect(p.x - 20, p.y, 40, 40);
+    c.fillStyle = '#ffffff'; c.fillRect(p.x - 10, p.y, 8, 40); c.fillRect(p.x + 2, p.y, 8, 40); // Rayas
+    // Cabeza
+    c.fillStyle = '#ffcc80'; c.beginPath(); c.arc(p.x, p.y - 30, 16, 0, Math.PI * 2); c.fill();
+    // Pelo/Barba
+    c.fillStyle = '#3e2723'; 
+    c.beginPath(); c.arc(p.x, p.y - 36, 16, Math.PI, 0); c.fill(); // Pelo
+    c.beginPath(); c.arc(p.x, p.y - 22, 10, 0, Math.PI); c.fill(); // Barba
+
+    // Renderizar Milanesas
+    for (let item of this.items) {
+      c.save();
+      c.translate(item.x, item.y);
+      c.rotate(item.rotation);
+      // Forma de la milanesa (óvalo irregular)
+      c.fillStyle = '#8d6e63'; // Color pan rallado oscuro
+      c.beginPath(); c.ellipse(0, 0, item.r * 1.4, item.r * 0.9, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#d7ccc8'; // Destellos claros
+      c.beginPath(); c.arc(-5, -2, 3, 0, Math.PI*2); c.fill();
+      c.beginPath(); c.arc(6, 4, 2, 0, Math.PI*2); c.fill();
+      c.restore();
+    }
+
+    // Marcador
+    c.fillStyle = 'rgba(0,0,0,0.7)'; c.beginPath(); c.roundRect(W/2 - 60, 10, 120, 30, 6); c.fill();
+    c.fillStyle = '#ff5722'; c.font = 'bold 18px "Barlow Condensed", sans-serif'; c.textAlign = 'center';
+    c.fillText(`ATRAPADAS: ${this.score}`, W/2, 29);
+  }
+};
+
+// ══════════════════════════════════════════════════════
+//  GAME CONTROLLER
+// ══════════════════════════════════════════════════════
+let currentGame = 'cabezazo';
+
+function selectGame(game) {
+  currentGame = game;
+  document.getElementById('btnCabezazo').classList.toggle('selected', game === 'cabezazo');
+  document.getElementById('btnMilanesas').classList.toggle('selected', game === 'milanesas');
+  const titles = { cabezazo: '🤸 Cabezazo', milanesas: '🥩 Milanesas' };
+  document.getElementById('gameTitle').textContent = titles[game];
+  document.getElementById('gameLiveScore').textContent = '0';
+  
+  if (game === 'cabezazo') HEAD.init(document.getElementById('gameCanvas'));
+  else MILA.init(document.getElementById('gameCanvas'));
+  setupCanvasEvents();
+}
+
+function startGame() {
+  if (currentGame === 'cabezazo') HEAD.start();
+  else MILA.start();
+}
+
+function restartGame() {
+  if (currentGame === 'cabezazo') HEAD.reset();
+  else MILA.reset();
+}
+
+function setupCanvasEvents() {
+  const canvas = document.getElementById('gameCanvas');
+  const newCanvas = canvas.cloneNode(true);
+  canvas.parentNode.replaceChild(newCanvas, canvas);
+  newCanvas.id = 'gameCanvas';
+
+  if (currentGame === 'cabezazo') {
+    HEAD.canvas = newCanvas; HEAD.ctx = newCanvas.getContext('2d');
+    newCanvas.addEventListener('mousemove', e => HEAD.setMouse(e.clientX, e.clientY));
+    newCanvas.addEventListener('touchmove', e => { e.preventDefault(); HEAD.setMouse(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+  } else {
+    MILA.canvas = newCanvas; MILA.ctx = newCanvas.getContext('2d');
+    newCanvas.addEventListener('mousemove', e => MILA.setMouse(e.clientX, e.clientY));
+    newCanvas.addEventListener('touchmove', e => { e.preventDefault(); MILA.setMouse(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+  }
+}
+
+// ══════════════════════════════════════════════════════
+//  QUINIELA — LÓGICA ORIGINAL
+// ══════════════════════════════════════════════════════
 function generateFallbackMatches() {
   const generated = [];
   const letters = Object.keys(GROUPS);
   letters.forEach((letter, index) => {
     const teams = GROUPS[letter];
-    const dayOffset = Math.floor(index / 2); 
-    const baseDate = new Date('2026-06-11T14:00:00Z'); 
+    const dayOffset = Math.floor(index / 2);
+    const baseDate = new Date('2026-06-11T14:00:00Z');
     baseDate.setDate(baseDate.getDate() + dayOffset);
     const d1 = new Date(baseDate); d1.setUTCHours(15 + (index % 2) * 3, 0, 0);
     generated.push({ g: letter, h: teams[0], a: teams[1], sH: null, sA: null, st: 'SCHED', date: d1 });
@@ -449,7 +1061,6 @@ function generateFallbackMatches() {
   matches = generated.sort((a, b) => a.date - b.date);
 }
 
-// ── 1. CARGA Y CÁLCULO DE PREDICCIONES (GRÁFICOS) ───────
 async function fetchDatosFormulario() {
   try {
     const r = await fetch(`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${GID_DATOS}`);
@@ -457,21 +1068,17 @@ async function fetchDatosFormulario() {
     const text = await r.text();
     const rows = parseCSV(text);
     if (rows.length < 2) return;
-
     const headers = rows[0];
     let nameIdx = 1;
-    for(let i=0; i<headers.length; i++){
-      if(headers[i].toLowerCase().includes('nombre') || headers[i].toLowerCase().includes('participante')) nameIdx = i;
+    for (let i = 0; i < headers.length; i++) {
+      if (headers[i].toLowerCase().includes('nombre') || headers[i].toLowerCase().includes('participante')) nameIdx = i;
     }
-
     formPicks = {};
     const globalStats = {};
-
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       if (!row[nameIdx]) continue;
       const pName = row[nameIdx].trim().toLowerCase();
-      
       let picks = [];
       for (let j = 0; j < headers.length; j++) {
         const h = headers[j].toLowerCase();
@@ -488,11 +1095,9 @@ async function fetchDatosFormulario() {
       }
       formPicks[pName] = picks;
     }
-
     renderCharts(globalStats);
-
-  } catch (e) { 
-    console.error('Error cargando Formulario', e); 
+  } catch (e) {
+    console.error('Error cargando Formulario', e);
     document.getElementById('chartsContainer').innerHTML = '<div class="err">No se pudieron cargar las tendencias.</div>';
   }
 }
@@ -500,96 +1105,36 @@ async function fetchDatosFormulario() {
 function renderCharts(stats) {
   const container = document.getElementById('chartsContainer');
   const allQuestions = Object.keys(stats);
-  
-  if(allQuestions.length === 0) {
-    container.innerHTML = '<div class="err">No hay suficientes datos globales para graficar.</div>';
-    return;
-  }
-
+  if (allQuestions.length === 0) { container.innerHTML = '<div class="err">No hay suficientes datos globales para graficar.</div>'; return; }
   let selectedQ = [];
   const keywords = ['campeón', 'ganador', 'goleador', 'sorpresa', 'decepción', 'revelación', 'final'];
-  
-  allQuestions.forEach(q => {
-    if (keywords.some(k => q.toLowerCase().includes(k))) {
-      selectedQ.push(q);
-    }
-  });
-
+  allQuestions.forEach(q => { if (keywords.some(k => q.toLowerCase().includes(k))) selectedQ.push(q); });
   if (selectedQ.length === 0) selectedQ = allQuestions.slice(0, 3);
   else selectedQ = selectedQ.slice(0, 3);
-
   container.innerHTML = selectedQ.map((q, idx) => `
-    <div class="chart-box">
-      <div class="chart-title">${q}</div>
-      <div class="chart-canvas-wrap">
-        <canvas id="chart${idx}"></canvas>
-      </div>
-    </div>
+    <div class="chart-box"><div class="chart-title">${q}</div>
+    <div class="chart-canvas-wrap"><canvas id="chart${idx}"></canvas></div></div>
   `).join('');
-
-  // Paleta derivada de los tokens del sistema: gold, green, blue, accent, bronze, silver + variantes con opacidad
-  const colors = [
-    '#f5c842',        // --gold
-    '#00e676',        // --green
-    '#4fc3f7',        // --blue
-    '#ff5722',        // --accent
-    '#cd7f32',        // --bronze
-    '#b0bec5',        // --silver
-    'rgba(245,200,66,0.55)',   // gold suave
-    'rgba(0,230,118,0.55)',    // green suave
-    'rgba(79,195,247,0.55)',   // blue suave
-    'rgba(255,87,34,0.55)',    // accent suave
-    'rgba(205,127,50,0.55)',   // bronze suave
-    'rgba(176,190,197,0.55)',  // silver suave
-  ];
-
+  const colors = ['#f5c842','#00e676','#4fc3f7','#ff5722','#cd7f32','#b0bec5','rgba(245,200,66,0.55)','rgba(0,230,118,0.55)','rgba(79,195,247,0.55)','rgba(255,87,34,0.55)','rgba(205,127,50,0.55)','rgba(176,190,197,0.55)'];
   selectedQ.forEach((q, idx) => {
     const dataObj = stats[q];
     const sortedAnswers = Object.entries(dataObj).sort((a, b) => b[1] - a[1]);
     const labels = sortedAnswers.map(item => item[0]);
     const values = sortedAnswers.map(item => item[1]);
-
     const ctx = document.getElementById('chart' + idx);
-    if(chartInstances[idx]) chartInstances[idx].destroy();
-    
+    if (chartInstances[idx]) chartInstances[idx].destroy();
     chartInstances[idx] = new Chart(ctx, {
       type: 'doughnut',
-      data: {
-        labels: labels,
-        datasets: [{
-          data: values,
-          backgroundColor: colors,
-          borderColor: '#161b23',
-          borderWidth: 2,
-          hoverOffset: 6
-        }]
-      },
+      data: { labels, datasets: [{ data: values, backgroundColor: colors, borderColor: '#161b23', borderWidth: 2, hoverOffset: 6 }] },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '60%',
+        responsive: true, maintainAspectRatio: false, cutout: '60%',
         plugins: {
-          legend: {
-            position: 'bottom',  /* ← leyenda abajo para que no se corte */
-            labels: {
-              color: '#e8edf2',
-              font: { size: 12, family: "'Barlow Condensed', sans-serif" },
-              boxWidth: 12,
-              padding: 10
-            }
-          },
+          legend: { position: 'bottom', labels: { color: '#e8edf2', font: { size: 12, family: "'Barlow Condensed', sans-serif" }, boxWidth: 12, padding: 10 } },
           tooltip: {
             backgroundColor: 'rgba(0,0,0,0.8)',
             titleFont: { family: "'Barlow Condensed', sans-serif", size: 14 },
             bodyFont: { family: "'Barlow Condensed', sans-serif", size: 13 },
-            callbacks: {
-              label: function(context) {
-                let label = context.label || '';
-                if (label) label += ': ';
-                label += context.parsed + (context.parsed === 1 ? ' voto' : ' votos');
-                return label;
-              }
-            }
+            callbacks: { label: ctx => { let l = ctx.label || ''; if (l) l += ': '; l += ctx.parsed + (ctx.parsed === 1 ? ' voto' : ' votos'); return l; } }
           }
         }
       }
@@ -597,58 +1142,42 @@ function renderCharts(stats) {
   });
 }
 
-// ── 2. MODAL FICHA FIFA ────────────────────
 function openPlayerCard(rawName, pts, rank, gPts, pPts) {
   const modal = document.getElementById('playerModal');
   const content = document.getElementById('fcContent');
-  
   const normName = rawName.trim().toLowerCase();
   const picks = formPicks[normName] || [];
-
   let rColor = 'var(--muted)'; let borderColor = 'var(--border)';
-  if(rank === 1) { rColor = 'var(--gold)'; borderColor = 'var(--gold)'; }
-  if(rank === 2) { rColor = 'var(--silver)'; borderColor = 'var(--silver)'; }
-  if(rank === 3) { rColor = 'var(--bronze)'; borderColor = 'var(--bronze)'; }
-
+  if (rank === 1) { rColor = 'var(--gold)'; borderColor = 'var(--gold)'; }
+  if (rank === 2) { rColor = 'var(--silver)'; borderColor = 'var(--silver)'; }
+  if (rank === 3) { rColor = 'var(--bronze)'; borderColor = 'var(--bronze)'; }
   content.style.borderTop = `4px solid ${borderColor}`;
-
-  let picksHTML = '';
-  if (picks.length === 0) {
-     picksHTML = '<div class="err">Aún no se procesan las predicciones para este jugador.</div>';
-  } else {
-     picksHTML = picks.map(p => {
+  let picksHTML = picks.length === 0
+    ? '<div class="err">Aún no se procesan las predicciones para este jugador.</div>'
+    : picks.map(p => {
         let cleanQ = p.q.replace(/\[.*?\]\s*/g, '');
         let answerFlag = FLAGS[p.a] ? `<span style="font-size:18px">${FLAGS[p.a]}</span> ` : '';
-        return `<div class="pick-row" style="border-left-color: ${borderColor}">
-                   <div class="pick-q">${cleanQ}</div>
-                   <div class="pick-a">${answerFlag}${p.a}</div>
-                </div>`;
-     }).join('');
-  }
-
+        return `<div class="pick-row" style="border-left-color: ${borderColor}"><div class="pick-q">${cleanQ}</div><div class="pick-a">${answerFlag}${p.a}</div></div>`;
+      }).join('');
   content.innerHTML = `
     <button class="close-btn" onclick="closePlayerCard()">×</button>
     <div class="fc-header">
       <div class="fc-rank" style="color: ${rColor}">${rank}</div>
-      <div class="fc-info">
-        <h2>${rawName}</h2>
-        <div class="fc-stats">
-          <div class="fc-stat"><span class="val">${pts}</span><span class="lbl">Total</span></div>
-          <div class="fc-stat"><span class="val">${gPts}</span><span class="lbl">Grupos</span></div>
-          <div class="fc-stat"><span class="val">${pPts}</span><span class="lbl">Partidos</span></div>
-        </div>
-      </div>
+      <div class="fc-info"><h2>${rawName}</h2>
+      <div class="fc-stats">
+        <div class="fc-stat"><span class="val">${pts}</span><span class="lbl">Total</span></div>
+        <div class="fc-stat"><span class="val">${gPts}</span><span class="lbl">Grupos</span></div>
+        <div class="fc-stat"><span class="val">${pPts}</span><span class="lbl">Partidos</span></div>
+      </div></div>
     </div>
     <div class="fc-body">
       <div style="font-size:12px; color:${borderColor}; margin-bottom:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase;">Predicciones Oficiales</div>
       ${picksHTML}
-    </div>
-  `;
+    </div>`;
   modal.classList.add('active');
 }
 function closePlayerCard() { document.getElementById('playerModal').classList.remove('active'); }
 
-// ── 3. LEADERBOARD ──────────────────────────────────────
 function getDirectCsvUrl(gid) { return `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${gid}`; }
 
 async function fetchLeaderboard() {
@@ -672,7 +1201,7 @@ function parseCSV(txt) {
         while (end !== -1 && line[end + 1] === '"') end = line.indexOf('"', end + 2);
         if (end === -1) end = line.length;
         row.push(line.substring(c + 1, end).replace(/""/g, '"').trim());
-        c = end + 2; 
+        c = end + 2;
       } else {
         let nextComma = line.indexOf(',', c);
         if (nextComma === -1) nextComma = line.length;
@@ -700,21 +1229,17 @@ function processLB(rows) {
       players.push({ name, total: parseFloat(row[2]) || 0, grupos: parseFloat(row[4]) || 0, pPartidos: row[12] !== undefined ? parseFloat(row[12]) : 0 });
     }
   }
-
   const sPlayers = document.getElementById('sPlayers');
   if (sPlayers) sPlayers.textContent = `${players.length} participante${players.length !== 1 ? 's' : ''}`;
-  
   const lbTime = document.getElementById('lbTime');
   if (lbTime) {
-    const cdmxTime = new Date().toLocaleTimeString('es-MX', { timeZone: 'America/Mexico_City', hour:'2-digit', minute:'2-digit', hour12: true });
+    const cdmxTime = new Date().toLocaleTimeString('es-MX', { timeZone: 'America/Mexico_City', hour: '2-digit', minute: '2-digit', hour12: true });
     lbTime.textContent = 'Act: ' + cdmxTime + ' (CDMX)';
   }
-
   const body = document.getElementById('lbBody');
   if (body) {
     const totalPool = players.length * 400;
     const p1 = totalPool * 0.50; const p2 = totalPool * 0.30; const p3 = totalPool * 0.20;
-
     let prizeBox = document.getElementById('prizeBoxAuto');
     if (!prizeBox) {
       prizeBox = document.createElement('div'); prizeBox.id = 'prizeBoxAuto';
@@ -729,15 +1254,12 @@ function processLB(rows) {
       <div><div style="font-size:16px;">🥉</div><span style="font-size:11px;color:#aaa">3º (20%)</span><br><strong style="color:#fff; font-size:14px;">$${p3.toLocaleString('es-MX')}</strong></div>
     `;
   }
-
   const max = players.length ? Math.max(...players.map(p => p.total)) : 1;
   if (!players.length) { if (body) body.innerHTML = '<div class="err">No hay participantes.</div>'; return; }
-
   if (body) {
     body.innerHTML = players.map((p, i) => {
       const rank = i + 1; const cls = rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
       const rc = rank===1?'g':rank===2?'s':rank===3?'b':''; const em = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
-      const pct = max > 0 ? (p.total / max * 100).toFixed(1) : 0;
       return `<div class="lb-row ${cls}" title="Ver Ficha de Jugador" onclick="openPlayerCard('${p.name.replace(/'/g, "\\'")}', ${p.total}, ${rank}, ${p.grupos}, ${p.pPartidos})">
         <div class="rank ${rc}">${em || rank}</div>
         <div class="name-wrap"><div class="name">${p.name}</div><div class="bar-bg"><div class="bar"></div></div></div>
@@ -745,38 +1267,29 @@ function processLB(rows) {
         <div class="pts">${p.total}</div>
       </div>`;
     }).join('');
-    requestAnimationFrame(() => { document.querySelectorAll('.lb-row').forEach(r => { const bar = r.querySelector('.bar'); if (bar) bar.style.width = r.dataset.pct + '%'; }); });
   }
 }
 
-// ── 4. API PARTIDOS ─────────────────────────────────────
 async function fetchAPI() {
   try {
     const opts = { headers: { 'X-Auth-Token': API_TOKEN } };
     const resM = await fetch(API_URL_MATCHES, opts);
     if (!resM.ok) throw new Error('API en espera');
     const dataM = await resM.json();
-    
     if (dataM.matches && dataM.matches.length > 0) {
       matches = dataM.matches.map(m => {
         let st = 'SCHED'; if (m.status === 'FINISHED') st = 'FIN'; if (m.status === 'IN_PLAY' || m.status === 'PAUSED') st = 'LIVE';
         let groupLetter = '?'; if (m.group && m.group.includes('GROUP_')) groupLetter = m.group.split('_')[1];
-        return {
-          g: groupLetter, h: tr(m.homeTeam?.name), a: tr(m.awayTeam?.name),
-          sH: m.score?.fullTime?.home !== undefined ? m.score.fullTime.home : null,
-          sA: m.score?.fullTime?.away !== undefined ? m.score.fullTime.away : null,
-          st: st, date: new Date(m.utcDate)
-        };
+        return { g: groupLetter, h: tr(m.homeTeam?.name), a: tr(m.awayTeam?.name), sH: m.score?.fullTime?.home !== undefined ? m.score.fullTime.home : null, sA: m.score?.fullTime?.away !== undefined ? m.score.fullTime.away : null, st, date: new Date(m.utcDate) };
       });
     } else { generateFallbackMatches(); }
-
     const resS = await fetch(API_URL_STANDINGS, opts);
     if (resS.ok) {
       const dataS = await resS.json(); grpResults = {};
       if (dataS.standings) {
         dataS.standings.forEach(std => {
           if (std.type === 'TOTAL' && std.group) {
-            const gL = std.group.split('_')[1]; 
+            const gL = std.group.split('_')[1];
             grpResults[gL] = std.table.map(t => ({ team: tr(t.team.name), pts: t.points, pj: t.playedGames }));
           }
         });
@@ -786,24 +1299,26 @@ async function fetchAPI() {
   renderMatches(); renderStd();
 }
 
-// ── RENDERIZADO TABLAS LATERALES ────────────────────────
 function setTab(t) {
-  curTab = t; document.getElementById('tR').classList.toggle('on', t==='r'); document.getElementById('tU').classList.toggle('on', t==='u'); renderMatches();
+  curTab = t;
+  document.getElementById('tR').classList.toggle('on', t==='r');
+  document.getElementById('tU').classList.toggle('on', t==='u');
+  renderMatches();
 }
 
 function renderMatches() {
   const body = document.getElementById('mBody'); if (!body) return;
-  let list = curTab === 'r' ? matches.filter(m => m.st === 'FIN' || m.st === 'LIVE').sort((a,b) => b.date - a.date).slice(0, 8) : matches.filter(m => m.st === 'SCHED').sort((a,b) => a.date - b.date).slice(0, 4); 
+  let list = curTab === 'r'
+    ? matches.filter(m => m.st === 'FIN' || m.st === 'LIVE').sort((a,b) => b.date - a.date).slice(0, 8)
+    : matches.filter(m => m.st === 'SCHED').sort((a,b) => a.date - b.date).slice(0, 4);
   if (!list.length) { body.innerHTML = `<div class="err">${curTab==='r' ? '⚽ Ningún partido ha comenzado. ¡La Copa inicia este jueves!' : '📅 No hay más partidos programados.'}</div>`; return; }
   body.innerHTML = list.map(m => matchHTML(m)).join('');
 }
 
 function matchHTML(m) {
   const isLive = m.st === 'LIVE'; const hasSc = m.sH !== null && m.sA !== null;
-  const cdmxOptionsDate = { timeZone: 'America/Mexico_City', weekday: 'short', day: 'numeric' };
-  const cdmxOptionsTime = { timeZone: 'America/Mexico_City', hour: '2-digit', minute: '2-digit', hour12: true };
-  const dateStr = m.date.toLocaleDateString('es-MX', cdmxOptionsDate);
-  const timeStr = m.date.toLocaleTimeString('es-MX', cdmxOptionsTime);
+  const dateStr = m.date.toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City', weekday: 'short', day: 'numeric' });
+  const timeStr = m.date.toLocaleTimeString('es-MX', { timeZone: 'America/Mexico_City', hour: '2-digit', minute: '2-digit', hour12: true });
   const timeLabel = m.st === 'FIN' ? 'Finalizado' : isLive ? '⚡ EN VIVO' : `⏳ ${dateStr} - ${timeStr} (CDMX)`;
   const scoreBlock = hasSc ? `<div class="score"><span class="sc">${m.sH}</span><span class="sep">–</span><span class="sc">${m.sA}</span></div>` : `<span class="vs">VS</span>`;
   return `<div class="match"><div class="match-meta"><span class="grp-tag">Grupo ${m.g}</span><span class="mt ${isLive?'live-t':''}">${timeLabel}</span></div><div class="teams"><div class="team"><span class="fl">${fl(m.h)}</span><span class="tn">${m.h}</span></div>${scoreBlock}<div class="team away"><span class="fl">${fl(m.a)}</span><span class="tn">${m.a}</span></div></div></div>`;
@@ -813,27 +1328,37 @@ function renderStd() {
   const body = document.getElementById('stdBody'); if (!body) return;
   const g = document.getElementById('gSel') ? document.getElementById('gSel').value : 'A';
   const apiData = grpResults[g]; const baseData = GROUPS[g] || [];
-  let rows = (apiData && apiData.length > 0) ? apiData : baseData.map(team => ({ team: team, pts: 0, pj: 0 }));
-  body.innerHTML = `<table class="std-table"><thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>Pts</th></tr></thead><tbody>${rows.map((r,i) => { const dot = i<2 ? `<span class="qdot"></span>` : i===2 ? `<span class="qdot maybe"></span>` : ''; return `<tr><td style="font-size:13px;color:var(--muted)">${i+1}</td><td><span>${fl(r.team)}</span> ${dot}<span style="font-weight:700">${r.team}</span></td><td>${r.pj}</td><td class="ptd">${r.pts}</td></tr>`; }).join('')}</tbody></table><div class="legend"><span><span class="qdot" style="display:inline-block"></span>Clasifica</span><span><span class="qdot maybe" style="display:inline-block"></span>Posible 3ro</span></div>`;
+  let rows = (apiData && apiData.length > 0) ? apiData : baseData.map(team => ({ team, pts: 0, pj: 0 }));
+  body.innerHTML = `<table class="std-table"><thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>Pts</th></tr></thead><tbody>${rows.map((r,i) => {
+    const dot = i<2 ? `<span class="qdot"></span>` : i===2 ? `<span class="qdot maybe"></span>` : '';
+    return `<tr><td style="font-size:13px;color:var(--muted)">${i+1}</td><td><span>${fl(r.team)}</span> ${dot}<span style="font-weight:700">${r.team}</span></td><td>${r.pj}</td><td class="ptd">${r.pts}</td></tr>`;
+  }).join('')}</tbody></table><div class="legend"><span><span class="qdot" style="display:inline-block"></span>Clasifica</span><span><span class="qdot maybe" style="display:inline-block"></span>Posible 3ro</span></div>`;
 }
 
-function updateHeader() { const sDate = document.getElementById('sDate'); if (sDate) sDate.textContent = new Date().toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City', weekday:'short', day:'numeric', month:'long'}); }
+function updateHeader() {
+  const sDate = document.getElementById('sDate');
+  if (sDate) sDate.textContent = new Date().toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City', weekday:'short', day:'numeric', month:'long' });
+}
 
-// ── CONTROLADOR CENTRAL ─────────────────────────────────
 async function run() {
   const sDot = document.getElementById('sDot'); const sStatus = document.getElementById('sStatus');
   if (sDot) sDot.classList.remove('live'); if (sStatus) sStatus.textContent = 'Actualizando…';
-
-  await Promise.allSettled([ fetchLeaderboard(), fetchAPI(), fetchDatosFormulario() ]);
-
+  await Promise.allSettled([fetchLeaderboard(), fetchAPI(), fetchDatosFormulario()]);
   if (sStatus) sStatus.textContent = 'Sincronizado'; if (sDot) sDot.classList.add('live');
 }
 
 function init() {
-  updateHeader(); run(); setInterval(run, REFRESH_INTERVAL);
+  updateHeader();
+  run();
+  setInterval(run, REFRESH_INTERVAL);
   if (document.getElementById('btnRefresh')) document.getElementById('btnRefresh').addEventListener('click', run);
   if (document.getElementById('gSel')) document.getElementById('gSel').addEventListener('change', renderStd);
+
+  // Init mini games
+  renderGameLeaderboards();
+  selectGame('cabezazo');
 }
+
 if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', init); } else { init(); }
 </script>
 </body>
