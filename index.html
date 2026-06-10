@@ -384,6 +384,148 @@
     .rm-btn.confirm:hover { background: #ffe066; }
     .rm-btn.skip { background: var(--border); color: var(--dim); }
     .rm-btn.skip:hover { color: var(--text); }
+
+    /* ══════════════════════════════════════════
+       SECCIÓN 1v1 DUEL
+    ══════════════════════════════════════════ */
+    .duel-wrap {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 30px 16px 60px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .duel-picker-row {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+    @media(max-width: 650px) {
+      .duel-picker-row { grid-template-columns: 1fr; }
+      .duel-vs-center { order: -1; }
+      .duel-picker-side.right .eyebrow-sm { text-align: left; }
+    }
+
+    .duel-picker-side { display: flex; flex-direction: column; gap: 10px; }
+    .duel-picker-side.right { align-items: flex-end; }
+    .duel-picker-side.right .duel-avatar { align-items: flex-end; }
+
+    .duel-sel {
+      width: 100%;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 10px 14px;
+      outline: none;
+      cursor: pointer;
+      transition: border-color .2s;
+    }
+    .duel-sel:focus { border-color: var(--gold); }
+    .duel-sel option { background: var(--card); }
+
+    .duel-avatar {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+      width: 100%;
+    }
+    .da-rank { font-family: 'Barlow Condensed', sans-serif; font-size: 28px; font-weight: 900; color: var(--muted); }
+    .da-name { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 800; color: var(--text); }
+    .da-pts  { font-size: 13px; color: var(--dim); font-weight: 600; }
+
+    .duel-vs-center {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 6px; padding-top: 36px;
+    }
+    .duel-vs-badge {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 22px; font-weight: 900; letter-spacing: 3px;
+      background: var(--accent); color: #fff;
+      border-radius: 50%; width: 52px; height: 52px;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 20px rgba(255,87,34,0.35);
+    }
+    .duel-score-row { display: flex; align-items: center; gap: 6px; }
+    .duel-score-num {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 36px; font-weight: 900; color: var(--gold); min-width: 36px; text-align: center;
+    }
+    .duel-score-num.right { text-align: center; }
+    .duel-score-sep { font-family: 'Barlow Condensed', sans-serif; font-size: 24px; color: var(--muted); }
+    .duel-score-label { font-size: 11px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; }
+
+    /* Placeholder */
+    .duel-placeholder {
+      text-align: center; padding: 60px 20px;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 14px; color: var(--dim);
+    }
+
+    /* Filas de comparación */
+    .duel-section-title {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 10px; padding-left: 2px;
+    }
+
+    .duel-row {
+      display: grid;
+      grid-template-columns: 1fr 28px 1fr;
+      align-items: center;
+      gap: 10px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: border-color .2s;
+    }
+    .duel-row.match  { border-color: var(--green);  background: rgba(0,230,118,0.04); }
+    .duel-row.diff   { border-color: var(--accent);  background: rgba(255,87,34,0.04); }
+    .duel-row.empty  { border-color: var(--border); opacity: .55; }
+
+    .duel-cell {
+      padding: 12px 14px;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 15px; font-weight: 700; color: var(--text);
+      line-height: 1.3;
+    }
+    .duel-cell.right { text-align: right; }
+    .duel-cell .duel-q {
+      font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+      color: var(--muted); margin-bottom: 3px;
+    }
+    .duel-cell .duel-a { display: flex; align-items: center; gap: 5px; }
+    .duel-cell.right .duel-a { justify-content: flex-end; }
+    .duel-icon { font-size: 16px; text-align: center; }
+
+    .duel-empty-msg {
+      text-align: center; padding: 20px; color: var(--muted); font-size: 13px;
+      background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+    }
+
+    .duel-summary-bar {
+      display: grid; grid-template-columns: 1fr 1fr;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden; margin-bottom: 20px;
+    }
+    .dsb-cell { padding: 12px 18px; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; }
+    .dsb-cell span { display: block; font-size: 22px; font-weight: 900; }
+    .dsb-cell.green span { color: var(--green); }
+    .dsb-cell.red span   { color: var(--accent); }
+    .dsb-cell.right-side { text-align: right; border-left: 1px solid var(--border); }
   </style>
 </head>
 <body>
@@ -404,6 +546,7 @@
 <nav class="main-nav">
   <button class="main-tab on" id="navQuiniela" onclick="switchSection('quiniela')">🏆 Quiniela</button>
   <button class="main-tab games-tab" id="navGames" onclick="switchSection('games')">🎮 Mini Juegos</button>
+  <button class="main-tab" id="navDuel" onclick="switchSection('duel')">⚔️ 1v1</button>
 </nav>
 
 <div class="section active" id="secQuiniela">
@@ -543,7 +686,59 @@
     </div>
 
   </div>
-</div><div class="modal-overlay" id="playerModal" onclick="if(event.target===this) closePlayerCard()">
+</div>
+
+<div class="section" id="secDuel">
+  <div class="duel-wrap">
+
+    <div class="duel-picker-row">
+      <div class="duel-picker-side left">
+        <div class="eyebrow-sm">Jugador 1</div>
+        <select class="duel-sel" id="duelSelA" onchange="renderDuel()">
+          <option value="">— Elige un participante —</option>
+        </select>
+        <div class="duel-avatar" id="duelAvatarA">
+          <div class="da-rank" id="daRankA">—</div>
+          <div class="da-name" id="daNameA">—</div>
+          <div class="da-pts" id="daPtsA">— pts</div>
+        </div>
+      </div>
+
+      <div class="duel-vs-center">
+        <div class="duel-vs-badge">VS</div>
+        <div class="duel-score-row">
+          <span class="duel-score-num" id="duelScoreA">0</span>
+          <span class="duel-score-sep">:</span>
+          <span class="duel-score-num right" id="duelScoreB">0</span>
+        </div>
+        <div class="duel-score-label">Diferencias</div>
+      </div>
+
+      <div class="duel-picker-side right">
+        <div class="eyebrow-sm" style="text-align:right">Jugador 2</div>
+        <select class="duel-sel" id="duelSelB" onchange="renderDuel()">
+          <option value="">— Elige un participante —</option>
+        </select>
+        <div class="duel-avatar" id="duelAvatarB">
+          <div class="da-rank" id="daRankB">—</div>
+          <div class="da-name" id="daNameB">—</div>
+          <div class="da-pts" id="daPtsB">— pts</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="duelBody">
+      <div class="duel-placeholder">
+        <div style="font-size:52px">⚔️</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:var(--text);margin-top:8px">Elige dos participantes</div>
+        <div style="color:var(--dim);font-size:14px;margin-top:6px;max-width:280px;line-height:1.5">Compara sus predicciones para los partidos pendientes y descubre quién apostó diferente.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal-overlay" id="playerModal" onclick="if(event.target===this) closePlayerCard()">
   <div class="fifa-card" id="fcContent"></div>
 </div>
 
@@ -1253,6 +1448,7 @@ async function fetchDatosFormulario() {
       formPicks[pName] = picks;
     }
     renderCharts(globalStats);
+    duelInjectPicks(); // PARTE 5: inyectar picks al duel tras cargar formulario
   } catch (e) {
     console.error('Error cargando Formulario', e);
     document.getElementById('chartsContainer').innerHTML = '<div class="err">No se pudieron cargar las tendencias.</div>';
@@ -1343,6 +1539,7 @@ async function fetchLeaderboard() {
   const text = await r.text();
   const rows = parseCSV(text);
   processLB(rows);
+  duelLoadFromLB(rows); // PARTE 5: cargar jugadores del duel tras leaderboard
 }
 
 function parseCSV(txt) {
@@ -1497,11 +1694,188 @@ function updateHeader() {
   if (sDate) sDate.textContent = new Date().toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City', weekday:'short', day:'numeric', month:'long' });
 }
 
+// ══════════════════════════════════════════════════════
+//  1v1 DUEL
+// ══════════════════════════════════════════════════════
+let duelPlayers = []; // { name, rank, total, grupos, pPartidos, picks: [{q,a}] }
+
+function duelPopulateSelects() {
+  const selA = document.getElementById('duelSelA');
+  const selB = document.getElementById('duelSelB');
+  if (!selA || !selB || !duelPlayers.length) return;
+  const opts = duelPlayers.map((p, i) =>
+    `<option value="${i}">${p.name}</option>`
+  ).join('');
+  const blank = '<option value="">— Elige un participante —</option>';
+  selA.innerHTML = blank + opts;
+  selB.innerHTML = blank + opts;
+}
+
+function duelLoadFromLB(rows) {
+  let hdr = -1;
+  for (let i = 0; i < rows.length; i++) {
+    if (rows[i].some(c => /participante/i.test(c))) { hdr = i; break; }
+  }
+  if (hdr < 0) return;
+  const newPlayers = [];
+  for (let i = hdr + 1; i < rows.length; i++) {
+    const row = rows[i];
+    if (!row || row.length < 2) continue;
+    const col1 = (row[1] || '');
+    if (row[0].includes('📋') || col1.includes('📋') || /pts\s*\//.test(col1)) break;
+    const name = col1.replace(/^[\u{1F947}\u{1F948}\u{1F949}\u{1F3C5}🥇🥈🥉🏅]+/gu, '').trim();
+    if (!name) continue;
+    newPlayers.push({
+      name,
+      rank: i - hdr,
+      total: parseFloat(row[2]) || 0,
+      grupos: parseFloat(row[4]) || 0,
+      pPartidos: row[12] !== undefined ? parseFloat(row[12]) : 0,
+      picks: []
+    });
+  }
+  duelPlayers = newPlayers;
+  duelInjectPicks();
+  duelPopulateSelects();
+}
+
+function duelInjectPicks() {
+  duelPlayers.forEach(p => {
+    const key = p.name.trim().toLowerCase();
+    p.picks = formPicks[key] || [];
+  });
+}
+
+function renderDuel() {
+  const selA = document.getElementById('duelSelA');
+  const selB = document.getElementById('duelSelB');
+  const iA = selA ? selA.value : '';
+  const iB = selB ? selB.value : '';
+  const body = document.getElementById('duelBody');
+  if (!body) return;
+
+  // Actualizar picks por si cargaron después
+  duelInjectPicks();
+
+  if (iA === '' || iB === '' || iA === iB) {
+    updateDuelAvatars(iA, iB);
+    body.innerHTML = `<div class="duel-placeholder">
+      <div style="font-size:52px">⚔️</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:var(--text);margin-top:8px">${iA === iB && iA !== '' ? '¡Elige dos jugadores diferentes!' : 'Elige dos participantes'}</div>
+      <div style="color:var(--dim);font-size:14px;margin-top:6px;max-width:280px;line-height:1.5">Compara sus predicciones para los partidos pendientes y descubre quién apostó diferente.</div>
+    </div>`;
+    return;
+  }
+
+  const pA = duelPlayers[parseInt(iA)];
+  const pB = duelPlayers[parseInt(iB)];
+  updateDuelAvatars(iA, iB);
+
+  // Agrupar preguntas de ambos en un mapa
+  const mapA = {}, mapB = {};
+  pA.picks.forEach(p => { mapA[p.q] = p.a; });
+  pB.picks.forEach(p => { mapB[p.q] = p.a; });
+  const allQs = [...new Set([...Object.keys(mapA), ...Object.keys(mapB)])];
+
+  // Separar: preguntas de partidos vs generales
+  const matchQs = allQs.filter(q => q.includes('[') || q.toLowerCase().includes('grupo') || q.toLowerCase().includes('partido'));
+  const generalQs = allQs.filter(q => !matchQs.includes(q));
+
+  let diffCount = 0, matchCount = 0;
+  const rowsGeneral = buildDuelRows(generalQs, mapA, mapB, pA.name, pB.name, (isDiff) => { if(isDiff) diffCount++; else matchCount++; });
+  const rowsMatch   = buildDuelRows(matchQs,   mapA, mapB, pA.name, pB.name, (isDiff) => { if(isDiff) diffCount++; else matchCount++; });
+
+  // Actualizar marcador de diferencias
+  const scoreA = document.getElementById('duelScoreA');
+  const scoreB = document.getElementById('duelScoreB');
+  let dA = 0, dB = 0;
+  allQs.forEach(q => {
+    const a = mapA[q] || '', b = mapB[q] || '';
+    if (a !== b) { if (a) dA++; if (b) dB++; }
+  });
+  if (scoreA) scoreA.textContent = dA;
+  if (scoreB) scoreB.textContent = dB;
+
+  let html = '';
+
+  if (generalQs.length) {
+    html += `<div class="duel-section-title">🔮 Predicciones Generales</div>`;
+    html += rowsGeneral;
+  }
+
+  if (matchQs.length) {
+    html += `<div class="duel-section-title" style="margin-top:${generalQs.length?'20px':'0'}">⚽ Predicciones de Grupos / Partidos</div>`;
+    html += rowsMatch;
+  }
+
+  if (!allQs.length) {
+    html = `<div class="duel-empty-msg">No se encontraron predicciones para comparar. Las respuestas del formulario pueden no haber cargado aún — espera unos segundos y vuelve a intentarlo.</div>`;
+  }
+
+  body.innerHTML = html;
+}
+
+function buildDuelRows(questions, mapA, mapB, nameA, nameB, counter) {
+  if (!questions.length) return '';
+  return questions.map(q => {
+    const a = mapA[q] || null;
+    const b = mapB[q] || null;
+    const same = a && b && a.toLowerCase() === b.toLowerCase();
+    const cls = (!a && !b) ? 'empty' : same ? 'match' : 'diff';
+    const icon = cls === 'match' ? '✅' : cls === 'diff' ? '🔥' : '—';
+    const cleanQ = q.replace(/\[.*?\]\s*/g, '').trim();
+    const flagA = FLAGS[a] ? `${FLAGS[a]} ` : '';
+    const flagB = FLAGS[b] ? `${FLAGS[b]} ` : '';
+    counter(cls === 'diff');
+    return `
+      <div class="duel-row ${cls}">
+        <div class="duel-cell">
+          <div class="duel-q">${nameA}</div>
+          <div class="duel-a">${a ? `<span>${flagA}${a}</span>` : '<span style="color:var(--muted)">Sin respuesta</span>'}</div>
+        </div>
+        <div class="duel-icon">${icon}</div>
+        <div class="duel-cell right">
+          <div class="duel-q" style="text-align:right">${nameB}</div>
+          <div class="duel-a">${b ? `<span>${flagB}${b}</span>` : '<span style="color:var(--muted)">Sin respuesta</span>'}</div>
+        </div>
+      </div>
+      <div style="margin:-8px 0 10px; padding: 0 2px; font-size:11px; color:var(--muted); font-style:italic">${cleanQ}</div>
+    `;
+  }).join('');
+}
+
+function updateDuelAvatars(iA, iB) {
+  const rankLabels = ['🥇','🥈','🥉'];
+  const setAvatar = (suffix, idx) => {
+    const el = document.getElementById('duelAvatar' + suffix);
+    const rEl = document.getElementById('daRank' + suffix);
+    const nEl = document.getElementById('daName' + suffix);
+    const pEl = document.getElementById('daPts' + suffix);
+    if (!el) return;
+    if (idx === '') {
+      if (rEl) rEl.textContent = '—';
+      if (nEl) nEl.textContent = '—';
+      if (pEl) pEl.textContent = '— pts';
+      el.style.borderColor = 'var(--border)';
+      return;
+    }
+    const p = duelPlayers[parseInt(idx)];
+    if (!p) return;
+    const rankStr = p.rank <= 3 ? rankLabels[p.rank-1] : `#${p.rank}`;
+    const rankColor = p.rank===1 ? 'var(--gold)' : p.rank===2 ? 'var(--silver)' : p.rank===3 ? 'var(--bronze)' : 'var(--muted)';
+    if (rEl) { rEl.textContent = rankStr; rEl.style.color = rankColor; }
+    if (nEl) nEl.textContent = p.name;
+    if (pEl) pEl.textContent = `${p.total} pts`;
+    el.style.borderColor = rankColor;
+  };
+  setAvatar('A', iA);
+  setAvatar('B', iB);
+}
+
 async function run() {
   const sDot = document.getElementById('sDot'); const sStatus = document.getElementById('sStatus');
   if (sDot) sDot.classList.remove('live'); if (sStatus) sStatus.textContent = 'Actualizando…';
   
-  // ── AQUI AGREGO LA RECARGA DEL LEADERBOARD DE JUEGOS A LA PROMESA PRINCIPAL ──
   await Promise.allSettled([fetchLeaderboard(), fetchAPI(), fetchDatosFormulario(), fetchGamesLeaderboard()]);
   
   if (sStatus) sStatus.textContent = 'Sincronizado'; if (sDot) sDot.classList.add('live');
