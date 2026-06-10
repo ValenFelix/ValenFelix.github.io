@@ -521,23 +521,23 @@
         <div class="games-lb-card" id="lbCabezazoCard">
           <div class="games-lb-head">
             <span class="glh-icon">🤸</span>
-            <span class="glh-title">Top 3 — Cabezazo</span>
+            <span class="glh-title">Top 5 — Cabezazo</span>
           </div>
-          <div id="lbCabezazoBody"><div class="lb-empty">Aún no hay récords. ¡Sé el primero!</div></div>
+          <div id="lbCabezazoBody"><div class="lb-empty">⏳ Cargando récords...</div></div>
         </div>
         <div class="games-lb-card" id="lbMilanesasCard">
           <div class="games-lb-head">
             <span class="glh-icon">🥩</span>
-            <span class="glh-title">Top 3 — Milanesas</span>
+            <span class="glh-title">Top 5 — Milanesas</span>
           </div>
-          <div id="lbMilanesasBody"><div class="lb-empty">Aún no hay récords. ¡Sé el primero!</div></div>
+          <div id="lbMilanesasBody"><div class="lb-empty">⏳ Cargando récords...</div></div>
         </div>
         <div class="games-lb-card" id="lbSiuCard">
           <div class="games-lb-head">
             <span class="glh-icon">🚀</span>
-            <span class="glh-title">Top 3 — Salto del Bicho</span>
+            <span class="glh-title">Top 5 — Salto del Bicho</span>
           </div>
-          <div id="lbSiuBody"><div class="lb-empty">Aún no hay récords. ¡Sé el primero!</div></div>
+          <div id="lbSiuBody"><div class="lb-empty">⏳ Cargando récords...</div></div>
         </div>
       </div>
     </div>
@@ -551,7 +551,7 @@
   <div class="record-modal">
     <div class="rm-trophy">🏆</div>
     <div class="rm-title">¡NUEVO RÉCORD!</div>
-    <div class="rm-sub" id="rmSub">Rompiste el récord. Ingresa tu nombre para quedar en la historia.</div>
+    <div class="rm-sub" id="rmSub">Estás en el Top 5. Ingresa tu nombre para quedar en la historia.</div>
     <div class="rm-score" id="rmScoreDisplay">0</div>
     <input class="rm-input" id="rmNameInput" type="text" placeholder="Tu nombre" maxlength="20" autocomplete="off">
     <div class="rm-actions">
@@ -625,34 +625,70 @@ Chart.defaults.color = '#8a9ab0';
 Chart.defaults.font.family = "'Barlow Condensed', sans-serif";
 
 // ══════════════════════════════════════════════════════
-//  MINI JUEGOS — SISTEMA DE RÉCORDS
+//  MINI JUEGOS — SISTEMA DE RÉCORDS CON GOOGLE SHEETS
 // ══════════════════════════════════════════════════════
-const RECORDS_KEY = 'quiniela_mxwc26_records';
+const GAMES_SID = '1pDcY7q9SMP1mLGL12jKY3GKeD4RywOZtA_V7QjAYfDQ';
+const GAMES_GID = '0';
+// 👇 IMPORTANTE: Necesitas reemplazar esto con tu URL del Web App de Apps Script
+const GAMES_SCRIPT_URL = 'AQUI_PON_TU_URL_DEL_NUEVO_APPS_SCRIPT'; 
+
+let globalGameRecords = { cabezazo: [], milanesas: [], siu: [] };
 let pendingRecord = null; // { game, score }
 
-function loadRecords() {
-  try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || { cabezazo: [], milanesas: [], siu: [] }; }
-  catch { return { cabezazo: [], milanesas: [], siu: [] }; }
-}
-function saveRecords(data) {
-  try { localStorage.setItem(RECORDS_KEY, JSON.stringify(data)); } catch {}
+async function fetchGamesLeaderboard() {
+  try {
+    const r = await fetch(`https://docs.google.com/spreadsheets/d/${GAMES_SID}/gviz/tq?tqx=out:csv&gid=${GAMES_GID}`);
+    if (!r.ok) return;
+    const text = await r.text();
+    const rows = parseCSV(text);
+    
+    let newRecords = { cabezazo: [], milanesas: [], siu: [] };
+    
+    if (rows.length > 1) { 
+       let hJuego = 1, hNombre = 2, hScore = 3;
+       rows[0].forEach((h, i) => {
+         h = h.toLowerCase();
+         if (h.includes('juego')) hJuego = i;
+         if (h.includes('nombre')) hNombre = i;
+         if (h.includes('score') || h.includes('puntuaci')) hScore = i;
+       });
+
+       for(let i = 1; i < rows.length; i++) {
+         const row = rows[i];
+         if(row.length < 3) continue;
+         let juego = (row[hJuego] || '').toLowerCase().trim();
+         const nombre = row[hNombre] || 'Anónimo';
+         const score = parseInt(row[hScore], 10) || 0;
+         
+         // Normalizar nombre de juegos por si acaso
+         if(juego === 'siu' || juego === 'salto del bicho') juego = 'siu';
+         if(juego === 'cabezazo') juego = 'cabezazo';
+         if(juego === 'milanesas' || juego === 'atrapa la milanesa') juego = 'milanesas';
+
+         if (newRecords[juego] !== undefined) {
+            newRecords[juego].push({ name: nombre, score: score });
+         }
+       }
+       
+       // Ordenar y guardar solo el Top 5
+       for (let j in newRecords) {
+         newRecords[j].sort((a,b) => b.score - a.score);
+         newRecords[j] = newRecords[j].slice(0, 5);
+       }
+    }
+    
+    globalGameRecords = newRecords;
+    renderGameLeaderboards();
+  } catch(e) {
+     console.error("Error cargando leaderboard de juegos", e);
+  }
 }
 
 function isRecord(game, score) {
-  const recs = loadRecords();
-  const list = recs[game] || [];
-  if (list.length < 3) return true;
+  if(score <= 0) return false;
+  const list = globalGameRecords[game] || [];
+  if (list.length < 5) return true;
   return score > list[list.length - 1].score;
-}
-
-function commitRecord(game, score, name) {
-  const recs = loadRecords();
-  recs[game] = recs[game] || [];
-  recs[game].push({ name, score, date: new Date().toLocaleDateString('es-MX') });
-  recs[game].sort((a, b) => b.score - a.score);
-  recs[game] = recs[game].slice(0, 3);
-  saveRecords(recs);
-  renderGameLeaderboards();
 }
 
 function checkAndPromptRecord(game, score) {
@@ -660,7 +696,7 @@ function checkAndPromptRecord(game, score) {
     pendingRecord = { game, score };
     document.getElementById('rmScoreDisplay').textContent = score;
     const gameLabel = game === 'cabezazo' ? 'Cabezazo 🤸' : game === 'milanesas' ? 'Milanesas 🥩' : 'Salto del Bicho 🚀';
-    document.getElementById('rmSub').textContent = `¡Nuevo récord en ${gameLabel}! Ingresa tu nombre.`;
+    document.getElementById('rmSub').textContent = `¡Estás en el Top 5 de ${gameLabel}! Ingresa tu nombre para quedar en la historia.`;
     document.getElementById('rmNameInput').value = '';
     document.getElementById('recordModal').classList.add('active');
     setTimeout(() => document.getElementById('rmNameInput').focus(), 300);
@@ -670,16 +706,43 @@ function checkAndPromptRecord(game, score) {
 function saveRecord(doSave) {
   document.getElementById('recordModal').classList.remove('active');
   if (pendingRecord) {
-    const name = doSave
-      ? (document.getElementById('rmNameInput').value.trim() || 'Anónimo')
-      : 'Anónimo';
+    const name = doSave ? (document.getElementById('rmNameInput').value.trim() || 'Anónimo') : 'Anónimo';
     if (doSave || document.getElementById('rmNameInput').value.trim()) {
-      commitRecord(pendingRecord.game, pendingRecord.score, name);
-    } else {
-      if (!doSave) commitRecord(pendingRecord.game, pendingRecord.score, '—');
+      commitRecordToServer(pendingRecord.game, pendingRecord.score, name);
     }
     pendingRecord = null;
   }
+}
+
+function commitRecordToServer(game, score, name) {
+  const payload = { 
+    fecha: new Date().toLocaleDateString('es-MX'),
+    juego: game, 
+    nombre: name, 
+    score: score 
+  };
+  
+  // UI Optimista (se ve el cambio inmediatamente)
+  globalGameRecords[game].push({ name: name, score: score });
+  globalGameRecords[game].sort((a,b) => b.score - a.score);
+  globalGameRecords[game] = globalGameRecords[game].slice(0, 5);
+  renderGameLeaderboards();
+
+  if(GAMES_SCRIPT_URL === 'AQUI_PON_TU_URL_DEL_NUEVO_APPS_SCRIPT') {
+    console.warn("Falta conectar el Apps Script URL");
+    return;
+  }
+
+  fetch(GAMES_SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+  })
+  .then(r => r.json())
+  .then(data => {
+     fetchGamesLeaderboard(); // Refrescar oficiales de la base de datos
+  })
+  .catch(e => console.error("Error guardando score", e));
 }
 
 document.getElementById('rmNameInput').addEventListener('keydown', e => {
@@ -687,15 +750,14 @@ document.getElementById('rmNameInput').addEventListener('keydown', e => {
 });
 
 function renderGameLeaderboards() {
-  const recs = loadRecords();
-  const medals = ['gold', 'silver', 'bronze'];
-  const emojis = ['🥇', '🥈', '🥉'];
+  const medals = ['gold', 'silver', 'bronze', 'muted', 'muted'];
+  const emojis = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
 
   ['cabezazo', 'milanesas', 'siu'].forEach(game => {
     const idMap = { cabezazo: 'lbCabezazoBody', milanesas: 'lbMilanesasBody', siu: 'lbSiuBody' };
     const bodyEl = document.getElementById(idMap[game]);
     if (!bodyEl) return;
-    const list = recs[game] || [];
+    const list = globalGameRecords[game] || [];
     if (!list.length) {
       bodyEl.innerHTML = '<div class="lb-empty">Aún no hay récords. ¡Sé el primero!</div>';
       return;
@@ -1132,7 +1194,6 @@ function setupCanvasEvents() {
     newCanvas.addEventListener('mousemove', e => MILA.setMouse(e.clientX, e.clientY));
     newCanvas.addEventListener('touchmove', e => { e.preventDefault(); MILA.setMouse(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
   } else {
-    // Eventos de SALTO
     BICH.canvas = newCanvas; BICH.ctx = newCanvas.getContext('2d');
     newCanvas.addEventListener('mousedown', () => BICH.jump());
     newCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); BICH.jump(); }, { passive: false });
@@ -1440,7 +1501,10 @@ function updateHeader() {
 async function run() {
   const sDot = document.getElementById('sDot'); const sStatus = document.getElementById('sStatus');
   if (sDot) sDot.classList.remove('live'); if (sStatus) sStatus.textContent = 'Actualizando…';
-  await Promise.allSettled([fetchLeaderboard(), fetchAPI(), fetchDatosFormulario()]);
+  
+  // ── AQUI AGREGO LA RECARGA DEL LEADERBOARD DE JUEGOS A LA PROMESA PRINCIPAL ──
+  await Promise.allSettled([fetchLeaderboard(), fetchAPI(), fetchDatosFormulario(), fetchGamesLeaderboard()]);
+  
   if (sStatus) sStatus.textContent = 'Sincronizado'; if (sDot) sDot.classList.add('live');
 }
 
@@ -1451,8 +1515,7 @@ function init() {
   if (document.getElementById('btnRefresh')) document.getElementById('btnRefresh').addEventListener('click', run);
   if (document.getElementById('gSel')) document.getElementById('gSel').addEventListener('change', renderStd);
 
-  // Init mini games
-  renderGameLeaderboards();
+  // Init mini games selector
   selectGame('cabezazo');
 }
 
