@@ -231,7 +231,7 @@
     /* Game selector */
     .game-selector {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(3, 1fr);
       gap: 12px;
     }
     @media(max-width: 600px) { .game-selector { grid-template-columns: 1fr; } }
@@ -311,6 +311,7 @@
       padding: 24px;
       gap: 10px;
       pointer-events: none;
+      z-index: 10;
     }
     .game-msg.hidden { display: none; }
     .game-msg .gm-emoji { font-size: 52px; }
@@ -319,8 +320,8 @@
     .game-msg .gm-score { font-size: 44px; font-weight: 900; color: var(--gold); }
 
     /* LEADERBOARD DE JUEGOS */
-    .games-lb-section { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
-    @media(max-width: 600px) { .games-lb-section { grid-template-columns: 1fr; } }
+    .games-lb-section { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    @media(max-width: 800px) { .games-lb-section { grid-template-columns: 1fr; } }
 
     .games-lb-card {
       background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
@@ -485,7 +486,12 @@
         <button class="game-pick-btn" id="btnMilanesas" onclick="selectGame('milanesas')">
           <div class="game-icon">🥩</div>
           <div class="game-name">Atrapa la Milanesa</div>
-          <div class="game-desc">Ayuda a Messi a cachar todas las milanesas. ¡Si cae una, pierdes!</div>
+          <div class="game-desc">Cacha todas las milanesas. ¡Si cae una, pierdes!</div>
+        </button>
+        <button class="game-pick-btn" id="btnSiu" onclick="selectGame('siu')">
+          <div class="game-icon">🚀</div>
+          <div class="game-name">Salto del Bicho</div>
+          <div class="game-desc">Salta y remata los centros. ¡No dejes pasar el balón!</div>
         </button>
       </div>
     </div>
@@ -525,6 +531,13 @@
             <span class="glh-title">Top 3 — Milanesas</span>
           </div>
           <div id="lbMilanesasBody"><div class="lb-empty">Aún no hay récords. ¡Sé el primero!</div></div>
+        </div>
+        <div class="games-lb-card" id="lbSiuCard">
+          <div class="games-lb-head">
+            <span class="glh-icon">🚀</span>
+            <span class="glh-title">Top 3 — Salto del Bicho</span>
+          </div>
+          <div id="lbSiuBody"><div class="lb-empty">Aún no hay récords. ¡Sé el primero!</div></div>
         </div>
       </div>
     </div>
@@ -618,8 +631,8 @@ const RECORDS_KEY = 'quiniela_mxwc26_records';
 let pendingRecord = null; // { game, score }
 
 function loadRecords() {
-  try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || { cabezazo: [], milanesas: [] }; }
-  catch { return { cabezazo: [], milanesas: [] }; }
+  try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || { cabezazo: [], milanesas: [], siu: [] }; }
+  catch { return { cabezazo: [], milanesas: [], siu: [] }; }
 }
 function saveRecords(data) {
   try { localStorage.setItem(RECORDS_KEY, JSON.stringify(data)); } catch {}
@@ -646,7 +659,7 @@ function checkAndPromptRecord(game, score) {
   if (isRecord(game, score)) {
     pendingRecord = { game, score };
     document.getElementById('rmScoreDisplay').textContent = score;
-    const gameLabel = game === 'cabezazo' ? 'Cabezazo 🤸' : 'Milanesas 🥩';
+    const gameLabel = game === 'cabezazo' ? 'Cabezazo 🤸' : game === 'milanesas' ? 'Milanesas 🥩' : 'Salto del Bicho 🚀';
     document.getElementById('rmSub').textContent = `¡Nuevo récord en ${gameLabel}! Ingresa tu nombre.`;
     document.getElementById('rmNameInput').value = '';
     document.getElementById('recordModal').classList.add('active');
@@ -663,7 +676,6 @@ function saveRecord(doSave) {
     if (doSave || document.getElementById('rmNameInput').value.trim()) {
       commitRecord(pendingRecord.game, pendingRecord.score, name);
     } else {
-      // skip with "Anónimo" only if name typed
       if (!doSave) commitRecord(pendingRecord.game, pendingRecord.score, '—');
     }
     pendingRecord = null;
@@ -679,8 +691,8 @@ function renderGameLeaderboards() {
   const medals = ['gold', 'silver', 'bronze'];
   const emojis = ['🥇', '🥈', '🥉'];
 
-  ['cabezazo', 'milanesas'].forEach(game => {
-    const idMap = { cabezazo: 'lbCabezazoBody', milanesas: 'lbMilanesasBody' };
+  ['cabezazo', 'milanesas', 'siu'].forEach(game => {
+    const idMap = { cabezazo: 'lbCabezazoBody', milanesas: 'lbMilanesasBody', siu: 'lbSiuBody' };
     const bodyEl = document.getElementById(idMap[game]);
     if (!bodyEl) return;
     const list = recs[game] || [];
@@ -699,31 +711,25 @@ function renderGameLeaderboards() {
 }
 
 // ══════════════════════════════════════════════════════
-//  MINI JUEGO: CABEZAZO (Keepie-uppie)
+//  MINI JUEGO 1: CABEZAZO (Keepie-uppie)
 // ══════════════════════════════════════════════════════
 const HEAD = {
   running: false, animFrame: null, score: 0,
   ball: { x: 300, y: 200, vx: 1.0, vy: 0, r: 16 },
   player: { x: 300, y: 285, w: 60, h: 20, targetX: 300 },
-  gravity: 0.055,   // muy ligero — se siente globo de playa
-  bounces: 0,
-  canvas: null, ctx: null,
-  mouseX: 300,
+  gravity: 0.055, bounces: 0, canvas: null, ctx: null, mouseX: 300,
 
   init(canvas) {
-    this.canvas = canvas;
-    this.ctx = canvas.getContext('2d');
-    this.reset();
-    this.render();
+    this.canvas = canvas; this.ctx = canvas.getContext('2d');
+    this.reset(); this.render();
   },
 
   reset() {
-    this.running = false; this.score = 0; this.bounces = 0;
-    this.gravity = 0.055;
+    this.running = false; this.score = 0; this.bounces = 0; this.gravity = 0.055;
     this.ball = { x: 300, y: 200, vx: 1.0, vy: 0, r: 16 };
     this.player.x = 300; this.player.targetX = 300;
     if (this.animFrame) { cancelAnimationFrame(this.animFrame); this.animFrame = null; }
-    this.updateUI();
+    document.getElementById('gameLiveScore').textContent = this.score;
     const msg = document.getElementById('gameMsg');
     msg.innerHTML = `<div class="gm-emoji">🤸</div><div class="gm-title">CABEZAZO</div><div class="gm-sub">Mueve el ratón (o toca) para mover al jugador.<br>¡No dejes caer el balón!</div>`;
     msg.classList.remove('hidden');
@@ -742,42 +748,31 @@ const HEAD = {
 
   loop() {
     if (!this.running) return;
-    this.update();
-    this.render();
+    this.update(); this.render();
     this.animFrame = requestAnimationFrame(() => this.loop());
   },
 
   update() {
     const b = this.ball, p = this.player, W = 600, H = 340;
-    // Ball physics
-    b.vy += this.gravity;
-    b.x += b.vx; b.y += b.vy;
-    // Wall bounce (slight energy loss for realism)
+    b.vy += this.gravity; b.x += b.vx; b.y += b.vy;
     if (b.x - b.r < 0)  { b.x = b.r;     b.vx =  Math.abs(b.vx) * 0.9; }
     if (b.x + b.r > W)  { b.x = W - b.r; b.vx = -Math.abs(b.vx) * 0.9; }
-    // Player follow mouse smoothly
+    
     p.x += (this.mouseX - p.x) * 0.15;
     p.x = Math.max(p.w/2, Math.min(W - p.w/2, p.x));
-    // Head collision
-    const headCY = p.y - 14;
-    const headR  = 22; 
-    const dx = b.x - p.x;
-    const dy = b.y - headCY;
+    
+    const headCY = p.y - 14, headR = 22; 
+    const dx = b.x - p.x, dy = b.y - headCY;
     const dist = Math.sqrt(dx*dx + dy*dy);
     if (dist < b.r + headR && b.vy > 0) {
-      b.vy = -7.5;                           
-      b.vx += dx * 0.06;                     
+      b.vy = -7.5; b.vx += dx * 0.06;                     
       b.vx = Math.max(-5, Math.min(5, b.vx));
       b.y = headCY - b.r - headR - 1;        
-      this.score++;
-      this.bounces++;
-      this.updateUI();
-      if (this.bounces % 10 === 0) {
-        this.gravity = Math.min(0.18, this.gravity + 0.008);
-      }
+      this.score++; this.bounces++;
+      document.getElementById('gameLiveScore').textContent = this.score;
+      if (this.bounces % 10 === 0) this.gravity = Math.min(0.18, this.gravity + 0.008);
     }
-    // Ground = game over
-    if (b.y - b.r > H) { this.end(); }
+    if (b.y - b.r > H) this.end();
   },
 
   end() {
@@ -787,11 +782,8 @@ const HEAD = {
     const stars = this.score >= 50 ? '⭐⭐⭐' : this.score >= 25 ? '⭐⭐' : this.score >= 8 ? '⭐' : '';
     msg.innerHTML = `<div class="gm-score">${this.score}</div><div class="gm-title">${stars || '😮'} toque${this.score !== 1 ? 's' : ''}</div><div class="gm-sub">¡Inténtalo de nuevo!</div>`;
     msg.classList.remove('hidden');
-    document.getElementById('gameLiveScore').textContent = this.score;
     checkAndPromptRecord('cabezazo', this.score);
   },
-
-  updateUI() { document.getElementById('gameLiveScore').textContent = this.score; },
 
   setMouse(ex, ey) {
     if (!this.running) return;
@@ -801,43 +793,29 @@ const HEAD = {
 
   render() {
     const c = this.ctx, W = 600, H = 340;
-    // Sky + grass
     c.fillStyle = '#0a1a0e'; c.fillRect(0, 0, W, H);
     for (let i = 0; i < 8; i++) {
       c.fillStyle = i % 2 === 0 ? 'rgba(0,0,0,0.08)' : 'transparent';
       c.fillRect(i * 75, 0, 75, H);
     }
-    // Ground line
     c.strokeStyle = 'rgba(255,255,255,0.15)'; c.lineWidth = 2;
     c.beginPath(); c.moveTo(0, H - 5); c.lineTo(W, H - 5); c.stroke();
 
-    // Difficulty bar
     const diff = Math.min(1, (this.gravity - 0.25) / 0.25);
-    if (diff > 0) {
-      c.fillStyle = `rgba(255,87,34,${diff * 0.6})`; c.fillRect(0, 0, W * diff, 4);
-    }
+    if (diff > 0) { c.fillStyle = `rgba(255,87,34,${diff * 0.6})`; c.fillRect(0, 0, W * diff, 4); }
 
-    // Player (head shape)
     const p = this.player;
-    // Body
-    c.fillStyle = '#1565c0';
-    c.beginPath(); c.roundRect(p.x - 12, p.y, 24, 40, 4); c.fill();
-    // Head
+    c.fillStyle = '#1565c0'; c.beginPath(); c.roundRect(p.x - 12, p.y, 24, 40, 4); c.fill();
     c.fillStyle = '#ffcc80'; c.beginPath(); c.arc(p.x, p.y - 14, 18, 0, Math.PI * 2); c.fill();
-    // Hair
     c.fillStyle = '#5d4037'; c.beginPath(); c.arc(p.x, p.y - 20, 18, Math.PI, 0); c.fill();
-    // Eyes
     c.fillStyle = '#333'; c.beginPath(); c.arc(p.x - 6, p.y - 14, 3, 0, Math.PI * 2); c.fill();
     c.beginPath(); c.arc(p.x + 6, p.y - 14, 3, 0, Math.PI * 2); c.fill();
 
-    // Ball
     const b = this.ball;
     c.fillStyle = '#ffffff'; c.beginPath(); c.arc(b.x, b.y, b.r, 0, Math.PI * 2); c.fill();
     c.strokeStyle = '#333'; c.lineWidth = 1.5; c.beginPath(); c.arc(b.x, b.y, b.r, 0, Math.PI * 2); c.stroke();
-    // Pentagon pattern
     c.fillStyle = '#333'; c.beginPath(); c.arc(b.x, b.y, b.r * 0.45, 0, Math.PI * 2); c.fill();
 
-    // Score
     c.fillStyle = 'rgba(0,0,0,0.6)'; c.beginPath(); c.roundRect(W/2 - 50, 10, 100, 30, 6); c.fill();
     c.fillStyle = '#00e676'; c.font = 'bold 18px "Barlow Condensed", sans-serif'; c.textAlign = 'center';
     c.fillText(`TOQUES: ${this.score}`, W/2, 29);
@@ -845,20 +823,14 @@ const HEAD = {
 };
 
 // ══════════════════════════════════════════════════════
-//  MINI JUEGO: ATRAPA LA MILANESA
+//  MINI JUEGO 2: ATRAPA LA MILANESA
 // ══════════════════════════════════════════════════════
 const MILA = {
   running: false, animFrame: null, score: 0,
   items: [], spawnTimer: 0, spawnRate: 60, speedMultiplier: 1,
-  player: { x: 300, y: 300, w: 80, h: 20 }, // Messi (su área de atrape)
-  canvas: null, ctx: null,
-  mouseX: 300,
+  player: { x: 300, y: 300, w: 80, h: 20 }, canvas: null, ctx: null, mouseX: 300,
 
-  init(canvas) {
-    this.canvas = canvas;
-    this.ctx = canvas.getContext('2d');
-    this.reset();
-  },
+  init(canvas) { this.canvas = canvas; this.ctx = canvas.getContext('2d'); this.reset(); },
 
   reset() {
     this.running = false; this.score = 0;
@@ -884,55 +856,34 @@ const MILA = {
 
   loop() {
     if (!this.running) return;
-    this.update();
-    this.render();
+    this.update(); this.render();
     this.animFrame = requestAnimationFrame(() => this.loop());
   },
 
   update() {
     const p = this.player, W = 600, H = 340;
-    
-    // Movimiento suavizado del jugador
     p.x += (this.mouseX - p.x) * 0.2;
     p.x = Math.max(p.w/2, Math.min(W - p.w/2, p.x));
 
-    // Instanciar nuevas milanesas (Spawning)
     this.spawnTimer++;
     if (this.spawnTimer >= this.spawnRate) {
       this.spawnTimer = 0;
-      this.items.push({
-        x: 30 + Math.random() * (W - 60),
-        y: -20,
-        r: 15,
-        speed: (2 + Math.random() * 2) * this.speedMultiplier,
-        rotation: Math.random() * Math.PI * 2,
-        rotSpeed: (Math.random() - 0.5) * 0.1
-      });
-      // Aumentar dificultad progresivamente
+      this.items.push({ x: 30 + Math.random() * (W - 60), y: -20, r: 15, speed: (2 + Math.random() * 2) * this.speedMultiplier, rotation: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.1 });
       if (this.spawnRate > 25) this.spawnRate -= 1.5;
       this.speedMultiplier += 0.02;
     }
 
-    // Actualizar posiciones y chequear colisiones
     for (let i = this.items.length - 1; i >= 0; i--) {
       let item = this.items[i];
-      item.y += item.speed;
-      item.rotation += item.rotSpeed;
+      item.y += item.speed; item.rotation += item.rotSpeed;
 
-      // Colisión con el jugador (caja delimitadora simple)
-      if (item.y + item.r > p.y - 10 && item.y - item.r < p.y + p.h && 
-          item.x + item.r > p.x - p.w/2 && item.x - item.r < p.x + p.w/2) {
-        this.items.splice(i, 1); // ¡Atrapada!
+      if (item.y + item.r > p.y - 10 && item.y - item.r < p.y + p.h && item.x + item.r > p.x - p.w/2 && item.x - item.r < p.x + p.w/2) {
+        this.items.splice(i, 1);
         this.score++;
         document.getElementById('gameLiveScore').textContent = this.score;
         continue;
       }
-
-      // Si toca el piso, fin del juego
-      if (item.y > H + item.r) {
-        this.end();
-        return;
-      }
+      if (item.y > H + item.r) { this.end(); return; }
     }
   },
 
@@ -954,46 +905,182 @@ const MILA = {
 
   render() {
     const c = this.ctx, W = 600, H = 340;
-    
-    // Fondo de cocina/cancha abstracto
     c.fillStyle = '#161b23'; c.fillRect(0, 0, W, H);
     c.strokeStyle = '#1f2733'; c.lineWidth = 2;
     for(let i=0; i<W; i+=40) { c.beginPath(); c.moveTo(i,0); c.lineTo(i,H); c.stroke(); }
     for(let i=0; i<H; i+=40) { c.beginPath(); c.moveTo(0,i); c.lineTo(W,i); c.stroke(); }
 
-    // Jugador (Messi simplificado: camiseta argentina y un plato/manos)
     const p = this.player;
-    // Brazos/Plato
-    c.fillStyle = '#b0bec5'; 
-    c.beginPath(); c.roundRect(p.x - p.w/2, p.y - 10, p.w, 12, 6); c.fill();
-    // Cuerpo
+    c.fillStyle = '#b0bec5'; c.beginPath(); c.roundRect(p.x - p.w/2, p.y - 10, p.w, 12, 6); c.fill();
     c.fillStyle = '#4fc3f7'; c.fillRect(p.x - 20, p.y, 40, 40);
-    c.fillStyle = '#ffffff'; c.fillRect(p.x - 10, p.y, 8, 40); c.fillRect(p.x + 2, p.y, 8, 40); // Rayas
-    // Cabeza
+    c.fillStyle = '#ffffff'; c.fillRect(p.x - 10, p.y, 8, 40); c.fillRect(p.x + 2, p.y, 8, 40); 
     c.fillStyle = '#ffcc80'; c.beginPath(); c.arc(p.x, p.y - 30, 16, 0, Math.PI * 2); c.fill();
-    // Pelo/Barba
-    c.fillStyle = '#3e2723'; 
-    c.beginPath(); c.arc(p.x, p.y - 36, 16, Math.PI, 0); c.fill(); // Pelo
-    c.beginPath(); c.arc(p.x, p.y - 22, 10, 0, Math.PI); c.fill(); // Barba
+    c.fillStyle = '#3e2723'; c.beginPath(); c.arc(p.x, p.y - 36, 16, Math.PI, 0); c.fill(); 
+    c.beginPath(); c.arc(p.x, p.y - 22, 10, 0, Math.PI); c.fill(); 
 
-    // Renderizar Milanesas
     for (let item of this.items) {
-      c.save();
-      c.translate(item.x, item.y);
-      c.rotate(item.rotation);
-      // Forma de la milanesa (óvalo irregular)
-      c.fillStyle = '#8d6e63'; // Color pan rallado oscuro
-      c.beginPath(); c.ellipse(0, 0, item.r * 1.4, item.r * 0.9, 0, 0, Math.PI * 2); c.fill();
-      c.fillStyle = '#d7ccc8'; // Destellos claros
-      c.beginPath(); c.arc(-5, -2, 3, 0, Math.PI*2); c.fill();
-      c.beginPath(); c.arc(6, 4, 2, 0, Math.PI*2); c.fill();
+      c.save(); c.translate(item.x, item.y); c.rotate(item.rotation);
+      c.fillStyle = '#8d6e63'; c.beginPath(); c.ellipse(0, 0, item.r * 1.4, item.r * 0.9, 0, 0, Math.PI * 2); c.fill();
+      c.fillStyle = '#d7ccc8'; c.beginPath(); c.arc(-5, -2, 3, 0, Math.PI*2); c.fill(); c.beginPath(); c.arc(6, 4, 2, 0, Math.PI*2); c.fill();
       c.restore();
     }
 
-    // Marcador
     c.fillStyle = 'rgba(0,0,0,0.7)'; c.beginPath(); c.roundRect(W/2 - 60, 10, 120, 30, 6); c.fill();
     c.fillStyle = '#ff5722'; c.font = 'bold 18px "Barlow Condensed", sans-serif'; c.textAlign = 'center';
     c.fillText(`ATRAPADAS: ${this.score}`, W/2, 29);
+  }
+};
+
+// ══════════════════════════════════════════════════════
+//  MINI JUEGO 3: EL SALTO DEL BICHO
+// ══════════════════════════════════════════════════════
+const BICH = {
+  running: false, animFrame: null, score: 0,
+  balls: [], spawnTimer: 0, spawnRate: 100, speedMultiplier: 1,
+  player: { x: 120, y: 280, w: 30, h: 60, vy: 0, gravity: 0.6, jumpPower: -12.5, grounded: true },
+  feedback: [], canvas: null, ctx: null,
+
+  init(canvas) { this.canvas = canvas; this.ctx = canvas.getContext('2d'); this.reset(); },
+
+  reset() {
+    this.running = false; this.score = 0;
+    this.balls = []; this.spawnTimer = 0; this.spawnRate = 100; this.speedMultiplier = 1;
+    this.player.vy = 0; this.player.y = 280; this.player.grounded = true;
+    this.feedback = [];
+    if (this.animFrame) { cancelAnimationFrame(this.animFrame); this.animFrame = null; }
+    document.getElementById('gameLiveScore').textContent = '0';
+    const msg = document.getElementById('gameMsg');
+    msg.innerHTML = `<div class="gm-emoji">🚀</div><div class="gm-title">SALTO DEL BICHO</div><div class="gm-sub">Toca la pantalla o haz clic para saltar.<br>¡Calcula bien para rematar de cabeza!</div>`;
+    msg.classList.remove('hidden');
+    document.getElementById('btnStart').style.display = '';
+    document.getElementById('btnRestart').style.display = 'none';
+    this.render();
+  },
+
+  start() {
+    this.running = true;
+    document.getElementById('gameMsg').classList.add('hidden');
+    document.getElementById('btnStart').style.display = 'none';
+    document.getElementById('btnRestart').style.display = '';
+    this.loop();
+  },
+
+  loop() {
+    if (!this.running) return;
+    this.update(); this.render();
+    this.animFrame = requestAnimationFrame(() => this.loop());
+  },
+
+  update() {
+    const p = this.player, W = 600, H = 340;
+    
+    // Gravedad del salto
+    p.vy += p.gravity;
+    p.y += p.vy;
+    if (p.y >= 280) { p.y = 280; p.vy = 0; p.grounded = true; }
+
+    // Generar centros (balones)
+    this.spawnTimer++;
+    if (this.spawnTimer >= this.spawnRate) {
+      this.spawnTimer = 0;
+      // Los balones vienen entre y=130 (alto) y y=260 (bajo)
+      this.balls.push({ x: W + 20, y: 130 + Math.random() * 130, vx: -(5 + Math.random() * 2) * this.speedMultiplier, r: 12 });
+      if (this.spawnRate > 45) this.spawnRate -= 2;
+      this.speedMultiplier += 0.03;
+    }
+
+    // Actualizar balones y checar colisiones
+    for (let i = this.balls.length - 1; i >= 0; i--) {
+      let b = this.balls[i];
+      b.x += b.vx;
+
+      // Colisión (Solo cuenta si le da con la cabeza/parte alta del cuerpo)
+      const headY = p.y - p.h;
+      if (b.x - b.r < p.x + p.w/2 && b.x + b.r > p.x - p.w/2 &&
+          b.y + b.r > headY - 15 && b.y - b.r < headY + 30) {
+        this.balls.splice(i, 1);
+        this.score++;
+        document.getElementById('gameLiveScore').textContent = this.score;
+        this.feedback.push({ x: p.x + 10, y: headY - 20, text: '¡SIUUU!', alpha: 1.5 });
+        continue;
+      }
+
+      // Si el balón pasa al jugador sin ser tocado, game over
+      if (b.x < p.x - p.w) { this.end(); return; }
+    }
+
+    // Actualizar animaciones de SIUUU
+    this.feedback.forEach(f => { f.y -= 1.5; f.alpha -= 0.03; });
+    this.feedback = this.feedback.filter(f => f.alpha > 0);
+  },
+
+  jump() {
+    if (this.player.grounded && this.running) {
+      this.player.vy = this.player.jumpPower;
+      this.player.grounded = false;
+    }
+  },
+
+  end() {
+    this.running = false;
+    if (this.animFrame) cancelAnimationFrame(this.animFrame);
+    const msg = document.getElementById('gameMsg');
+    const stars = this.score >= 30 ? '🚀🐐' : this.score >= 15 ? '⭐⭐' : this.score >= 5 ? '⭐' : '';
+    msg.innerHTML = `<div class="gm-score">${this.score}</div><div class="gm-title">${stars || '🤦‍♂️'}</div><div class="gm-sub">¡Dejaste pasar el balón!</div>`;
+    msg.classList.remove('hidden');
+    checkAndPromptRecord('siu', this.score);
+  },
+
+  render() {
+    const c = this.ctx, W = 600, H = 340;
+    
+    // Fondo: Estadio Nocturno
+    c.fillStyle = '#0f172a'; c.fillRect(0, 0, W, H);
+    // Piso
+    c.fillStyle = '#064e3b'; c.fillRect(0, 280, W, H - 280);
+    c.strokeStyle = '#047857'; c.lineWidth = 4;
+    c.beginPath(); c.moveTo(0, 280); c.lineTo(W, 280); c.stroke();
+
+    const p = this.player;
+    // Dibujar CR7
+    c.fillStyle = '#ef4444'; // Camisa Portugal (Roja)
+    c.beginPath(); c.roundRect(p.x - p.w/2, p.y - p.h, p.w, p.h * 0.6, 4); c.fill();
+    c.fillStyle = '#166534'; // Shorts Verdes
+    c.fillRect(p.x - p.w/2, p.y - p.h * 0.4, p.w, p.h * 0.2);
+    // Piernas (saltando o parado)
+    c.fillStyle = '#fcd34d'; 
+    if (p.grounded) {
+      c.fillRect(p.x - 10, p.y - p.h * 0.2, 6, p.h * 0.2);
+      c.fillRect(p.x + 4, p.y - p.h * 0.2, 6, p.h * 0.2);
+    } else { // Pose de salto encogida
+      c.fillRect(p.x - 10, p.y - p.h * 0.2, 16, 6);
+      c.fillRect(p.x - 4, p.y - p.h * 0.1, 10, 6);
+    }
+    // Cabeza
+    c.fillStyle = '#fcd34d'; c.beginPath(); c.arc(p.x, p.y - p.h - 10, 14, 0, Math.PI*2); c.fill();
+    // Pelo engominado
+    c.fillStyle = '#111'; c.beginPath(); c.arc(p.x, p.y - p.h - 14, 14, Math.PI*0.8, Math.PI*2.2); c.fill();
+
+    // Dibujar Balones
+    for (let b of this.balls) {
+      c.fillStyle = '#fff'; c.beginPath(); c.arc(b.x, b.y, b.r, 0, Math.PI*2); c.fill();
+      c.strokeStyle = '#000'; c.lineWidth = 1.5; c.stroke();
+      c.fillStyle = '#000'; c.beginPath(); c.arc(b.x, b.y, b.r*0.4, 0, Math.PI*2); c.fill();
+    }
+
+    // Feedback (SIUUU)
+    c.font = 'bold 26px "Barlow Condensed", sans-serif'; c.textAlign = 'center';
+    for (let f of this.feedback) {
+      c.globalAlpha = Math.min(1, f.alpha);
+      c.fillStyle = '#f5c842';
+      c.fillText(f.text, f.x, f.y);
+      c.globalAlpha = 1;
+    }
+
+    // Score
+    c.fillStyle = 'rgba(0,0,0,0.7)'; c.beginPath(); c.roundRect(W/2 - 60, 10, 120, 30, 6); c.fill();
+    c.fillStyle = '#00e676'; c.font = 'bold 18px "Barlow Condensed"'; c.textAlign = 'center';
+    c.fillText(`REMATES: ${this.score}`, W/2, 29);
   }
 };
 
@@ -1006,23 +1093,28 @@ function selectGame(game) {
   currentGame = game;
   document.getElementById('btnCabezazo').classList.toggle('selected', game === 'cabezazo');
   document.getElementById('btnMilanesas').classList.toggle('selected', game === 'milanesas');
-  const titles = { cabezazo: '🤸 Cabezazo', milanesas: '🥩 Milanesas' };
+  document.getElementById('btnSiu').classList.toggle('selected', game === 'siu');
+  const titles = { cabezazo: '🤸 Cabezazo', milanesas: '🥩 Milanesas', siu: '🚀 Salto del Bicho' };
   document.getElementById('gameTitle').textContent = titles[game];
   document.getElementById('gameLiveScore').textContent = '0';
   
   if (game === 'cabezazo') HEAD.init(document.getElementById('gameCanvas'));
-  else MILA.init(document.getElementById('gameCanvas'));
+  else if (game === 'milanesas') MILA.init(document.getElementById('gameCanvas'));
+  else BICH.init(document.getElementById('gameCanvas'));
+  
   setupCanvasEvents();
 }
 
 function startGame() {
   if (currentGame === 'cabezazo') HEAD.start();
-  else MILA.start();
+  else if (currentGame === 'milanesas') MILA.start();
+  else BICH.start();
 }
 
 function restartGame() {
   if (currentGame === 'cabezazo') HEAD.reset();
-  else MILA.reset();
+  else if (currentGame === 'milanesas') MILA.reset();
+  else BICH.reset();
 }
 
 function setupCanvasEvents() {
@@ -1035,10 +1127,15 @@ function setupCanvasEvents() {
     HEAD.canvas = newCanvas; HEAD.ctx = newCanvas.getContext('2d');
     newCanvas.addEventListener('mousemove', e => HEAD.setMouse(e.clientX, e.clientY));
     newCanvas.addEventListener('touchmove', e => { e.preventDefault(); HEAD.setMouse(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
-  } else {
+  } else if (currentGame === 'milanesas') {
     MILA.canvas = newCanvas; MILA.ctx = newCanvas.getContext('2d');
     newCanvas.addEventListener('mousemove', e => MILA.setMouse(e.clientX, e.clientY));
     newCanvas.addEventListener('touchmove', e => { e.preventDefault(); MILA.setMouse(e.touches[0].clientX, e.touches[0].clientY); }, { passive: false });
+  } else {
+    // Eventos de SALTO
+    BICH.canvas = newCanvas; BICH.ctx = newCanvas.getContext('2d');
+    newCanvas.addEventListener('mousedown', () => BICH.jump());
+    newCanvas.addEventListener('touchstart', (e) => { e.preventDefault(); BICH.jump(); }, { passive: false });
   }
 }
 
