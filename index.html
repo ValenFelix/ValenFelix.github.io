@@ -15,6 +15,7 @@
       --bg:#0a0c10;--surface:#111419;--card:#161b23;--border:#1f2733;
       --gold:#f5c842;--silver:#b0bec5;--bronze:#cd7f32;--green:#00e676;
       --blue:#4fc3f7;--muted:#546e7a;--text:#e8edf2;--dim:#8a9ab0;--accent:#ff5722;
+      --live-red:#ff1744;--live-red-glow:rgba(255,23,68,0.35);
     }
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     body{background:var(--bg);color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;min-height:100vh;overflow-x:hidden;padding-bottom:60px}
@@ -33,6 +34,41 @@
     .dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
     .dot.live{background:var(--accent);animation:pulse 1.5s infinite}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+    /* ── LIVE BADGE ── */
+    .live-badge{
+      display:inline-flex;align-items:center;gap:6px;
+      background:var(--live-red);color:#fff;
+      font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:900;
+      letter-spacing:1.5px;text-transform:uppercase;
+      padding:4px 10px;border-radius:6px;
+      box-shadow:0 0 14px var(--live-red-glow);
+      animation:live-pulse 1.2s ease-in-out infinite;
+      flex-shrink:0;
+    }
+    .live-badge::before{
+      content:'';width:7px;height:7px;border-radius:50%;
+      background:#fff;opacity:.9;
+      animation:live-dot 1.2s ease-in-out infinite;
+    }
+    @keyframes live-pulse{
+      0%,100%{box-shadow:0 0 10px var(--live-red-glow),0 0 0 0 var(--live-red-glow);}
+      50%{box-shadow:0 0 18px var(--live-red-glow),0 0 8px 3px rgba(255,23,68,0.15);}
+    }
+    @keyframes live-dot{0%,100%{opacity:1}50%{opacity:.3}}
+
+    /* ── MATCH LIVE ROW ── */
+    .match.is-live{
+      background:rgba(255,23,68,0.04);
+      border-left:3px solid var(--live-red);
+      animation:live-row-pulse 2s ease-in-out infinite;
+    }
+    @keyframes live-row-pulse{
+      0%,100%{background:rgba(255,23,68,0.04);}
+      50%{background:rgba(255,23,68,0.09);}
+    }
+    .sc.live-sc{color:var(--live-red);text-shadow:0 0 8px rgba(255,23,68,0.5);}
+
     .wrap{max-width:1100px;margin:0 auto;padding:30px 16px;display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start}
     @media(max-width:850px){.wrap{grid-template-columns:1fr}}
     .charts-section{max-width:1100px;margin:0 auto;padding:0 16px 30px}
@@ -59,13 +95,13 @@
     .tabs{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:3px}
     .tab{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:5px 12px;border-radius:6px;border:none;cursor:pointer;background:transparent;color:var(--muted);transition:background .15s,color .15s}
     .tab.on{background:var(--border);color:var(--text)}
-    .match{padding:14px 20px;border-bottom:1px solid var(--border)}
+    .match{padding:14px 20px;border-bottom:1px solid var(--border);border-left:3px solid transparent;transition:background .3s}
     .match:last-child{border-bottom:none}
     .match:hover{background:rgba(255,255,255,.01)}
-    .match-meta{display:flex;justify-content:space-between;margin-bottom:8px;align-items:center}
+    .match-meta{display:flex;justify-content:space-between;margin-bottom:8px;align-items:center;gap:8px;flex-wrap:wrap}
     .grp-tag{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:2px 6px}
     .mt{font-size:12px;color:var(--dim)}
-    .mt.live-t{color:var(--accent);font-weight:600;animation:pulse 1.5s infinite}
+    .mt.live-t{color:var(--live-red);font-weight:700;animation:pulse 1.5s infinite}
     .teams{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px}
     .team{display:flex;align-items:center;gap:6px;min-width:0}
     .team.away{flex-direction:row-reverse}
@@ -407,20 +443,19 @@
 // ══════════════════════════════════════════════════════
 //  CONFIGURACIÓN
 // ══════════════════════════════════════════════════════
-const SID           = '1Lxz_7Hf20m685XGDQQmNFL0IclDY8RzK0IXIo0jnZg4';
+const SID             = '1Lxz_7Hf20m685XGDQQmNFL0IclDY8RzK0IXIo0jnZg4';
 const GID_LEADERBOARD = '1369482165';
-const GID_DATOS     = '0';
-// ▼▼▼ NUEVA PESTAÑA DE PARTIDOS ▼▼▼
-const GID_PARTIDOS  = '164525355';   // Pestaña "Partidos" en tu Sheets
+const GID_DATOS       = '0';
+const GID_PARTIDOS    = '164525355';   // Pestaña "Partidos"
 
-const GAMES_SID     = '1pDcY7q9SMP1mLGL12jKY3GKeD4RywOZtA_V7QjAYfDQ';
-const GAMES_GID     = '0';
+const GAMES_SID        = '1pDcY7q9SMP1mLGL12jKY3GKeD4RywOZtA_V7QjAYfDQ';
+const GAMES_GID        = '0';
 const GAMES_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8uGFJAWqC7UiKSNFer6BlNk5bsm63bbUn_y9Yd-Tb6HEvXqmDeB5vRhoy4L1b4vSv/exec';
 
 const REFRESH_INTERVAL = 3 * 60 * 1000;
 
 // ══════════════════════════════════════════════════════
-//  DATOS ESTÁTICOS (grupos, banderas, traducciones)
+//  DATOS ESTÁTICOS
 // ══════════════════════════════════════════════════════
 const GROUPS = {
   A:['México','Corea del Sur','Sudáfrica','Chequia'],
@@ -458,10 +493,10 @@ Chart.defaults.font.family = "'Barlow Condensed', sans-serif";
 // ══════════════════════════════════════════════════════
 //  ESTADO GLOBAL
 // ══════════════════════════════════════════════════════
-let matches   = [];    // Partidos leídos desde Sheets
-let formPicks = {};
+let matches        = [];
+let formPicks      = {};
 let chartInstances = {};
-let curTab    = 'r';
+let curTab         = 'r';
 
 // ══════════════════════════════════════════════════════
 //  UTILIDADES
@@ -505,9 +540,8 @@ function parseCSV(txt) {
 }
 
 // ══════════════════════════════════════════════════════
-//  NUEVO: LEER PARTIDOS DESDE GOOGLE SHEETS
-//  Columnas esperadas en la pestaña "Partidos":
-//  0-Grupo | 1-Fecha | 2-Local | 3-Visitante | 4-Goles Local | 5-Goles Visitante | 6-Estado
+//  LEER PARTIDOS DESDE GOOGLE SHEETS
+//  Columnas: Grupo | Fecha | Local | Visitante | Marcador Local | Marcador Visitante | Estado
 // ══════════════════════════════════════════════════════
 async function fetchPartidosFromSheets() {
   try {
@@ -515,20 +549,17 @@ async function fetchPartidosFromSheets() {
     if (!r.ok) throw new Error('No se pudo leer la pestaña Partidos');
     const text = await r.text();
     const rows = parseCSV(text);
-
     if (rows.length < 2) return;
 
-    // Detectar índices de columnas por header
     const hdr = rows[0].map(h => h.toLowerCase().trim());
-    const iGrupo    = hdr.findIndex(h => h.includes('grupo'));
-    const iFecha    = hdr.findIndex(h => h.includes('fecha'));
-    const iLocal    = hdr.findIndex(h => h.includes('local') && !h.includes('gol'));
-    const iVisit    = hdr.findIndex(h => h.includes('visitante') && !h.includes('gol'));
-    const iGolL     = hdr.findIndex(h => h.includes('marcador local') || (h.includes('gol') && h.includes('local')));
-    const iGolV     = hdr.findIndex(h => h.includes('marcador visitante') || (h.includes('gol') && h.includes('visit')));
-    const iEstado   = hdr.findIndex(h => h.includes('estado'));
+    const iGrupo  = hdr.findIndex(h => h.includes('grupo'));
+    const iFecha  = hdr.findIndex(h => h.includes('fecha'));
+    const iLocal  = hdr.findIndex(h => h.includes('local') && !h.includes('gol') && !h.includes('marcador'));
+    const iVisit  = hdr.findIndex(h => h.includes('visitante') && !h.includes('gol') && !h.includes('marcador'));
+    const iGolL   = hdr.findIndex(h => h.includes('marcador local') || (h.includes('gol') && h.includes('local')));
+    const iGolV   = hdr.findIndex(h => h.includes('marcador visitante') || (h.includes('gol') && h.includes('visit')));
+    const iEstado = hdr.findIndex(h => h.includes('estado'));
 
-    // Fallback a posiciones fijas si no se detectan los headers
     const g   = iGrupo  >= 0 ? iGrupo  : 0;
     const f   = iFecha  >= 0 ? iFecha  : 1;
     const l   = iLocal  >= 0 ? iLocal  : 2;
@@ -540,22 +571,32 @@ async function fetchPartidosFromSheets() {
     const newMatches = [];
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      if (!row[l] || !row[v]) continue;  // fila vacía
+      if (!row[l] || !row[v]) continue;
 
-      const grupoRaw = (row[g] || '').replace('Grupo ', '').trim().toUpperCase();
-      const fechaStr = (row[f] || '').trim();
-      const local    = (row[l] || '').trim();
-      const visitante= (row[v] || '').trim();
-      const golL     = row[gl] !== '' && row[gl] !== undefined && row[gl] !== null ? parseFloat(row[gl]) : null;
-      const golV     = row[gv] !== '' && row[gv] !== undefined && row[gv] !== null ? parseFloat(row[gv]) : null;
-      const estadoRaw= (row[est] || '').trim().toLowerCase();
+      const grupoRaw  = (row[g] || '').replace(/grupo\s*/i, '').trim().toUpperCase();
+      const fechaStr  = (row[f] || '').trim();
+      const local     = (row[l] || '').trim();
+      const visitante = (row[v] || '').trim();
+      const golL      = row[gl] !== '' && row[gl] !== undefined && row[gl] !== null ? parseFloat(row[gl]) : null;
+      const golV      = row[gv] !== '' && row[gv] !== undefined && row[gv] !== null ? parseFloat(row[gv]) : null;
+      const estadoRaw = (row[est] || '').trim().toLowerCase();
 
-      // Normalizar estado
+      // ── Normalizar estado (detecta LIVE / EN VIVO / EN CURSO) ──
       let st = 'SCHED';
-      if (estadoRaw.includes('finaliz') || estadoRaw === 'fin') st = 'FIN';
-      else if (estadoRaw.includes('vivo') || estadoRaw.includes('live') || estadoRaw.includes('curso')) st = 'LIVE';
+      if (estadoRaw.includes('finaliz') || estadoRaw === 'fin' || estadoRaw === 'ft') {
+        st = 'FIN';
+      } else if (
+        estadoRaw === 'live' ||
+        estadoRaw.includes('en vivo') ||
+        estadoRaw.includes('en curso') ||
+        estadoRaw.includes('curso') ||
+        estadoRaw.includes('vivo') ||
+        estadoRaw.includes('directo') ||
+        estadoRaw.includes('jugando')
+      ) {
+        st = 'LIVE';
+      }
 
-      // Parsear fecha (ej: "jue 11 - 01:00 p.m.")
       const dateObj = parseFecha(fechaStr);
 
       newMatches.push({
@@ -573,20 +614,14 @@ async function fetchPartidosFromSheets() {
     matches = newMatches;
   } catch(e) {
     console.error('Error leyendo Partidos desde Sheets:', e);
-    // Si falla, generar matches vacíos con equipos de los grupos
     generateFallbackMatches();
   }
   renderMatches();
   renderStd();
 }
 
-/**
- * Convierte una cadena tipo "jue 11 - 01:00 p.m." a un objeto Date.
- * Asume el mes/año del Mundial (junio 2026).
- */
 function parseFecha(str) {
   if (!str) return new Date('2026-06-11T00:00:00');
-  // Extraer día y hora
   const dayMatch  = str.match(/(\d{1,2})\s*[-–]/);
   const timeMatch = str.match(/(\d{1,2}):(\d{2})\s*(a\.?m\.?|p\.?m\.?)/i);
   const day  = dayMatch  ? parseInt(dayMatch[1])  : 11;
@@ -595,11 +630,8 @@ function parseFecha(str) {
   const ampm = timeMatch ? timeMatch[3].replace(/\./g,'').toLowerCase() : 'am';
   if (ampm === 'pm' && hour !== 12) hour += 12;
   if (ampm === 'am' && hour === 12) hour = 0;
-  // Determinar mes (junio=6, julio=7) en base al día
   const month = day <= 30 ? 6 : 7;
-  // La hora en la hoja está en CDMX (UTC-6), convertir a UTC
-  const d = new Date(Date.UTC(2026, month-1, day, hour + 6, min, 0));
-  return d;
+  return new Date(Date.UTC(2026, month-1, day, hour + 6, min, 0));
 }
 
 function generateFallbackMatches() {
@@ -631,18 +663,26 @@ function setTab(t) {
 function renderMatches() {
   const body = document.getElementById('mBody');
   if (!body) return;
+
   let list;
   if (curTab === 'r') {
+    // "Recientes" muestra finalizados + EN VIVO (los live primero)
     list = matches
       .filter(m => m.st === 'FIN' || m.st === 'LIVE')
-      .sort((a, b) => b.date - a.date)
-      .slice(0, 8);
+      .sort((a, b) => {
+        // LIVE siempre arriba
+        if (a.st === 'LIVE' && b.st !== 'LIVE') return -1;
+        if (b.st === 'LIVE' && a.st !== 'LIVE') return  1;
+        return b.date - a.date;
+      })
+      .slice(0, 10);
   } else {
     list = matches
       .filter(m => m.st === 'SCHED')
       .sort((a, b) => a.date - b.date)
       .slice(0, 6);
   }
+
   if (!list.length) {
     body.innerHTML = `<div class="err">${curTab==='r' ? '⚽ Ningún partido ha finalizado aún.' : '📅 No hay más partidos programados.'}</div>`;
     return;
@@ -652,14 +692,15 @@ function renderMatches() {
 
 function matchHTML(m) {
   const isLive = m.st === 'LIVE';
+  const isFin  = m.st === 'FIN';
   const hasSc  = m.sH !== null && m.sA !== null;
 
-  // Usar la cadena de fecha original si está disponible, o formatear el objeto Date
+  // ── Etiqueta de tiempo/estado ──
   let timeLabel;
-  if (m.st === 'FIN') {
+  if (isFin) {
     timeLabel = 'Finalizado';
   } else if (isLive) {
-    timeLabel = '⚡ EN VIVO';
+    timeLabel = ''; // se reemplaza con el badge animado
   } else if (m.dateStr) {
     timeLabel = `⏳ ${m.dateStr} (CDMX)`;
   } else {
@@ -668,14 +709,27 @@ function matchHTML(m) {
     timeLabel = `⏳ ${dateStr} - ${timeStr} (CDMX)`;
   }
 
-  const scoreBlock = hasSc
-    ? `<div class="score"><span class="sc">${m.sH}</span><span class="sep">–</span><span class="sc">${m.sA}</span></div>`
-    : `<span class="vs">VS</span>`;
+  // ── Badge LIVE animado ──
+  const liveIndicator = isLive
+    ? `<span class="live-badge">EN VIVO</span>`
+    : `<span class="mt ${isFin ? '' : ''}">${timeLabel}</span>`;
 
-  return `<div class="match">
+  // ── Marcador ──
+  let scoreBlock;
+  if (hasSc) {
+    scoreBlock = `<div class="score">
+      <span class="sc ${isLive ? 'live-sc' : ''}">${m.sH}</span>
+      <span class="sep">–</span>
+      <span class="sc ${isLive ? 'live-sc' : ''}">${m.sA}</span>
+    </div>`;
+  } else {
+    scoreBlock = `<span class="vs">VS</span>`;
+  }
+
+  return `<div class="match${isLive ? ' is-live' : ''}">
     <div class="match-meta">
       <span class="grp-tag">Grupo ${m.g}</span>
-      <span class="mt ${isLive?'live-t':''}">${timeLabel}</span>
+      ${liveIndicator}
     </div>
     <div class="teams">
       <div class="team"><span class="fl">${fl(m.h)}</span><span class="tn">${m.h}</span></div>
@@ -686,7 +740,7 @@ function matchHTML(m) {
 }
 
 // ══════════════════════════════════════════════════════
-//  POSICIONES DE GRUPO (calculadas desde los partidos)
+//  POSICIONES DE GRUPO
 // ══════════════════════════════════════════════════════
 function renderStd() {
   const body = document.getElementById('stdBody');
@@ -694,7 +748,6 @@ function renderStd() {
   const g = document.getElementById('gSel') ? document.getElementById('gSel').value : 'A';
   const baseTeams = GROUPS[g] || [];
 
-  // Calcular tabla desde los partidos jugados
   const table = {};
   baseTeams.forEach(t => { table[t] = { pts:0, pj:0, gf:0, gc:0 }; });
 
@@ -706,16 +759,15 @@ function renderStd() {
       table[m.h].pj++; table[m.a].pj++;
       table[m.h].gf += m.sH; table[m.h].gc += m.sA;
       table[m.a].gf += m.sA; table[m.a].gc += m.sH;
-      if (m.sH > m.sA) { table[m.h].pts += 3; }
+      if (m.sH > m.sA)      { table[m.h].pts += 3; }
       else if (m.sH < m.sA) { table[m.a].pts += 3; }
-      else { table[m.h].pts += 1; table[m.a].pts += 1; }
+      else                  { table[m.h].pts += 1; table[m.a].pts += 1; }
     });
 
   const rows = Object.entries(table)
     .sort((a, b) => {
       if (b[1].pts !== a[1].pts) return b[1].pts - a[1].pts;
-      const gdA = a[1].gf - a[1].gc, gdB = b[1].gf - b[1].gc;
-      return gdB - gdA;
+      return (b[1].gf - b[1].gc) - (a[1].gf - a[1].gc);
     });
 
   body.innerHTML = `<table class="std-table">
@@ -764,8 +816,8 @@ function processLB(rows) {
       if (!name) continue;
       players.push({
         name,
-        total:    parseFloat(row[2]) || 0,
-        grupos:   parseFloat(row[4]) || 0,
+        total:     parseFloat(row[2]) || 0,
+        grupos:    parseFloat(row[4]) || 0,
         pPartidos: row[12] !== undefined ? parseFloat(row[12]) : 0
       });
     }
@@ -1371,7 +1423,7 @@ async function run(){
   if(sDot)sDot.classList.remove('live');if(sStatus)sStatus.textContent='Actualizando…';
   await Promise.allSettled([
     fetchLeaderboard(),
-    fetchPartidosFromSheets(),   // ← NUEVA función, reemplaza fetchAPI()
+    fetchPartidosFromSheets(),
     fetchDatosFormulario(),
     fetchGamesLeaderboard()
   ]);
