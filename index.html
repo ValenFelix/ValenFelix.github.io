@@ -1725,8 +1725,31 @@ async function fetchAPI() {
     if (!resM.ok) throw new Error('API en espera: status ' + resM.status);
     const dataM = await resM.json();
     if (dataM.matches && dataM.matches.length > 0) {
-      matches = dataM.matches.map(m => {
-        let st = 'SCHED'; if (m.status === 'FINISHED') st = 'FIN'; if (m.status === 'IN_PLAY' || m.status === 'PAUSED') st = 'LIVE';
+matches = dataM.matches.map(m => {
+
+    const matchDate = new Date(m.utcDate);
+    const now = new Date();
+
+    let st = 'SCHED';
+
+    if (m.status === 'FINISHED') {
+        st = 'FIN';
+    }
+    else if (m.status === 'IN_PLAY' || m.status === 'PAUSED') {
+        st = 'LIVE';
+    }
+    else {
+        const elapsedMin = (now - matchDate) / 60000;
+
+        // Si ya empezó hace menos de 130 min,
+        // asumir que sigue en vivo aunque la API diga SCHEDULED
+        if (elapsedMin >= 0 && elapsedMin < 130) {
+            st = 'LIVE';
+        }
+        else if (elapsedMin >= 130) {
+            st = 'FIN';
+        }
+    }
         let groupLetter = '?'; if (m.group && m.group.includes('GROUP_')) groupLetter = m.group.split('_')[1];
         // v4: fullTime acts as running score during IN_PLAY; fallback to halfTime (PAUSED); show 0-0 for live matches
         const ftH = m.score?.fullTime?.home;
@@ -1737,7 +1760,15 @@ async function fetchAPI() {
         if (ftH !== null && ftH !== undefined) { sH = ftH; sA = ftA; }
         else if (htH !== null && htH !== undefined) { sH = htH; sA = htA; }
         else if (st === 'LIVE') { sH = 0; sA = 0; } // partido en vivo sin score aún = 0-0
-        return { g: groupLetter, h: tr(m.homeTeam?.name), a: tr(m.awayTeam?.name), sH, sA, st, date: new Date(m.utcDate) };
+       return {
+    g: groupLetter,
+    h: tr(m.homeTeam?.name),
+    a: tr(m.awayTeam?.name),
+    sH,
+    sA,
+    st,
+    date: matchDate
+};
       });
     } else { generateFallbackMatches(); }
     const resS = await fetch(API_URL_STANDINGS, opts);
