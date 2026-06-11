@@ -1491,9 +1491,20 @@ function generateFallbackMatches() {
     ['L','Croacia','Inglaterra','2026-06-27T20:00:00-06:00'],
     ['L','Panamá','Ghana','2026-06-27T20:00:00-06:00'],
   ];
-  matches = FIXTURE.map(([g, h, a, iso]) => ({
-    g, h, a, sH: null, sA: null, st: 'SCHED', date: new Date(iso)
-  }));
+ const now = new Date();
+  matches = FIXTURE.map(([g, h, a, iso]) => {
+    const date = new Date(iso);
+    const elapsedMin = (now - date) / 60000;
+    let st = 'SCHED', sH = null, sA = null;
+    if (elapsedMin >= 0 && elapsedMin < 130) {
+      // Partido en curso (asumimos ~2h10 incluyendo descanso)
+      st = 'LIVE'; sH = 0; sA = 0;
+    } else if (elapsedMin >= 130) {
+      // Ya debería haber terminado; sin datos reales lo marcamos finalizado sin marcador visible
+      st = 'FIN'; sH = 0; sA = 0;
+    }
+    return { g, h, a, sH, sA, st, date };
+  });
 }
 
 async function fetchDatosFormulario() {
@@ -1711,7 +1722,7 @@ async function fetchAPI() {
   try {
     const opts = { headers: { 'X-Auth-Token': API_TOKEN } };
     const resM = await fetch(API_URL_MATCHES, opts);
-    if (!resM.ok) throw new Error('API en espera');
+    if (!resM.ok) throw new Error('API en espera: status ' + resM.status);
     const dataM = await resM.json();
     if (dataM.matches && dataM.matches.length > 0) {
       matches = dataM.matches.map(m => {
@@ -1741,7 +1752,7 @@ async function fetchAPI() {
         });
       }
     }
-  } catch(e) { generateFallbackMatches(); }
+  } catch(e) { console.warn('fetchAPI fallback:', e); generateFallbackMatches(); }
   renderMatches(); renderStd();
 }
 
