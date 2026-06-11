@@ -831,7 +831,8 @@ let pendingRecord = null; // { game, score }
 
 async function fetchGamesLeaderboard() {
   try {
-    const r = await fetch(`https://docs.google.com/spreadsheets/d/${GAMES_SID}/gviz/tq?tqx=out:csv&gid=${GAMES_GID}`);
+    const ts = new Date().getTime(); // CACHE-BUSTING
+    const r = await fetch(`https://docs.google.com/spreadsheets/d/${GAMES_SID}/gviz/tq?tqx=out:csv&gid=${GAMES_GID}&_t=${ts}`, { cache: 'no-store' });
     if (!r.ok) return;
     const text = await r.text();
     const rows = parseCSV(text);
@@ -854,7 +855,6 @@ async function fetchGamesLeaderboard() {
          const nombre = row[hNombre] || 'Anónimo';
          const score = parseInt(row[hScore], 10) || 0;
          
-         // Normalizar nombre de juegos por si acaso
          if(juego === 'siu' || juego === 'salto del bicho') juego = 'siu';
          if(juego === 'cabezazo') juego = 'cabezazo';
          if(juego === 'milanesas' || juego === 'atrapa la milanesa') juego = 'milanesas';
@@ -864,7 +864,6 @@ async function fetchGamesLeaderboard() {
          }
        }
        
-       // Ordenar y guardar solo el Top 5
        for (let j in newRecords) {
          newRecords[j].sort((a,b) => b.score - a.score);
          newRecords[j] = newRecords[j].slice(0, 5);
@@ -916,16 +915,12 @@ function commitRecordToServer(game, score, name) {
     score: score 
   };
   
-  // UI Optimista (se ve el cambio inmediatamente)
   globalGameRecords[game].push({ name: name, score: score });
   globalGameRecords[game].sort((a,b) => b.score - a.score);
   globalGameRecords[game] = globalGameRecords[game].slice(0, 5);
   renderGameLeaderboards();
 
-  if(GAMES_SCRIPT_URL === 'AQUI_PON_TU_URL_DEL_NUEVO_APPS_SCRIPT') {
-    console.warn("Falta conectar el Apps Script URL");
-    return;
-  }
+  if(GAMES_SCRIPT_URL === 'AQUI_PON_TU_URL_DEL_NUEVO_APPS_SCRIPT') { return; }
 
   fetch(GAMES_SCRIPT_URL, {
     method: 'POST',
@@ -933,15 +928,11 @@ function commitRecordToServer(game, score, name) {
     headers: { 'Content-Type': 'text/plain;charset=utf-8' }
   })
   .then(r => r.json())
-  .then(data => {
-     fetchGamesLeaderboard(); // Refrescar oficiales de la base de datos
-  })
+  .then(data => { fetchGamesLeaderboard(); })
   .catch(e => console.error("Error guardando score", e));
 }
 
-document.getElementById('rmNameInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') saveRecord(true);
-});
+document.getElementById('rmNameInput').addEventListener('keydown', e => { if (e.key === 'Enter') saveRecord(true); });
 
 function renderGameLeaderboards() {
   const medals = ['gold', 'silver', 'bronze', 'muted', 'muted'];
@@ -967,19 +958,14 @@ function renderGameLeaderboards() {
 }
 
 // ══════════════════════════════════════════════════════
-//  MINI JUEGO 1: CABEZAZO (Keepie-uppie)
+//  MINI JUEGO 1: CABEZAZO
 // ══════════════════════════════════════════════════════
 const HEAD = {
   running: false, animFrame: null, score: 0,
   ball: { x: 300, y: 200, vx: 1.0, vy: 0, r: 16 },
   player: { x: 300, y: 285, w: 60, h: 20, targetX: 300 },
   gravity: 0.055, bounces: 0, canvas: null, ctx: null, mouseX: 300,
-
-  init(canvas) {
-    this.canvas = canvas; this.ctx = canvas.getContext('2d');
-    this.reset(); this.render();
-  },
-
+  init(canvas) { this.canvas = canvas; this.ctx = canvas.getContext('2d'); this.reset(); this.render(); },
   reset() {
     this.running = false; this.score = 0; this.bounces = 0; this.gravity = 0.055;
     this.ball = { x: 300, y: 200, vx: 1.0, vy: 0, r: 16 };
@@ -993,85 +979,56 @@ const HEAD = {
     document.getElementById('btnRestart').style.display = 'none';
     this.render();
   },
-
   start() {
-    this.running = true;
-    document.getElementById('gameMsg').classList.add('hidden');
-    document.getElementById('btnStart').style.display = 'none';
-    document.getElementById('btnRestart').style.display = '';
+    this.running = true; document.getElementById('gameMsg').classList.add('hidden');
+    document.getElementById('btnStart').style.display = 'none'; document.getElementById('btnRestart').style.display = '';
     this.loop();
   },
-
-  loop() {
-    if (!this.running) return;
-    this.update(); this.render();
-    this.animFrame = requestAnimationFrame(() => this.loop());
-  },
-
+  loop() { if (!this.running) return; this.update(); this.render(); this.animFrame = requestAnimationFrame(() => this.loop()); },
   update() {
     const b = this.ball, p = this.player, W = 600, H = 340;
     b.vy += this.gravity; b.x += b.vx; b.y += b.vy;
     if (b.x - b.r < 0)  { b.x = b.r;     b.vx =  Math.abs(b.vx) * 0.9; }
     if (b.x + b.r > W)  { b.x = W - b.r; b.vx = -Math.abs(b.vx) * 0.9; }
-    
-    p.x += (this.mouseX - p.x) * 0.15;
-    p.x = Math.max(p.w/2, Math.min(W - p.w/2, p.x));
-    
+    p.x += (this.mouseX - p.x) * 0.15; p.x = Math.max(p.w/2, Math.min(W - p.w/2, p.x));
     const headCY = p.y - 14, headR = 22; 
-    const dx = b.x - p.x, dy = b.y - headCY;
-    const dist = Math.sqrt(dx*dx + dy*dy);
+    const dx = b.x - p.x, dy = b.y - headCY, dist = Math.sqrt(dx*dx + dy*dy);
     if (dist < b.r + headR && b.vy > 0) {
-      b.vy = -7.5; b.vx += dx * 0.06;                     
-      b.vx = Math.max(-5, Math.min(5, b.vx));
-      b.y = headCY - b.r - headR - 1;        
+      b.vy = -7.5; b.vx += dx * 0.06; b.vx = Math.max(-5, Math.min(5, b.vx)); b.y = headCY - b.r - headR - 1;        
       this.score++; this.bounces++;
       document.getElementById('gameLiveScore').textContent = this.score;
       if (this.bounces % 10 === 0) this.gravity = Math.min(0.18, this.gravity + 0.008);
     }
     if (b.y - b.r > H) this.end();
   },
-
   end() {
-    this.running = false;
-    if (this.animFrame) cancelAnimationFrame(this.animFrame);
-    const msg = document.getElementById('gameMsg');
-    const stars = this.score >= 50 ? '⭐⭐⭐' : this.score >= 25 ? '⭐⭐' : this.score >= 8 ? '⭐' : '';
+    this.running = false; if (this.animFrame) cancelAnimationFrame(this.animFrame);
+    const msg = document.getElementById('gameMsg'), stars = this.score >= 50 ? '⭐⭐⭐' : this.score >= 25 ? '⭐⭐' : this.score >= 8 ? '⭐' : '';
     msg.innerHTML = `<div class="gm-score">${this.score}</div><div class="gm-title">${stars || '😮'} toque${this.score !== 1 ? 's' : ''}</div><div class="gm-sub">¡Inténtalo de nuevo!</div>`;
     msg.classList.remove('hidden');
     checkAndPromptRecord('cabezazo', this.score);
   },
-
   setMouse(ex, ey) {
     if (!this.running) return;
-    const rect = this.canvas.getBoundingClientRect();
-    this.mouseX = (ex - rect.left) * (this.canvas.width / rect.width);
+    const rect = this.canvas.getBoundingClientRect(); this.mouseX = (ex - rect.left) * (this.canvas.width / rect.width);
   },
-
   render() {
     const c = this.ctx, W = 600, H = 340;
     c.fillStyle = '#0a1a0e'; c.fillRect(0, 0, W, H);
-    for (let i = 0; i < 8; i++) {
-      c.fillStyle = i % 2 === 0 ? 'rgba(0,0,0,0.08)' : 'transparent';
-      c.fillRect(i * 75, 0, 75, H);
-    }
-    c.strokeStyle = 'rgba(255,255,255,0.15)'; c.lineWidth = 2;
-    c.beginPath(); c.moveTo(0, H - 5); c.lineTo(W, H - 5); c.stroke();
-
+    for (let i = 0; i < 8; i++) { c.fillStyle = i % 2 === 0 ? 'rgba(0,0,0,0.08)' : 'transparent'; c.fillRect(i * 75, 0, 75, H); }
+    c.strokeStyle = 'rgba(255,255,255,0.15)'; c.lineWidth = 2; c.beginPath(); c.moveTo(0, H - 5); c.lineTo(W, H - 5); c.stroke();
     const diff = Math.min(1, (this.gravity - 0.25) / 0.25);
     if (diff > 0) { c.fillStyle = `rgba(255,87,34,${diff * 0.6})`; c.fillRect(0, 0, W * diff, 4); }
-
     const p = this.player;
     c.fillStyle = '#1565c0'; c.beginPath(); c.roundRect(p.x - 12, p.y, 24, 40, 4); c.fill();
     c.fillStyle = '#ffcc80'; c.beginPath(); c.arc(p.x, p.y - 14, 18, 0, Math.PI * 2); c.fill();
     c.fillStyle = '#5d4037'; c.beginPath(); c.arc(p.x, p.y - 20, 18, Math.PI, 0); c.fill();
     c.fillStyle = '#333'; c.beginPath(); c.arc(p.x - 6, p.y - 14, 3, 0, Math.PI * 2); c.fill();
     c.beginPath(); c.arc(p.x + 6, p.y - 14, 3, 0, Math.PI * 2); c.fill();
-
     const b = this.ball;
     c.fillStyle = '#ffffff'; c.beginPath(); c.arc(b.x, b.y, b.r, 0, Math.PI * 2); c.fill();
     c.strokeStyle = '#333'; c.lineWidth = 1.5; c.beginPath(); c.arc(b.x, b.y, b.r, 0, Math.PI * 2); c.stroke();
     c.fillStyle = '#333'; c.beginPath(); c.arc(b.x, b.y, b.r * 0.45, 0, Math.PI * 2); c.fill();
-
     c.fillStyle = 'rgba(0,0,0,0.6)'; c.beginPath(); c.roundRect(W/2 - 50, 10, 100, 30, 6); c.fill();
     c.fillStyle = '#00e676'; c.font = 'bold 18px "Barlow Condensed", sans-serif'; c.textAlign = 'center';
     c.fillText(`TOQUES: ${this.score}`, W/2, 29);
@@ -1082,90 +1039,53 @@ const HEAD = {
 //  MINI JUEGO 2: ATRAPA LA MILANESA
 // ══════════════════════════════════════════════════════
 const MILA = {
-  running: false, animFrame: null, score: 0,
-  items: [], spawnTimer: 0, spawnRate: 60, speedMultiplier: 1,
+  running: false, animFrame: null, score: 0, items: [], spawnTimer: 0, spawnRate: 60, speedMultiplier: 1,
   player: { x: 300, y: 300, w: 80, h: 20 }, canvas: null, ctx: null, mouseX: 300,
-
   init(canvas) { this.canvas = canvas; this.ctx = canvas.getContext('2d'); this.reset(); },
-
   reset() {
-    this.running = false; this.score = 0;
-    this.items = []; this.spawnTimer = 0; this.spawnRate = 70; this.speedMultiplier = 1;
-    this.player.x = 300;
+    this.running = false; this.score = 0; this.items = []; this.spawnTimer = 0; this.spawnRate = 70; this.speedMultiplier = 1; this.player.x = 300;
     if (this.animFrame) { cancelAnimationFrame(this.animFrame); this.animFrame = null; }
     document.getElementById('gameLiveScore').textContent = '0';
     const msg = document.getElementById('gameMsg');
     msg.innerHTML = `<div class="gm-emoji">🐐</div><div class="gm-title">LAS MILANESAS</div><div class="gm-sub">Mueve el ratón o el dedo para atraparlas.<br>¡Si se te cae una al piso, pierdes!</div>`;
     msg.classList.remove('hidden');
-    document.getElementById('btnStart').style.display = '';
-    document.getElementById('btnRestart').style.display = 'none';
+    document.getElementById('btnStart').style.display = ''; document.getElementById('btnRestart').style.display = 'none';
     this.render();
   },
-
   start() {
-    this.running = true;
-    document.getElementById('gameMsg').classList.add('hidden');
-    document.getElementById('btnStart').style.display = 'none';
-    document.getElementById('btnRestart').style.display = '';
+    this.running = true; document.getElementById('gameMsg').classList.add('hidden');
+    document.getElementById('btnStart').style.display = 'none'; document.getElementById('btnRestart').style.display = '';
     this.loop();
   },
-
-  loop() {
-    if (!this.running) return;
-    this.update(); this.render();
-    this.animFrame = requestAnimationFrame(() => this.loop());
-  },
-
+  loop() { if (!this.running) return; this.update(); this.render(); this.animFrame = requestAnimationFrame(() => this.loop()); },
   update() {
-    const p = this.player, W = 600, H = 340;
-    p.x += (this.mouseX - p.x) * 0.2;
-    p.x = Math.max(p.w/2, Math.min(W - p.w/2, p.x));
-
+    const p = this.player, W = 600, H = 340; p.x += (this.mouseX - p.x) * 0.2; p.x = Math.max(p.w/2, Math.min(W - p.w/2, p.x));
     this.spawnTimer++;
     if (this.spawnTimer >= this.spawnRate) {
       this.spawnTimer = 0;
       this.items.push({ x: 30 + Math.random() * (W - 60), y: -20, r: 15, speed: (2 + Math.random() * 2) * this.speedMultiplier, rotation: Math.random() * Math.PI * 2, rotSpeed: (Math.random() - 0.5) * 0.1 });
-      if (this.spawnRate > 25) this.spawnRate -= 1.5;
-      this.speedMultiplier += 0.02;
+      if (this.spawnRate > 25) this.spawnRate -= 1.5; this.speedMultiplier += 0.02;
     }
-
     for (let i = this.items.length - 1; i >= 0; i--) {
-      let item = this.items[i];
-      item.y += item.speed; item.rotation += item.rotSpeed;
-
+      let item = this.items[i]; item.y += item.speed; item.rotation += item.rotSpeed;
       if (item.y + item.r > p.y - 10 && item.y - item.r < p.y + p.h && item.x + item.r > p.x - p.w/2 && item.x - item.r < p.x + p.w/2) {
-        this.items.splice(i, 1);
-        this.score++;
-        document.getElementById('gameLiveScore').textContent = this.score;
-        continue;
+        this.items.splice(i, 1); this.score++; document.getElementById('gameLiveScore').textContent = this.score; continue;
       }
       if (item.y > H + item.r) { this.end(); return; }
     }
   },
-
   end() {
-    this.running = false;
-    if (this.animFrame) cancelAnimationFrame(this.animFrame);
-    const msg = document.getElementById('gameMsg');
-    const stars = this.score >= 40 ? '🐐🐐🐐' : this.score >= 20 ? '⭐⭐' : this.score >= 5 ? '⭐' : '';
+    this.running = false; if (this.animFrame) cancelAnimationFrame(this.animFrame);
+    const msg = document.getElementById('gameMsg'), stars = this.score >= 40 ? '🐐🐐🐐' : this.score >= 20 ? '⭐⭐' : this.score >= 5 ? '⭐' : '';
     msg.innerHTML = `<div class="gm-score">${this.score}</div><div class="gm-title">${stars || '😭'}</div><div class="gm-sub">¡Se te cayó la milanesa! Inténtalo de nuevo.</div>`;
-    msg.classList.remove('hidden');
-    checkAndPromptRecord('milanesas', this.score);
+    msg.classList.remove('hidden'); checkAndPromptRecord('milanesas', this.score);
   },
-
-  setMouse(ex, ey) {
-    if (!this.running) return;
-    const rect = this.canvas.getBoundingClientRect();
-    this.mouseX = (ex - rect.left) * (this.canvas.width / rect.width);
-  },
-
+  setMouse(ex, ey) { if (!this.running) return; const rect = this.canvas.getBoundingClientRect(); this.mouseX = (ex - rect.left) * (this.canvas.width / rect.width); },
   render() {
     const c = this.ctx, W = 600, H = 340;
-    c.fillStyle = '#161b23'; c.fillRect(0, 0, W, H);
-    c.strokeStyle = '#1f2733'; c.lineWidth = 2;
+    c.fillStyle = '#161b23'; c.fillRect(0, 0, W, H); c.strokeStyle = '#1f2733'; c.lineWidth = 2;
     for(let i=0; i<W; i+=40) { c.beginPath(); c.moveTo(i,0); c.lineTo(i,H); c.stroke(); }
     for(let i=0; i<H; i+=40) { c.beginPath(); c.moveTo(0,i); c.lineTo(W,i); c.stroke(); }
-
     const p = this.player;
     c.fillStyle = '#b0bec5'; c.beginPath(); c.roundRect(p.x - p.w/2, p.y - 10, p.w, 12, 6); c.fill();
     c.fillStyle = '#4fc3f7'; c.fillRect(p.x - 20, p.y, 40, 40);
@@ -1173,14 +1093,12 @@ const MILA = {
     c.fillStyle = '#ffcc80'; c.beginPath(); c.arc(p.x, p.y - 30, 16, 0, Math.PI * 2); c.fill();
     c.fillStyle = '#3e2723'; c.beginPath(); c.arc(p.x, p.y - 36, 16, Math.PI, 0); c.fill(); 
     c.beginPath(); c.arc(p.x, p.y - 22, 10, 0, Math.PI); c.fill(); 
-
     for (let item of this.items) {
       c.save(); c.translate(item.x, item.y); c.rotate(item.rotation);
       c.fillStyle = '#8d6e63'; c.beginPath(); c.ellipse(0, 0, item.r * 1.4, item.r * 0.9, 0, 0, Math.PI * 2); c.fill();
       c.fillStyle = '#d7ccc8'; c.beginPath(); c.arc(-5, -2, 3, 0, Math.PI*2); c.fill(); c.beginPath(); c.arc(6, 4, 2, 0, Math.PI*2); c.fill();
       c.restore();
     }
-
     c.fillStyle = 'rgba(0,0,0,0.7)'; c.beginPath(); c.roundRect(W/2 - 60, 10, 120, 30, 6); c.fill();
     c.fillStyle = '#ff5722'; c.font = 'bold 18px "Barlow Condensed", sans-serif'; c.textAlign = 'center';
     c.fillText(`ATRAPADAS: ${this.score}`, W/2, 29);
@@ -1191,152 +1109,71 @@ const MILA = {
 //  MINI JUEGO 3: EL SALTO DEL BICHO
 // ══════════════════════════════════════════════════════
 const BICH = {
-  running: false, animFrame: null, score: 0,
-  balls: [], spawnTimer: 0, spawnRate: 100, speedMultiplier: 1,
+  running: false, animFrame: null, score: 0, balls: [], spawnTimer: 0, spawnRate: 100, speedMultiplier: 1,
   player: { x: 120, y: 280, w: 30, h: 60, vy: 0, gravity: 0.6, jumpPower: -12.5, grounded: true },
   feedback: [], canvas: null, ctx: null,
-
   init(canvas) { this.canvas = canvas; this.ctx = canvas.getContext('2d'); this.reset(); },
-
   reset() {
-    this.running = false; this.score = 0;
-    this.balls = []; this.spawnTimer = 0; this.spawnRate = 100; this.speedMultiplier = 1;
-    this.player.vy = 0; this.player.y = 280; this.player.grounded = true;
-    this.feedback = [];
+    this.running = false; this.score = 0; this.balls = []; this.spawnTimer = 0; this.spawnRate = 100; this.speedMultiplier = 1;
+    this.player.vy = 0; this.player.y = 280; this.player.grounded = true; this.feedback = [];
     if (this.animFrame) { cancelAnimationFrame(this.animFrame); this.animFrame = null; }
     document.getElementById('gameLiveScore').textContent = '0';
     const msg = document.getElementById('gameMsg');
     msg.innerHTML = `<div class="gm-emoji">🚀</div><div class="gm-title">SALTO DEL BICHO</div><div class="gm-sub">Toca la pantalla o haz clic para saltar.<br>¡Calcula bien para rematar de cabeza!</div>`;
-    msg.classList.remove('hidden');
-    document.getElementById('btnStart').style.display = '';
-    document.getElementById('btnRestart').style.display = 'none';
+    msg.classList.remove('hidden'); document.getElementById('btnStart').style.display = ''; document.getElementById('btnRestart').style.display = 'none';
     this.render();
   },
-
   start() {
-    this.running = true;
-    document.getElementById('gameMsg').classList.add('hidden');
-    document.getElementById('btnStart').style.display = 'none';
-    document.getElementById('btnRestart').style.display = '';
+    this.running = true; document.getElementById('gameMsg').classList.add('hidden');
+    document.getElementById('btnStart').style.display = 'none'; document.getElementById('btnRestart').style.display = '';
     this.loop();
   },
-
-  loop() {
-    if (!this.running) return;
-    this.update(); this.render();
-    this.animFrame = requestAnimationFrame(() => this.loop());
-  },
-
+  loop() { if (!this.running) return; this.update(); this.render(); this.animFrame = requestAnimationFrame(() => this.loop()); },
   update() {
-    const p = this.player, W = 600, H = 340;
-    
-    // Gravedad del salto
-    p.vy += p.gravity;
-    p.y += p.vy;
+    const p = this.player, W = 600, H = 340; p.vy += p.gravity; p.y += p.vy;
     if (p.y >= 280) { p.y = 280; p.vy = 0; p.grounded = true; }
-
-    // Generar centros (balones)
     this.spawnTimer++;
     if (this.spawnTimer >= this.spawnRate) {
-      this.spawnTimer = 0;
-      // Los balones vienen entre y=130 (alto) y y=260 (bajo)
-      this.balls.push({ x: W + 20, y: 130 + Math.random() * 130, vx: -(5 + Math.random() * 2) * this.speedMultiplier, r: 12 });
-      if (this.spawnRate > 45) this.spawnRate -= 2;
-      this.speedMultiplier += 0.03;
+      this.spawnTimer = 0; this.balls.push({ x: W + 20, y: 130 + Math.random() * 130, vx: -(5 + Math.random() * 2) * this.speedMultiplier, r: 12 });
+      if (this.spawnRate > 45) this.spawnRate -= 2; this.speedMultiplier += 0.03;
     }
-
-    // Actualizar balones y checar colisiones
     for (let i = this.balls.length - 1; i >= 0; i--) {
-      let b = this.balls[i];
-      b.x += b.vx;
-
-      // Colisión (Solo cuenta si le da con la cabeza/parte alta del cuerpo)
+      let b = this.balls[i]; b.x += b.vx;
       const headY = p.y - p.h;
-      if (b.x - b.r < p.x + p.w/2 && b.x + b.r > p.x - p.w/2 &&
-          b.y + b.r > headY - 15 && b.y - b.r < headY + 30) {
-        this.balls.splice(i, 1);
-        this.score++;
-        document.getElementById('gameLiveScore').textContent = this.score;
-        this.feedback.push({ x: p.x + 10, y: headY - 20, text: '¡SIUUU!', alpha: 1.5 });
-        continue;
+      if (b.x - b.r < p.x + p.w/2 && b.x + b.r > p.x - p.w/2 && b.y + b.r > headY - 15 && b.y - b.r < headY + 30) {
+        this.balls.splice(i, 1); this.score++; document.getElementById('gameLiveScore').textContent = this.score;
+        this.feedback.push({ x: p.x + 10, y: headY - 20, text: '¡SIUUU!', alpha: 1.5 }); continue;
       }
-
-      // Si el balón pasa al jugador sin ser tocado, game over
       if (b.x < p.x - p.w) { this.end(); return; }
     }
-
-    // Actualizar animaciones de SIUUU
-    this.feedback.forEach(f => { f.y -= 1.5; f.alpha -= 0.03; });
-    this.feedback = this.feedback.filter(f => f.alpha > 0);
+    this.feedback.forEach(f => { f.y -= 1.5; f.alpha -= 0.03; }); this.feedback = this.feedback.filter(f => f.alpha > 0);
   },
-
-  jump() {
-    if (this.player.grounded && this.running) {
-      this.player.vy = this.player.jumpPower;
-      this.player.grounded = false;
-    }
-  },
-
+  jump() { if (this.player.grounded && this.running) { this.player.vy = this.player.jumpPower; this.player.grounded = false; } },
   end() {
-    this.running = false;
-    if (this.animFrame) cancelAnimationFrame(this.animFrame);
-    const msg = document.getElementById('gameMsg');
-    const stars = this.score >= 30 ? '🚀🐐' : this.score >= 15 ? '⭐⭐' : this.score >= 5 ? '⭐' : '';
+    this.running = false; if (this.animFrame) cancelAnimationFrame(this.animFrame);
+    const msg = document.getElementById('gameMsg'), stars = this.score >= 30 ? '🚀🐐' : this.score >= 15 ? '⭐⭐' : this.score >= 5 ? '⭐' : '';
     msg.innerHTML = `<div class="gm-score">${this.score}</div><div class="gm-title">${stars || '🤦‍♂️'}</div><div class="gm-sub">¡Dejaste pasar el balón!</div>`;
-    msg.classList.remove('hidden');
-    checkAndPromptRecord('siu', this.score);
+    msg.classList.remove('hidden'); checkAndPromptRecord('siu', this.score);
   },
-
   render() {
     const c = this.ctx, W = 600, H = 340;
-    
-    // Fondo: Estadio Nocturno
-    c.fillStyle = '#0f172a'; c.fillRect(0, 0, W, H);
-    // Piso
-    c.fillStyle = '#064e3b'; c.fillRect(0, 280, W, H - 280);
-    c.strokeStyle = '#047857'; c.lineWidth = 4;
-    c.beginPath(); c.moveTo(0, 280); c.lineTo(W, 280); c.stroke();
-
-    const p = this.player;
-    // Dibujar CR7
-    c.fillStyle = '#ef4444'; // Camisa Portugal (Roja)
-    c.beginPath(); c.roundRect(p.x - p.w/2, p.y - p.h, p.w, p.h * 0.6, 4); c.fill();
-    c.fillStyle = '#166534'; // Shorts Verdes
-    c.fillRect(p.x - p.w/2, p.y - p.h * 0.4, p.w, p.h * 0.2);
-    // Piernas (saltando o parado)
-    c.fillStyle = '#fcd34d'; 
-    if (p.grounded) {
-      c.fillRect(p.x - 10, p.y - p.h * 0.2, 6, p.h * 0.2);
-      c.fillRect(p.x + 4, p.y - p.h * 0.2, 6, p.h * 0.2);
-    } else { // Pose de salto encogida
-      c.fillRect(p.x - 10, p.y - p.h * 0.2, 16, 6);
-      c.fillRect(p.x - 4, p.y - p.h * 0.1, 10, 6);
-    }
-    // Cabeza
+    c.fillStyle = '#0f172a'; c.fillRect(0, 0, W, H); c.fillStyle = '#064e3b'; c.fillRect(0, 280, W, H - 280);
+    c.strokeStyle = '#047857'; c.lineWidth = 4; c.beginPath(); c.moveTo(0, 280); c.lineTo(W, 280); c.stroke();
+    const p = this.player; c.fillStyle = '#ef4444'; c.beginPath(); c.roundRect(p.x - p.w/2, p.y - p.h, p.w, p.h * 0.6, 4); c.fill();
+    c.fillStyle = '#166534'; c.fillRect(p.x - p.w/2, p.y - p.h * 0.4, p.w, p.h * 0.2); c.fillStyle = '#fcd34d'; 
+    if (p.grounded) { c.fillRect(p.x - 10, p.y - p.h * 0.2, 6, p.h * 0.2); c.fillRect(p.x + 4, p.y - p.h * 0.2, 6, p.h * 0.2); } 
+    else { c.fillRect(p.x - 10, p.y - p.h * 0.2, 16, 6); c.fillRect(p.x - 4, p.y - p.h * 0.1, 10, 6); }
     c.fillStyle = '#fcd34d'; c.beginPath(); c.arc(p.x, p.y - p.h - 10, 14, 0, Math.PI*2); c.fill();
-    // Pelo engominado
     c.fillStyle = '#111'; c.beginPath(); c.arc(p.x, p.y - p.h - 14, 14, Math.PI*0.8, Math.PI*2.2); c.fill();
-
-    // Dibujar Balones
     for (let b of this.balls) {
       c.fillStyle = '#fff'; c.beginPath(); c.arc(b.x, b.y, b.r, 0, Math.PI*2); c.fill();
       c.strokeStyle = '#000'; c.lineWidth = 1.5; c.stroke();
       c.fillStyle = '#000'; c.beginPath(); c.arc(b.x, b.y, b.r*0.4, 0, Math.PI*2); c.fill();
     }
-
-    // Feedback (SIUUU)
     c.font = 'bold 26px "Barlow Condensed", sans-serif'; c.textAlign = 'center';
-    for (let f of this.feedback) {
-      c.globalAlpha = Math.min(1, f.alpha);
-      c.fillStyle = '#f5c842';
-      c.fillText(f.text, f.x, f.y);
-      c.globalAlpha = 1;
-    }
-
-    // Score
+    for (let f of this.feedback) { c.globalAlpha = Math.min(1, f.alpha); c.fillStyle = '#f5c842'; c.fillText(f.text, f.x, f.y); c.globalAlpha = 1; }
     c.fillStyle = 'rgba(0,0,0,0.7)'; c.beginPath(); c.roundRect(W/2 - 60, 10, 120, 30, 6); c.fill();
-    c.fillStyle = '#00e676'; c.font = 'bold 18px "Barlow Condensed"'; c.textAlign = 'center';
-    c.fillText(`REMATES: ${this.score}`, W/2, 29);
+    c.fillStyle = '#00e676'; c.font = 'bold 18px "Barlow Condensed"'; c.textAlign = 'center'; c.fillText(`REMATES: ${this.score}`, W/2, 29);
   }
 };
 
@@ -1351,13 +1188,11 @@ function selectGame(game) {
   document.getElementById('btnMilanesas').classList.toggle('selected', game === 'milanesas');
   document.getElementById('btnSiu').classList.toggle('selected', game === 'siu');
   const titles = { cabezazo: '🤸 Cabezazo', milanesas: '🥩 Milanesas', siu: '🚀 Salto del Bicho' };
-  document.getElementById('gameTitle').textContent = titles[game];
-  document.getElementById('gameLiveScore').textContent = '0';
+  document.getElementById('gameTitle').textContent = titles[game]; document.getElementById('gameLiveScore').textContent = '0';
   
   if (game === 'cabezazo') HEAD.init(document.getElementById('gameCanvas'));
   else if (game === 'milanesas') MILA.init(document.getElementById('gameCanvas'));
   else BICH.init(document.getElementById('gameCanvas'));
-  
   setupCanvasEvents();
 }
 
@@ -1374,10 +1209,8 @@ function restartGame() {
 }
 
 function setupCanvasEvents() {
-  const canvas = document.getElementById('gameCanvas');
-  const newCanvas = canvas.cloneNode(true);
-  canvas.parentNode.replaceChild(newCanvas, canvas);
-  newCanvas.id = 'gameCanvas';
+  const canvas = document.getElementById('gameCanvas'); const newCanvas = canvas.cloneNode(true);
+  canvas.parentNode.replaceChild(newCanvas, canvas); newCanvas.id = 'gameCanvas';
 
   if (currentGame === 'cabezazo') {
     HEAD.canvas = newCanvas; HEAD.ctx = newCanvas.getContext('2d');
@@ -1398,40 +1231,72 @@ function setupCanvasEvents() {
 //  QUINIELA — LÓGICA ORIGINAL
 // ══════════════════════════════════════════════════════
 function generateFallbackMatches() {
-  const generated = [];
-  const letters = Object.keys(GROUPS);
-  letters.forEach((letter, index) => {
-    const teams = GROUPS[letter];
-    const dayOffset = Math.floor(index / 2);
-    const baseDate = new Date('2026-06-11T14:00:00Z');
-    baseDate.setDate(baseDate.getDate() + dayOffset);
-    const d1 = new Date(baseDate); d1.setUTCHours(15 + (index % 2) * 3, 0, 0);
-    generated.push({ g: letter, h: teams[0], a: teams[1], sH: null, sA: null, st: 'SCHED', date: d1 });
-    const d2 = new Date(baseDate); d2.setUTCHours(18 + (index % 2) * 3, 0, 0);
-    generated.push({ g: letter, h: teams[2], a: teams[3], sH: null, sA: null, st: 'SCHED', date: d2 });
+  const FIXTURE = [
+    ['A','México','Sudáfrica','2026-06-11T13:00:00-06:00'], ['A','Corea del Sur','Chequia','2026-06-11T20:00:00-06:00'],
+    ['B','Canadá','Bosnia y H.','2026-06-12T13:00:00-06:00'], ['D','Estados Unidos','Paraguay','2026-06-12T19:00:00-06:00'],
+    ['B','Catar','Suiza','2026-06-13T13:00:00-06:00'], ['C','Brasil','Marruecos','2026-06-13T16:00:00-06:00'],
+    ['C','Haití','Escocia','2026-06-13T19:00:00-06:00'], ['D','Australia','Turquía','2026-06-13T22:00:00-06:00'],
+    ['E','Alemania','Curazao','2026-06-14T11:00:00-06:00'], ['F','Países Bajos','Japón','2026-06-14T14:00:00-06:00'],
+    ['E','Costa de Marfil','Ecuador','2026-06-14T17:00:00-06:00'], ['F','Suecia','Túnez','2026-06-14T20:00:00-06:00'],
+    ['H','España','Cabo Verde','2026-06-15T10:00:00-06:00'], ['G','Bélgica','Egipto','2026-06-15T13:00:00-06:00'],
+    ['H','Arabia Saudita','Uruguay','2026-06-15T16:00:00-06:00'], ['G','Irán','Nueva Zelanda','2026-06-15T19:00:00-06:00'],
+    ['I','Francia','Senegal','2026-06-16T13:00:00-06:00'], ['I','Irak','Noruega','2026-06-16T16:00:00-06:00'],
+    ['J','Argentina','Argelia','2026-06-16T19:00:00-06:00'], ['J','Austria','Jordania','2026-06-16T22:00:00-06:00'],
+    ['K','Portugal','RD Congo','2026-06-17T11:00:00-06:00'], ['L','Inglaterra','Croacia','2026-06-17T14:00:00-06:00'],
+    ['L','Ghana','Panamá','2026-06-17T17:00:00-06:00'], ['K','Uzbekistán','Colombia','2026-06-17T20:00:00-06:00'],
+    ['A','Chequia','Sudáfrica','2026-06-18T10:00:00-06:00'], ['B','Suiza','Bosnia y H.','2026-06-18T13:00:00-06:00'],
+    ['B','Canadá','Catar','2026-06-18T16:00:00-06:00'], ['A','México','Corea del Sur','2026-06-18T19:00:00-06:00'],
+    ['D','Estados Unidos','Australia','2026-06-19T13:00:00-06:00'], ['C','Escocia','Marruecos','2026-06-19T16:00:00-06:00'],
+    ['C','Brasil','Haití','2026-06-19T18:30:00-06:00'], ['D','Turquía','Paraguay','2026-06-19T21:00:00-06:00'],
+    ['F','Países Bajos','Suecia','2026-06-20T11:00:00-06:00'], ['E','Alemania','Costa de Marfil','2026-06-20T14:00:00-06:00'],
+    ['E','Ecuador','Curazao','2026-06-20T18:00:00-06:00'], ['F','Túnez','Japón','2026-06-20T22:00:00-06:00'],
+    ['H','España','Arabia Saudita','2026-06-21T10:00:00-06:00'], ['G','Bélgica','Irán','2026-06-21T13:00:00-06:00'],
+    ['H','Uruguay','Cabo Verde','2026-06-21T16:00:00-06:00'], ['G','Nueva Zelanda','Egipto','2026-06-21T19:00:00-06:00'],
+    ['J','Argentina','Austria','2026-06-22T11:00:00-06:00'], ['I','Francia','Irak','2026-06-22T15:00:00-06:00'],
+    ['I','Noruega','Senegal','2026-06-22T18:00:00-06:00'], ['J','Jordania','Argelia','2026-06-22T21:00:00-06:00'],
+    ['K','Portugal','Uzbekistán','2026-06-23T11:00:00-06:00'], ['L','Inglaterra','Ghana','2026-06-23T14:00:00-06:00'],
+    ['L','Panamá','Croacia','2026-06-23T17:00:00-06:00'], ['K','Colombia','RD Congo','2026-06-23T20:00:00-06:00'],
+    ['B','Suiza','Canadá','2026-06-24T13:00:00-06:00'], ['B','Bosnia y H.','Catar','2026-06-24T13:00:00-06:00'],
+    ['C','Marruecos','Haití','2026-06-24T16:00:00-06:00'], ['C','Escocia','Brasil','2026-06-24T16:00:00-06:00'],
+    ['A','Sudáfrica','Corea del Sur','2026-06-24T19:00:00-06:00'], ['A','Chequia','México','2026-06-24T19:00:00-06:00'],
+    ['E','Curazao','Costa de Marfil','2026-06-25T14:00:00-06:00'], ['E','Ecuador','Alemania','2026-06-25T14:00:00-06:00'],
+    ['F','Túnez','Países Bajos','2026-06-25T17:00:00-06:00'], ['F','Japón','Suecia','2026-06-25T17:00:00-06:00'],
+    ['D','Turquía','Estados Unidos','2026-06-25T20:00:00-06:00'], ['D','Paraguay','Australia','2026-06-25T20:00:00-06:00'],
+    ['I','Noruega','Francia','2026-06-26T13:00:00-06:00'], ['I','Senegal','Irak','2026-06-26T13:00:00-06:00'],
+    ['H','Cabo Verde','Arabia Saudita','2026-06-26T18:00:00-06:00'], ['H','Uruguay','España','2026-06-26T18:00:00-06:00'],
+    ['G','Nueva Zelanda','Bélgica','2026-06-26T21:00:00-06:00'], ['G','Egipto','Irán','2026-06-26T21:00:00-06:00'],
+    ['J','Argelia','Argentina','2026-06-27T14:00:00-06:00'], ['J','Jordania','Austria','2026-06-27T14:00:00-06:00'],
+    ['K','RD Congo','Portugal','2026-06-27T17:00:00-06:00'], ['K','Colombia','Uzbekistán','2026-06-27T17:00:00-06:00'],
+    ['L','Croacia','Inglaterra','2026-06-27T20:00:00-06:00'], ['L','Panamá','Ghana','2026-06-27T20:00:00-06:00']
+  ];
+  const now = new Date();
+  matches = FIXTURE.map(([g, h, a, iso]) => {
+    const date = new Date(iso);
+    const elapsedMin = (now - date) / 60000;
+    let st = 'SCHED', sH = null, sA = null;
+    if (elapsedMin >= 0 && elapsedMin < 130) {
+      st = 'LIVE'; sH = 0; sA = 0;
+    } else if (elapsedMin >= 130) {
+      st = 'FIN'; sH = 0; sA = 0;
+    }
+    return { g, h, a, sH, sA, st, date };
   });
-  matches = generated.sort((a, b) => a.date - b.date);
 }
 
 async function fetchDatosFormulario() {
   try {
-    const r = await fetch(`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${GID_DATOS}`);
+    const ts = new Date().getTime(); // CACHE-BUSTING
+    const r = await fetch(`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${GID_DATOS}&_t=${ts}`, { cache: 'no-store' });
     if (!r.ok) return;
     const text = await r.text();
     const rows = parseCSV(text);
     if (rows.length < 2) return;
-    const headers = rows[0];
-    let nameIdx = 1;
-    for (let i = 0; i < headers.length; i++) {
-      if (headers[i].toLowerCase().includes('nombre') || headers[i].toLowerCase().includes('participante')) nameIdx = i;
-    }
-    formPicks = {};
-    const globalStats = {};
+    const headers = rows[0]; let nameIdx = 1;
+    for (let i = 0; i < headers.length; i++) { if (headers[i].toLowerCase().includes('nombre') || headers[i].toLowerCase().includes('participante')) nameIdx = i; }
+    formPicks = {}; const globalStats = {};
     for (let i = 1; i < rows.length; i++) {
-      const row = rows[i];
-      if (!row[nameIdx]) continue;
-      const pName = row[nameIdx].trim().toLowerCase();
-      let picks = [];
+      const row = rows[i]; if (!row[nameIdx]) continue;
+      const pName = row[nameIdx].trim().toLowerCase(); let picks = [];
       for (let j = 0; j < headers.length; j++) {
         const h = headers[j].toLowerCase();
         if (j !== nameIdx && !h.includes('marca temporal') && !h.includes('puntuación') && !h.includes('correo')) {
@@ -1447,8 +1312,7 @@ async function fetchDatosFormulario() {
       }
       formPicks[pName] = picks;
     }
-    renderCharts(globalStats);
-    duelInjectPicks(); // PARTE 5: inyectar picks al duel tras cargar formulario
+    renderCharts(globalStats); duelInjectPicks();
   } catch (e) {
     console.error('Error cargando Formulario', e);
     document.getElementById('chartsContainer').innerHTML = '<div class="err">No se pudieron cargar las tendencias.</div>';
@@ -1456,24 +1320,19 @@ async function fetchDatosFormulario() {
 }
 
 function renderCharts(stats) {
-  const container = document.getElementById('chartsContainer');
-  const allQuestions = Object.keys(stats);
+  const container = document.getElementById('chartsContainer'); const allQuestions = Object.keys(stats);
   if (allQuestions.length === 0) { container.innerHTML = '<div class="err">No hay suficientes datos globales para graficar.</div>'; return; }
-  let selectedQ = [];
-  const keywords = ['campeón', 'ganador', 'goleador', 'sorpresa', 'decepción', 'revelación', 'final'];
+  let selectedQ = []; const keywords = ['campeón', 'ganador', 'goleador', 'sorpresa', 'decepción', 'revelación', 'final'];
   allQuestions.forEach(q => { if (keywords.some(k => q.toLowerCase().includes(k))) selectedQ.push(q); });
-  if (selectedQ.length === 0) selectedQ = allQuestions.slice(0, 3);
-  else selectedQ = selectedQ.slice(0, 3);
+  if (selectedQ.length === 0) selectedQ = allQuestions.slice(0, 3); else selectedQ = selectedQ.slice(0, 3);
   container.innerHTML = selectedQ.map((q, idx) => `
     <div class="chart-box"><div class="chart-title">${q}</div>
     <div class="chart-canvas-wrap"><canvas id="chart${idx}"></canvas></div></div>
   `).join('');
   const colors = ['#f5c842','#00e676','#4fc3f7','#ff5722','#cd7f32','#b0bec5','rgba(245,200,66,0.55)','rgba(0,230,118,0.55)','rgba(79,195,247,0.55)','rgba(255,87,34,0.55)','rgba(205,127,50,0.55)','rgba(176,190,197,0.55)'];
   selectedQ.forEach((q, idx) => {
-    const dataObj = stats[q];
-    const sortedAnswers = Object.entries(dataObj).sort((a, b) => b[1] - a[1]);
-    const labels = sortedAnswers.map(item => item[0]);
-    const values = sortedAnswers.map(item => item[1]);
+    const dataObj = stats[q]; const sortedAnswers = Object.entries(dataObj).sort((a, b) => b[1] - a[1]);
+    const labels = sortedAnswers.map(item => item[0]), values = sortedAnswers.map(item => item[1]);
     const ctx = document.getElementById('chart' + idx);
     if (chartInstances[idx]) chartInstances[idx].destroy();
     chartInstances[idx] = new Chart(ctx, {
@@ -1484,9 +1343,7 @@ function renderCharts(stats) {
         plugins: {
           legend: { position: 'bottom', labels: { color: '#e8edf2', font: { size: 12, family: "'Barlow Condensed', sans-serif" }, boxWidth: 12, padding: 10 } },
           tooltip: {
-            backgroundColor: 'rgba(0,0,0,0.8)',
-            titleFont: { family: "'Barlow Condensed', sans-serif", size: 14 },
-            bodyFont: { family: "'Barlow Condensed', sans-serif", size: 13 },
+            backgroundColor: 'rgba(0,0,0,0.8)', titleFont: { family: "'Barlow Condensed', sans-serif", size: 14 }, bodyFont: { family: "'Barlow Condensed', sans-serif", size: 13 },
             callbacks: { label: ctx => { let l = ctx.label || ''; if (l) l += ': '; l += ctx.parsed + (ctx.parsed === 1 ? ' voto' : ' votos'); return l; } }
           }
         }
@@ -1496,10 +1353,8 @@ function renderCharts(stats) {
 }
 
 function openPlayerCard(rawName, pts, rank, gPts, pPts) {
-  const modal = document.getElementById('playerModal');
-  const content = document.getElementById('fcContent');
-  const normName = rawName.trim().toLowerCase();
-  const picks = formPicks[normName] || [];
+  const modal = document.getElementById('playerModal'), content = document.getElementById('fcContent');
+  const normName = rawName.trim().toLowerCase(), picks = formPicks[normName] || [];
   let rColor = 'var(--muted)'; let borderColor = 'var(--border)';
   if (rank === 1) { rColor = 'var(--gold)'; borderColor = 'var(--gold)'; }
   if (rank === 2) { rColor = 'var(--silver)'; borderColor = 'var(--silver)'; }
@@ -1508,8 +1363,7 @@ function openPlayerCard(rawName, pts, rank, gPts, pPts) {
   let picksHTML = picks.length === 0
     ? '<div class="err">Aún no se procesan las predicciones para este jugador.</div>'
     : picks.map(p => {
-        let cleanQ = p.q.replace(/\[.*?\]\s*/g, '');
-        let answerFlag = FLAGS[p.a] ? `<span style="font-size:18px">${FLAGS[p.a]}</span> ` : '';
+        let cleanQ = p.q.replace(/\[.*?\]\s*/g, ''), answerFlag = FLAGS[p.a] ? `<span style="font-size:18px">${FLAGS[p.a]}</span> ` : '';
         return `<div class="pick-row" style="border-left-color: ${borderColor}"><div class="pick-q">${cleanQ}</div><div class="pick-a">${answerFlag}${p.a}</div></div>`;
       }).join('');
   content.innerHTML = `
@@ -1523,23 +1377,21 @@ function openPlayerCard(rawName, pts, rank, gPts, pPts) {
         <div class="fc-stat"><span class="val">${pPts}</span><span class="lbl">Partidos</span></div>
       </div></div>
     </div>
-    <div class="fc-body">
-      <div style="font-size:12px; color:${borderColor}; margin-bottom:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase;">Predicciones Oficiales</div>
-      ${picksHTML}
-    </div>`;
+    <div class="fc-body"><div style="font-size:12px; color:${borderColor}; margin-bottom:12px; font-weight:800; letter-spacing:1px; text-transform:uppercase;">Predicciones Oficiales</div>${picksHTML}</div>`;
   modal.classList.add('active');
 }
 function closePlayerCard() { document.getElementById('playerModal').classList.remove('active'); }
 
-function getDirectCsvUrl(gid) { return `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${gid}`; }
+// CACHE-BUSTING
+function getDirectCsvUrl(gid) { return `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${gid}&_t=${new Date().getTime()}`; }
 
 async function fetchLeaderboard() {
-  const r = await fetch(getDirectCsvUrl(GID_LEADERBOARD));
+  const r = await fetch(getDirectCsvUrl(GID_LEADERBOARD), { cache: 'no-store' });
   if (!r.ok) throw new Error('Error Sheets');
   const text = await r.text();
   const rows = parseCSV(text);
   processLB(rows);
-  duelLoadFromLB(rows); // PARTE 5: cargar jugadores del duel tras leaderboard
+  duelLoadFromLB(rows); 
 }
 
 function parseCSV(txt) {
@@ -1574,9 +1426,7 @@ function processLB(rows) {
   const players = [];
   if (hdr >= 0) {
     for (let i = hdr + 1; i < rows.length; i++) {
-      const row = rows[i];
-      if (!row || row.length < 2) continue;
-      const col1 = (row[1] || '');
+      const row = rows[i]; if (!row || row.length < 2) continue; const col1 = (row[1] || '');
       if (row[0].includes('📋') || col1.includes('📋') || /pts\s*\//.test(col1)) break;
       const name = col1.replace(/^[\u{1F947}\u{1F948}\u{1F949}\u{1F3C5}🥇🥈🥉🏅]+/gu, '').trim();
       if (!name) continue;
@@ -1592,8 +1442,7 @@ function processLB(rows) {
   }
   const body = document.getElementById('lbBody');
   if (body) {
-    const totalPool = players.length * 400;
-    const p1 = totalPool * 0.50; const p2 = totalPool * 0.30; const p3 = totalPool * 0.20;
+    const totalPool = players.length * 400; const p1 = totalPool * 0.50; const p2 = totalPool * 0.30; const p3 = totalPool * 0.20;
     let prizeBox = document.getElementById('prizeBoxAuto');
     if (!prizeBox) {
       prizeBox = document.createElement('div'); prizeBox.id = 'prizeBoxAuto';
@@ -1608,7 +1457,6 @@ function processLB(rows) {
       <div><div style="font-size:16px;">🥉</div><span style="font-size:11px;color:#aaa">3º (20%)</span><br><strong style="color:#fff; font-size:14px;">$${p3.toLocaleString('es-MX')}</strong></div>
     `;
   }
-  const max = players.length ? Math.max(...players.map(p => p.total)) : 1;
   if (!players.length) { if (body) body.innerHTML = '<div class="err">No hay participantes.</div>'; return; }
   if (body) {
     body.innerHTML = players.map((p, i) => {
@@ -1626,27 +1474,42 @@ function processLB(rows) {
 
 async function fetchAPI() {
   try {
-    const opts = { headers: { 'X-Auth-Token': API_TOKEN } };
-    const resM = await fetch(API_URL_MATCHES, opts);
-    if (!resM.ok) throw new Error('API en espera');
+    // CACHE-BUSTING
+    const opts = { headers: { 'X-Auth-Token': API_TOKEN }, cache: 'no-store' };
+    const ts = new Date().getTime();
+    const resM = await fetch(`${API_URL_MATCHES}&_t=${ts}`, opts);
+    if (!resM.ok) throw new Error('API en espera: status ' + resM.status);
     const dataM = await resM.json();
     if (dataM.matches && dataM.matches.length > 0) {
       matches = dataM.matches.map(m => {
-        let st = 'SCHED'; if (m.status === 'FINISHED') st = 'FIN'; if (m.status === 'IN_PLAY' || m.status === 'PAUSED') st = 'LIVE';
+        const matchDate = new Date(m.utcDate); const now = new Date();
+        let st = 'SCHED';
+        if (m.status === 'FINISHED') { st = 'FIN'; }
+        else if (m.status === 'IN_PLAY' || m.status === 'PAUSED') { st = 'LIVE'; }
+        else {
+            const elapsedMin = (now - matchDate) / 60000;
+            if (elapsedMin >= 0 && elapsedMin < 130) { st = 'LIVE'; }
+            else if (elapsedMin >= 130) { st = 'FIN'; }
+        }
         let groupLetter = '?'; if (m.group && m.group.includes('GROUP_')) groupLetter = m.group.split('_')[1];
-        // v4: fullTime acts as running score during IN_PLAY; fallback to halfTime (PAUSED); show 0-0 for live matches
-        const ftH = m.score?.fullTime?.home;
-        const ftA = m.score?.fullTime?.away;
+        
+        // RESPALDO DE MARCADORES (Football-Data a veces usa regularTime)
+        const ftH = m.score?.fullTime?.home ?? m.score?.regularTime?.home;
+        const ftA = m.score?.fullTime?.away ?? m.score?.regularTime?.away;
         const htH = m.score?.halfTime?.home;
         const htA = m.score?.halfTime?.away;
         let sH = null, sA = null;
+
         if (ftH !== null && ftH !== undefined) { sH = ftH; sA = ftA; }
         else if (htH !== null && htH !== undefined) { sH = htH; sA = htA; }
-        else if (st === 'LIVE') { sH = 0; sA = 0; } // partido en vivo sin score aún = 0-0
-        return { g: groupLetter, h: tr(m.homeTeam?.name), a: tr(m.awayTeam?.name), sH, sA, st, date: new Date(m.utcDate) };
+        else if (st === 'LIVE') { sH = 0; sA = 0; } 
+        
+        return { g: groupLetter, h: tr(m.homeTeam?.name), a: tr(m.awayTeam?.name), sH, sA, st, date: matchDate };
       });
     } else { generateFallbackMatches(); }
-    const resS = await fetch(API_URL_STANDINGS, opts);
+    
+    // CACHE-BUSTING STANDINGS
+    const resS = await fetch(`${API_URL_STANDINGS}&_t=${ts}`, opts);
     if (resS.ok) {
       const dataS = await resS.json(); grpResults = {};
       if (dataS.standings) {
@@ -1658,7 +1521,7 @@ async function fetchAPI() {
         });
       }
     }
-  } catch(e) { generateFallbackMatches(); }
+  } catch(e) { console.warn('fetchAPI fallback:', e); generateFallbackMatches(); }
   renderMatches(); renderStd();
 }
 
@@ -1706,147 +1569,78 @@ function updateHeader() {
 // ══════════════════════════════════════════════════════
 //  1v1 DUEL
 // ══════════════════════════════════════════════════════
-let duelPlayers = []; // { name, rank, total, grupos, pPartidos, picks: [{q,a}] }
+let duelPlayers = [];
 
 function duelPopulateSelects() {
-  const selA = document.getElementById('duelSelA');
-  const selB = document.getElementById('duelSelB');
+  const selA = document.getElementById('duelSelA'), selB = document.getElementById('duelSelB');
   if (!selA || !selB || !duelPlayers.length) return;
-  const opts = duelPlayers.map((p, i) =>
-    `<option value="${i}">${p.name}</option>`
-  ).join('');
+  const opts = duelPlayers.map((p, i) => `<option value="${i}">${p.name}</option>`).join('');
   const blank = '<option value="">— Elige un participante —</option>';
-  selA.innerHTML = blank + opts;
-  selB.innerHTML = blank + opts;
+  selA.innerHTML = blank + opts; selB.innerHTML = blank + opts;
 }
 
 function duelLoadFromLB(rows) {
   let hdr = -1;
-  for (let i = 0; i < rows.length; i++) {
-    if (rows[i].some(c => /participante/i.test(c))) { hdr = i; break; }
-  }
+  for (let i = 0; i < rows.length; i++) { if (rows[i].some(c => /participante/i.test(c))) { hdr = i; break; } }
   if (hdr < 0) return;
   const newPlayers = [];
   for (let i = hdr + 1; i < rows.length; i++) {
-    const row = rows[i];
-    if (!row || row.length < 2) continue;
-    const col1 = (row[1] || '');
+    const row = rows[i]; if (!row || row.length < 2) continue; const col1 = (row[1] || '');
     if (row[0].includes('📋') || col1.includes('📋') || /pts\s*\//.test(col1)) break;
     const name = col1.replace(/^[\u{1F947}\u{1F948}\u{1F949}\u{1F3C5}🥇🥈🥉🏅]+/gu, '').trim();
     if (!name) continue;
-    newPlayers.push({
-      name,
-      rank: i - hdr,
-      total: parseFloat(row[2]) || 0,
-      grupos: parseFloat(row[4]) || 0,
-      pPartidos: row[12] !== undefined ? parseFloat(row[12]) : 0,
-      picks: []
-    });
+    newPlayers.push({ name, rank: i - hdr, total: parseFloat(row[2]) || 0, grupos: parseFloat(row[4]) || 0, pPartidos: row[12] !== undefined ? parseFloat(row[12]) : 0, picks: [] });
   }
-  duelPlayers = newPlayers;
-  duelInjectPicks();
-  duelPopulateSelects();
+  duelPlayers = newPlayers; duelInjectPicks(); duelPopulateSelects();
 }
 
 function duelInjectPicks() {
-  duelPlayers.forEach(p => {
-    const key = p.name.trim().toLowerCase();
-    p.picks = formPicks[key] || [];
-  });
+  duelPlayers.forEach(p => { const key = p.name.trim().toLowerCase(); p.picks = formPicks[key] || []; });
 }
 
 function renderDuel() {
-  const selA = document.getElementById('duelSelA');
-  const selB = document.getElementById('duelSelB');
-  const iA = selA ? selA.value : '';
-  const iB = selB ? selB.value : '';
-  const body = document.getElementById('duelBody');
-  if (!body) return;
-
-  // Actualizar picks por si cargaron después
+  const selA = document.getElementById('duelSelA'), selB = document.getElementById('duelSelB');
+  const iA = selA ? selA.value : '', iB = selB ? selB.value : '';
+  const body = document.getElementById('duelBody'); if (!body) return;
   duelInjectPicks();
-
   if (iA === '' || iB === '' || iA === iB) {
     updateDuelAvatars(iA, iB);
-    body.innerHTML = `<div class="duel-placeholder">
-      <div style="font-size:52px">⚔️</div>
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:var(--text);margin-top:8px">${iA === iB && iA !== '' ? '¡Elige dos jugadores diferentes!' : 'Elige dos participantes'}</div>
-      <div style="color:var(--dim);font-size:14px;margin-top:6px;max-width:280px;line-height:1.5">Compara sus predicciones para los partidos pendientes y descubre quién apostó diferente.</div>
-    </div>`;
+    body.innerHTML = `<div class="duel-placeholder"><div style="font-size:52px">⚔️</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:800;color:var(--text);margin-top:8px">${iA === iB && iA !== '' ? '¡Elige dos jugadores diferentes!' : 'Elige dos participantes'}</div><div style="color:var(--dim);font-size:14px;margin-top:6px;max-width:280px;line-height:1.5">Compara sus predicciones para los partidos pendientes y descubre quién apostó diferente.</div></div>`;
     return;
   }
-
-  const pA = duelPlayers[parseInt(iA)];
-  const pB = duelPlayers[parseInt(iB)];
+  const pA = duelPlayers[parseInt(iA)], pB = duelPlayers[parseInt(iB)];
   updateDuelAvatars(iA, iB);
-
-  // Agrupar preguntas de ambos en un mapa
   const mapA = {}, mapB = {};
-  pA.picks.forEach(p => { mapA[p.q] = p.a; });
-  pB.picks.forEach(p => { mapB[p.q] = p.a; });
+  pA.picks.forEach(p => { mapA[p.q] = p.a; }); pB.picks.forEach(p => { mapB[p.q] = p.a; });
   const allQs = [...new Set([...Object.keys(mapA), ...Object.keys(mapB)])];
-
-  // Separar: preguntas de partidos vs generales
   const matchQs = allQs.filter(q => q.includes('[') || q.toLowerCase().includes('grupo') || q.toLowerCase().includes('partido'));
   const generalQs = allQs.filter(q => !matchQs.includes(q));
-
   let diffCount = 0, matchCount = 0;
   const rowsGeneral = buildDuelRows(generalQs, mapA, mapB, pA.name, pB.name, (isDiff) => { if(isDiff) diffCount++; else matchCount++; });
   const rowsMatch   = buildDuelRows(matchQs,   mapA, mapB, pA.name, pB.name, (isDiff) => { if(isDiff) diffCount++; else matchCount++; });
-
-  // Actualizar marcador de diferencias
-  const scoreA = document.getElementById('duelScoreA');
-  const scoreB = document.getElementById('duelScoreB');
+  const scoreA = document.getElementById('duelScoreA'), scoreB = document.getElementById('duelScoreB');
   let dA = 0, dB = 0;
-  allQs.forEach(q => {
-    const a = mapA[q] || '', b = mapB[q] || '';
-    if (a !== b) { if (a) dA++; if (b) dB++; }
-  });
-  if (scoreA) scoreA.textContent = dA;
-  if (scoreB) scoreB.textContent = dB;
-
+  allQs.forEach(q => { const a = mapA[q] || '', b = mapB[q] || ''; if (a !== b) { if (a) dA++; if (b) dB++; } });
+  if (scoreA) scoreA.textContent = dA; if (scoreB) scoreB.textContent = dB;
   let html = '';
-
-  if (generalQs.length) {
-    html += `<div class="duel-section-title">🔮 Predicciones Generales</div>`;
-    html += rowsGeneral;
-  }
-
-  if (matchQs.length) {
-    html += `<div class="duel-section-title" style="margin-top:${generalQs.length?'20px':'0'}">⚽ Predicciones de Grupos / Partidos</div>`;
-    html += rowsMatch;
-  }
-
-  if (!allQs.length) {
-    html = `<div class="duel-empty-msg">No se encontraron predicciones para comparar. Las respuestas del formulario pueden no haber cargado aún — espera unos segundos y vuelve a intentarlo.</div>`;
-  }
-
+  if (generalQs.length) { html += `<div class="duel-section-title">🔮 Predicciones Generales</div>` + rowsGeneral; }
+  if (matchQs.length) { html += `<div class="duel-section-title" style="margin-top:${generalQs.length?'20px':'0'}">⚽ Predicciones de Grupos / Partidos</div>` + rowsMatch; }
+  if (!allQs.length) { html = `<div class="duel-empty-msg">No se encontraron predicciones para comparar. Las respuestas del formulario pueden no haber cargado aún — espera unos segundos y vuelve a intentarlo.</div>`; }
   body.innerHTML = html;
 }
 
 function buildDuelRows(questions, mapA, mapB, nameA, nameB, counter) {
   if (!questions.length) return '';
   return questions.map(q => {
-    const a = mapA[q] || null;
-    const b = mapB[q] || null;
-    const same = a && b && a.toLowerCase() === b.toLowerCase();
-    const cls = (!a && !b) ? 'empty' : same ? 'match' : 'diff';
-    const icon = cls === 'match' ? '✅' : cls === 'diff' ? '🔥' : '—';
-    const cleanQ = q.replace(/\[.*?\]\s*/g, '').trim();
-    const flagA = FLAGS[a] ? `${FLAGS[a]} ` : '';
-    const flagB = FLAGS[b] ? `${FLAGS[b]} ` : '';
+    const a = mapA[q] || null, b = mapB[q] || null, same = a && b && a.toLowerCase() === b.toLowerCase();
+    const cls = (!a && !b) ? 'empty' : same ? 'match' : 'diff', icon = cls === 'match' ? '✅' : cls === 'diff' ? '🔥' : '—';
+    const cleanQ = q.replace(/\[.*?\]\s*/g, '').trim(), flagA = FLAGS[a] ? `${FLAGS[a]} ` : '', flagB = FLAGS[b] ? `${FLAGS[b]} ` : '';
     counter(cls === 'diff');
     return `
       <div class="duel-row ${cls}">
-        <div class="duel-cell">
-          <div class="duel-q">${nameA}</div>
-          <div class="duel-a">${a ? `<span>${flagA}${a}</span>` : '<span style="color:var(--muted)">Sin respuesta</span>'}</div>
-        </div>
+        <div class="duel-cell"><div class="duel-q">${nameA}</div><div class="duel-a">${a ? `<span>${flagA}${a}</span>` : '<span style="color:var(--muted)">Sin respuesta</span>'}</div></div>
         <div class="duel-icon">${icon}</div>
-        <div class="duel-cell right">
-          <div class="duel-q" style="text-align:right">${nameB}</div>
-          <div class="duel-a">${b ? `<span>${flagB}${b}</span>` : '<span style="color:var(--muted)">Sin respuesta</span>'}</div>
-        </div>
+        <div class="duel-cell right"><div class="duel-q" style="text-align:right">${nameB}</div><div class="duel-a">${b ? `<span>${flagB}${b}</span>` : '<span style="color:var(--muted)">Sin respuesta</span>'}</div></div>
       </div>
       <div style="margin:-8px 0 10px; padding: 0 2px; font-size:11px; color:var(--muted); font-style:italic">${cleanQ}</div>
     `;
@@ -1856,29 +1650,16 @@ function buildDuelRows(questions, mapA, mapB, nameA, nameB, counter) {
 function updateDuelAvatars(iA, iB) {
   const rankLabels = ['🥇','🥈','🥉'];
   const setAvatar = (suffix, idx) => {
-    const el = document.getElementById('duelAvatar' + suffix);
-    const rEl = document.getElementById('daRank' + suffix);
-    const nEl = document.getElementById('daName' + suffix);
-    const pEl = document.getElementById('daPts' + suffix);
+    const el = document.getElementById('duelAvatar' + suffix), rEl = document.getElementById('daRank' + suffix), nEl = document.getElementById('daName' + suffix), pEl = document.getElementById('daPts' + suffix);
     if (!el) return;
-    if (idx === '') {
-      if (rEl) rEl.textContent = '—';
-      if (nEl) nEl.textContent = '—';
-      if (pEl) pEl.textContent = '— pts';
-      el.style.borderColor = 'var(--border)';
-      return;
-    }
-    const p = duelPlayers[parseInt(idx)];
-    if (!p) return;
+    if (idx === '') { if (rEl) rEl.textContent = '—'; if (nEl) nEl.textContent = '—'; if (pEl) pEl.textContent = '— pts'; el.style.borderColor = 'var(--border)'; return; }
+    const p = duelPlayers[parseInt(idx)]; if (!p) return;
     const rankStr = p.rank <= 3 ? rankLabels[p.rank-1] : `#${p.rank}`;
     const rankColor = p.rank===1 ? 'var(--gold)' : p.rank===2 ? 'var(--silver)' : p.rank===3 ? 'var(--bronze)' : 'var(--muted)';
     if (rEl) { rEl.textContent = rankStr; rEl.style.color = rankColor; }
-    if (nEl) nEl.textContent = p.name;
-    if (pEl) pEl.textContent = `${p.total} pts`;
-    el.style.borderColor = rankColor;
+    if (nEl) nEl.textContent = p.name; if (pEl) pEl.textContent = `${p.total} pts`; el.style.borderColor = rankColor;
   };
-  setAvatar('A', iA);
-  setAvatar('B', iB);
+  setAvatar('A', iA); setAvatar('B', iB);
 }
 
 async function run() {
@@ -1896,8 +1677,6 @@ function init() {
   setInterval(run, REFRESH_INTERVAL);
   if (document.getElementById('btnRefresh')) document.getElementById('btnRefresh').addEventListener('click', run);
   if (document.getElementById('gSel')) document.getElementById('gSel').addEventListener('change', renderStd);
-
-  // Init mini games selector
   selectGame('cabezazo');
 }
 
