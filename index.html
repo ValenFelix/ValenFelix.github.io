@@ -258,7 +258,7 @@
 
 <div class="section active" id="secQuiniela">
   <div class="wrap">
-    <div style="display:flex;flex-direction:column;gap:24px">
+    <div id="colLeft" style="display:flex;flex-direction:column;gap:24px">
       <div>
         <div class="eyebrow-sm">Clasificación General</div>
         <div class="card">
@@ -275,7 +275,7 @@
       </div>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:24px">
+    <div id="colRight" style="display:flex;flex-direction:column;gap:24px">
       <div>
         <div class="eyebrow-sm">Resultados del Torneo</div>
         <div class="card">
@@ -687,7 +687,22 @@ function renderMatches() {
     body.innerHTML = `<div class="err">${curTab==='r' ? '⚽ Ningún partido ha finalizado aún.' : '📅 No hay más partidos programados.'}</div>`;
     return;
   }
-  body.innerHTML = list.map(m => matchHTML(m)).join('');
+body.innerHTML = list.map(m => matchHTML(m)).join('');
+
+  // Si hay algún partido LIVE, poner resultados encima del leaderboard
+  const hasLive = matches.some(m => m.st === 'LIVE');
+  const wrap = document.querySelector('.wrap');
+  const colLeft = document.getElementById('colLeft');
+  const colRight = document.getElementById('colRight');
+  if (wrap && colLeft && colRight) {
+    if (hasLive) {
+      // Mover colRight al primer lugar
+      wrap.insertBefore(colRight, colLeft);
+    } else {
+      // Restaurar orden original: colLeft primero
+      wrap.insertBefore(colLeft, colRight);
+    }
+  }
 }
 
 function matchHTML(m) {
