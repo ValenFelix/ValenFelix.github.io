@@ -253,6 +253,23 @@
     .duel-cell.right .duel-a{justify-content:flex-end}
     .duel-icon{font-size:16px;text-align:center}
     .duel-empty-msg{text-align:center;padding:20px;color:var(--muted);font-size:13px;background:var(--card);border:1px solid var(--border);border-radius:10px}
+    /* ── ACCORDION EN FICHA JUGADOR ── */
+.acc-section{margin-bottom:10px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
+.acc-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(255,255,255,0.04);cursor:pointer;user-select:none;transition:background .2s}
+.acc-header:hover{background:rgba(255,255,255,0.08)}
+.acc-title{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase}
+.acc-arrow{font-size:12px;color:var(--muted);transition:transform .25s}
+.acc-arrow.open{transform:rotate(180deg)}
+.acc-body{display:none;padding:10px}
+.acc-body.open{display:block}
+.acc-sub{margin-bottom:8px;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,0.06)}
+.acc-sub-header{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;background:rgba(255,255,255,0.02);cursor:pointer;user-select:none;transition:background .2s}
+.acc-sub-header:hover{background:rgba(255,255,255,0.05)}
+.acc-sub-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--dim)}
+.acc-sub-arrow{font-size:10px;color:var(--muted);transition:transform .25s}
+.acc-sub-arrow.open{transform:rotate(180deg)}
+.acc-sub-body{display:none;padding:8px}
+.acc-sub-body.open{display:block}
   </style>
 </head>
 <body>
@@ -1009,14 +1026,31 @@ function openPlayerCard(rawName, pts, rank, gPts, pPts) {
   if (rank===2){ rColor='var(--silver)'; borderColor='var(--silver)'; }
   if (rank===3){ rColor='var(--bronze)'; borderColor='var(--bronze)'; }
   content.style.borderTop = `4px solid ${borderColor}`;
-  let picksHTML = !picks.length
-    ? '<div class="err">Aún no se procesan las predicciones para este jugador.</div>'
-    : picks.map(p => {
-        const cleanQ = p.q.replace(/\[.*?\]\s*/g,'');
-        const flag   = FLAGS[p.a] ? `<span style="font-size:18px">${FLAGS[p.a]}</span> ` : '';
-        return `<div class="pick-row" style="border-left-color:${borderColor}"><div class="pick-q">${cleanQ}</div><div class="pick-a">${flag}${p.a}</div></div>`;
-      }).join('');
-  content.innerHTML = `
+
+  // ── Separar picks en generales vs por grupo ──
+  const generalPicks = [];
+  const groupPicksMap = {}; // { 'A': [{q,a}, ...], 'B': [...], ... }
+
+  picks.forEach(p => {
+    const bracketMatch = p.q.match(/\[([^\]]+)\]/);
+    if (bracketMatch) {
+      // Detectar si es un grupo (letra sola A-L) o partido específico
+      const tag = bracketMatch[1].trim().toUpperCase();
+      const groupLetter = tag.match(/^GRUPO\s*([A-L])$|^([A-L])$/) 
+        ? (tag.match(/^GRUPO\s*([A-L])$/)?.[1] || tag.match(/^([A-L])$/)?.[1])
+        : null;
+      const key = groupLetter || tag;
+      if (!groupPicksMap[key]) groupPicksMap[key] = [];
+      groupPicksMap[key].push(p);
+    } else {
+      generalPicks.push(p);
+    }
+  });
+
+  const groupKeys = Object.keys(groupPicksMap).sort();
+
+  // ── HTML cabecera ──
+  let html = `
     <button class="close-btn" onclick="closePlayerCard()">×</button>
     <div class="fc-header">
       <div class="fc-rank" style="color:${rColor}">${rank}</div>
@@ -1028,13 +1062,93 @@ function openPlayerCard(rawName, pts, rank, gPts, pPts) {
         </div>
       </div>
     </div>
-    <div class="fc-body">
-      <div style="font-size:12px;color:${borderColor};margin-bottom:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;">Predicciones Oficiales</div>
-      ${picksHTML}
-    </div>`;
+    <div class="fc-body">`;
+
+  if (!picks.length) {
+    html += '<div class="err">Aún no se procesan las predicciones para este jugador.</div>';
+  } else {
+
+    // ── SECCIÓN 1: Predicciones Generales ──
+    if (generalPicks.length) {
+      const rows = generalPicks.map(p => {
+        const cleanQ = p.q.replace(/\[.*?\]\s*/g,'');
+        const flag   = FLAGS[p.a] ? `<span style="font-size:16px">${FLAGS[p.a]}</span>` : '';
+        return `<div class="pick-row" style="border-left-color:${borderColor}">
+          <div class="pick-q">${cleanQ}</div>
+          <div class="pick-a">${flag} ${p.a}</div>
+        </div>`;
+      }).join('');
+
+      html += `
+        <div class="acc-section">
+          <div class="acc-header" onclick="toggleAcc(this)">
+            <span class="acc-title" style="color:${borderColor}">🔮 Predicciones Generales</span>
+            <span class="acc-arrow open">▼</span>
+          </div>
+          <div class="acc-body open">${rows}</div>
+        </div>`;
+    }
+
+    // ── SECCIÓN 2: Clasificación de Grupos ──
+    // Picks que parecen ser predicción de clasificados (sin bracket o bracket de grupo sin partido)
+    const clasiPicks = generalPicks.filter(p => {
+      const q = p.q.toLowerCase();
+      return q.includes('clasifica') || q.includes('primero') || q.includes('segundo') || q.includes('pasa') || q.includes('avanza');
+    });
+
+    // ── SECCIÓN 3: Resultados por grupo ──
+    if (groupKeys.length) {
+      let subHTML = '';
+      groupKeys.forEach(key => {
+        const gPicks = groupPicksMap[key];
+        const rows = gPicks.map(p => {
+          const cleanQ = p.q.replace(/\[.*?\]\s*/g,'').trim();
+          const flag   = FLAGS[p.a] ? `<span style="font-size:16px">${FLAGS[p.a]}</span>` : '';
+          return `<div class="pick-row" style="border-left-color:var(--dim);margin-bottom:6px">
+            <div class="pick-q">${cleanQ}</div>
+            <div class="pick-a">${flag} ${p.a}</div>
+          </div>`;
+        }).join('');
+
+        subHTML += `
+          <div class="acc-sub">
+            <div class="acc-sub-header" onclick="toggleAccSub(this)">
+              <span class="acc-sub-title">⚽ Grupo ${key}</span>
+              <span class="acc-sub-arrow">▼</span>
+            </div>
+            <div class="acc-sub-body">${rows}</div>
+          </div>`;
+      });
+
+      html += `
+        <div class="acc-section">
+          <div class="acc-header" onclick="toggleAcc(this)">
+            <span class="acc-title" style="color:var(--blue)">📋 Resultados por Grupo</span>
+            <span class="acc-arrow">▼</span>
+          </div>
+          <div class="acc-body">${subHTML}</div>
+        </div>`;
+    }
+  }
+
+  html += '</div>'; // cierra fc-body
+  content.innerHTML = html;
   modal.classList.add('active');
 }
 function closePlayerCard() { document.getElementById('playerModal').classList.remove('active'); }
+  function toggleAcc(header) {
+  const arrow = header.querySelector('.acc-arrow');
+  const body  = header.nextElementSibling;
+  const open  = body.classList.toggle('open');
+  arrow.classList.toggle('open', open);
+}
+
+function toggleAccSub(header) {
+  const arrow = header.querySelector('.acc-sub-arrow');
+  const body  = header.nextElementSibling;
+  const open  = body.classList.toggle('open');
+  arrow.classList.toggle('open', open);
+}
 
 // ══════════════════════════════════════════════════════
 //  MINI JUEGOS — RÉCORDS
