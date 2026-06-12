@@ -69,6 +69,26 @@
     }
     .sc.live-sc{color:var(--live-red);text-shadow:0 0 8px rgba(255,23,68,0.5);}
 
+    /* ── LIVE SCORES ABOVE LEADERBOARD ── */
+    #liveScoresBlock{display:none}
+    #liveScoresBlock.has-live{display:block}
+    .live-scores-card{
+      background:var(--card);
+      border:1px solid var(--live-red);
+      border-radius:12px;
+      overflow:hidden;
+      box-shadow:0 0 20px rgba(255,23,68,0.12);
+    }
+    .live-scores-head{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:14px 20px;border-bottom:1px solid rgba(255,23,68,0.25);
+      background:rgba(255,23,68,0.06);
+    }
+    .live-scores-title{
+      font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:800;letter-spacing:0.5px;
+      display:flex;align-items:center;gap:10px;
+    }
+
     .wrap{max-width:1100px;margin:0 auto;padding:30px 16px;display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start}
     @media(max-width:850px){.wrap{grid-template-columns:1fr}}
     .charts-section{max-width:1100px;margin:0 auto;padding:0 16px 30px}
@@ -258,7 +278,23 @@
 
 <div class="section active" id="secQuiniela">
   <div class="wrap">
-    <div id="colLeft" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-direction:column;gap:24px">
+
+      <!-- ══ LIVE SCORES BLOCK (above leaderboard) ══ -->
+      <div id="liveScoresBlock">
+        <div class="eyebrow-sm">⚡ En Vivo Ahora</div>
+        <div class="live-scores-card">
+          <div class="live-scores-head">
+            <span class="live-scores-title">
+              <span class="live-badge">EN VIVO</span>
+              Partidos en curso
+            </span>
+          </div>
+          <div id="liveScoresBody"></div>
+        </div>
+      </div>
+      <!-- ══ END LIVE SCORES BLOCK ══ -->
+
       <div>
         <div class="eyebrow-sm">Clasificación General</div>
         <div class="card">
@@ -275,7 +311,7 @@
       </div>
     </div>
 
-    <div id="colRight" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;flex-direction:column;gap:24px">
       <div>
         <div class="eyebrow-sm">Resultados del Torneo</div>
         <div class="card">
@@ -446,7 +482,7 @@
 const SID             = '1Lxz_7Hf20m685XGDQQmNFL0IclDY8RzK0IXIo0jnZg4';
 const GID_LEADERBOARD = '1369482165';
 const GID_DATOS       = '0';
-const GID_PARTIDOS    = '164525355';   // Pestaña "Partidos"
+const GID_PARTIDOS    = '164525355';
 
 const GAMES_SID        = '1pDcY7q9SMP1mLGL12jKY3GKeD4RywOZtA_V7QjAYfDQ';
 const GAMES_GID        = '0';
@@ -541,7 +577,6 @@ function parseCSV(txt) {
 
 // ══════════════════════════════════════════════════════
 //  LEER PARTIDOS DESDE GOOGLE SHEETS
-//  Columnas: Grupo | Fecha | Local | Visitante | Marcador Local | Marcador Visitante | Estado
 // ══════════════════════════════════════════════════════
 async function fetchPartidosFromSheets() {
   try {
@@ -581,7 +616,6 @@ async function fetchPartidosFromSheets() {
       const golV      = row[gv] !== '' && row[gv] !== undefined && row[gv] !== null ? parseFloat(row[gv]) : null;
       const estadoRaw = (row[est] || '').trim().toLowerCase();
 
-      // ── Normalizar estado (detecta LIVE / EN VIVO / EN CURSO) ──
       let st = 'SCHED';
       if (estadoRaw.includes('finaliz') || estadoRaw === 'fin' || estadoRaw === 'ft') {
         st = 'FIN';
@@ -617,6 +651,7 @@ async function fetchPartidosFromSheets() {
     generateFallbackMatches();
   }
   renderMatches();
+  renderLiveScores();   // ← nuevo: actualiza el bloque live encima del leaderboard
   renderStd();
 }
 
@@ -651,6 +686,26 @@ function generateFallbackMatches() {
 }
 
 // ══════════════════════════════════════════════════════
+//  BLOQUE LIVE ENCIMA DEL LEADERBOARD
+// ══════════════════════════════════════════════════════
+function renderLiveScores() {
+  const block = document.getElementById('liveScoresBlock');
+  const body  = document.getElementById('liveScoresBody');
+  if (!block || !body) return;
+
+  const liveMatches = matches.filter(m => m.st === 'LIVE');
+
+  if (!liveMatches.length) {
+    block.classList.remove('has-live');
+    body.innerHTML = '';
+    return;
+  }
+
+  block.classList.add('has-live');
+  body.innerHTML = liveMatches.map(m => matchHTML(m)).join('');
+}
+
+// ══════════════════════════════════════════════════════
 //  RENDERIZADO DE PARTIDOS
 // ══════════════════════════════════════════════════════
 function setTab(t) {
@@ -666,11 +721,9 @@ function renderMatches() {
 
   let list;
   if (curTab === 'r') {
-    // "Recientes" muestra finalizados + EN VIVO (los live primero)
     list = matches
       .filter(m => m.st === 'FIN' || m.st === 'LIVE')
       .sort((a, b) => {
-        // LIVE siempre arriba
         if (a.st === 'LIVE' && b.st !== 'LIVE') return -1;
         if (b.st === 'LIVE' && a.st !== 'LIVE') return  1;
         return b.date - a.date;
@@ -687,22 +740,7 @@ function renderMatches() {
     body.innerHTML = `<div class="err">${curTab==='r' ? '⚽ Ningún partido ha finalizado aún.' : '📅 No hay más partidos programados.'}</div>`;
     return;
   }
-body.innerHTML = list.map(m => matchHTML(m)).join('');
-
-  // Si hay algún partido LIVE, poner resultados encima del leaderboard
-  const hasLive = matches.some(m => m.st === 'LIVE');
-  const wrap = document.querySelector('.wrap');
-  const colLeft = document.getElementById('colLeft');
-  const colRight = document.getElementById('colRight');
-  if (wrap && colLeft && colRight) {
-    if (hasLive) {
-      // Mover colRight al primer lugar
-      wrap.insertBefore(colRight, colLeft);
-    } else {
-      // Restaurar orden original: colLeft primero
-      wrap.insertBefore(colLeft, colRight);
-    }
-  }
+  body.innerHTML = list.map(m => matchHTML(m)).join('');
 }
 
 function matchHTML(m) {
@@ -710,12 +748,11 @@ function matchHTML(m) {
   const isFin  = m.st === 'FIN';
   const hasSc  = m.sH !== null && m.sA !== null;
 
-  // ── Etiqueta de tiempo/estado ──
   let timeLabel;
   if (isFin) {
     timeLabel = 'Finalizado';
   } else if (isLive) {
-    timeLabel = ''; // se reemplaza con el badge animado
+    timeLabel = '';
   } else if (m.dateStr) {
     timeLabel = `⏳ ${m.dateStr} (CDMX)`;
   } else {
@@ -724,12 +761,10 @@ function matchHTML(m) {
     timeLabel = `⏳ ${dateStr} - ${timeStr} (CDMX)`;
   }
 
-  // ── Badge LIVE animado ──
   const liveIndicator = isLive
     ? `<span class="live-badge">EN VIVO</span>`
     : `<span class="mt ${isFin ? '' : ''}">${timeLabel}</span>`;
 
-  // ── Marcador ──
   let scoreBlock;
   if (hasSc) {
     scoreBlock = `<div class="score">
