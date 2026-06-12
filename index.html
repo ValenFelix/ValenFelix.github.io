@@ -1234,20 +1234,20 @@ function renderGameLeaderboards(){
 }
 
 // ══════════════════════════════════════════════════════
-//  MINI JUEGO 1: CABEZAZO (dificultad progresiva)
+//  MINI JUEGO 1: CABEZAZO
 // ══════════════════════════════════════════════════════
 const HEAD={
   running:false,animFrame:null,score:0,
   ball:{x:300,y:200,vx:1.0,vy:0,r:16},
   player:{x:300,y:285,w:60,h:20,targetX:300},
-  gravity:0.04,bounces:0,canvas:null,ctx:null,mouseX:300,
+  gravity:0.055,bounces:0,canvas:null,ctx:null,mouseX:300,
   init(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.reset();this.render();},
   reset(){
-    this.running=false;this.score=0;this.bounces=0;this.gravity=0.04;
+    this.running=false;this.score=0;this.bounces=0;this.gravity=0.055;
     this.ball={x:300,y:200,vx:1.0,vy:0,r:16};
-    this.player={x:300,y:285,w:60,h:20,targetX:300};
+    this.player.x=300;this.player.targetX=300;
     if(this.animFrame){cancelAnimationFrame(this.animFrame);this.animFrame=null;}
-    document.getElementById('gameLiveScore').textContent=0;
+    document.getElementById('gameLiveScore').textContent=this.score;
     const msg=document.getElementById('gameMsg');
     msg.innerHTML=`<div class="gm-emoji">🤸</div><div class="gm-title">CABEZAZO</div><div class="gm-sub">Mueve el ratón (o toca) para mover al jugador.<br>¡No dejes caer el balón!</div>`;
     msg.classList.remove('hidden');
@@ -1265,37 +1265,24 @@ const HEAD={
   loop(){if(!this.running)return;this.update();this.render();this.animFrame=requestAnimationFrame(()=>this.loop());},
   update(){
     const b=this.ball,p=this.player,W=600,H=340;
-    // Gravedad sube cada 5 toques (más gradual que antes)
-    this.gravity = 0.04 + (this.bounces * 0.006);
-    this.gravity = Math.min(this.gravity, 0.32);
-    b.vy+=this.gravity; b.x+=b.vx; b.y+=b.vy;
-    if(b.x-b.r<0){b.x=b.r;b.vx=Math.abs(b.vx)*0.92;}
-    if(b.x+b.r>W){b.x=W-b.r;b.vx=-Math.abs(b.vx)*0.92;}
-    // Cabeza más pequeña con el tiempo (mín 10px)
-    const headR = Math.max(10, 22 - Math.floor(this.bounces / 8));
-    // Plataforma más angosta con el tiempo (mín 22px de ancho)
-    p.w = Math.max(22, 60 - Math.floor(this.bounces / 6) * 3);
-    p.x+=(this.mouseX-p.x)*Math.max(0.07, 0.15 - this.bounces*0.001);
+    b.vy+=this.gravity;b.x+=b.vx;b.y+=b.vy;
+    if(b.x-b.r<0){b.x=b.r;b.vx=Math.abs(b.vx)*.9;}
+    if(b.x+b.r>W){b.x=W-b.r;b.vx=-Math.abs(b.vx)*.9;}
+    p.x+=(this.mouseX-p.x)*.15;
     p.x=Math.max(p.w/2,Math.min(W-p.w/2,p.x));
-    const headCY=p.y-14, dx=b.x-p.x, dy=b.y-headCY, dist=Math.sqrt(dx*dx+dy*dy);
+    const headCY=p.y-14,headR=22,dx=b.x-p.x,dy=b.y-headCY,dist=Math.sqrt(dx*dx+dy*dy);
     if(dist<b.r+headR&&b.vy>0){
-      // Rebote más débil a medida que avanza
-      const power = Math.max(-6.0, -8.5 + this.bounces*0.04);
-      b.vy=power;
-      b.vx+=dx*0.07;
-      // Velocidad horizontal crece con el score
-      const maxSpd = Math.min(8, 4 + this.bounces*0.05);
-      b.vx=Math.max(-maxSpd,Math.min(maxSpd,b.vx));
-      b.y=headCY-b.r-headR-1;
+      b.vy=-7.5;b.vx+=dx*.06;b.vx=Math.max(-5,Math.min(5,b.vx));b.y=headCY-b.r-headR-1;
       this.score++;this.bounces++;
       document.getElementById('gameLiveScore').textContent=this.score;
+      if(this.bounces%10===0)this.gravity=Math.min(0.18,this.gravity+.008);
     }
     if(b.y-b.r>H)this.end();
   },
   end(){
     this.running=false;if(this.animFrame)cancelAnimationFrame(this.animFrame);
     const msg=document.getElementById('gameMsg');
-    const stars=this.score>=40?'⭐⭐⭐':this.score>=20?'⭐⭐':this.score>=8?'⭐':'';
+    const stars=this.score>=50?'⭐⭐⭐':this.score>=25?'⭐⭐':this.score>=8?'⭐':'';
     msg.innerHTML=`<div class="gm-score">${this.score}</div><div class="gm-title">${stars||'😮'} toque${this.score!==1?'s':''}</div><div class="gm-sub">¡Inténtalo de nuevo!</div>`;
     msg.classList.remove('hidden');checkAndPromptRecord('cabezazo',this.score);
   },
@@ -1305,15 +1292,13 @@ const HEAD={
     c.fillStyle='#0a1a0e';c.fillRect(0,0,W,H);
     for(let i=0;i<8;i++){c.fillStyle=i%2===0?'rgba(0,0,0,0.08)':'transparent';c.fillRect(i*75,0,75,H);}
     c.strokeStyle='rgba(255,255,255,0.15)';c.lineWidth=2;c.beginPath();c.moveTo(0,H-5);c.lineTo(W,H-5);c.stroke();
-    // Barra de peligro
-    const danger=Math.min(1,(this.gravity-0.04)/0.28);
-    if(danger>0){c.fillStyle=`rgba(255,87,34,${danger*0.7})`;c.fillRect(0,0,W*danger,5);}
+    const diff=Math.min(1,(this.gravity-.25)/.25);
+    if(diff>0){c.fillStyle=`rgba(255,87,34,${diff*.6})`;c.fillRect(0,0,W*diff,4);}
     const p=this.player;
-    const headR=Math.max(10,22-Math.floor(this.bounces/8));
     c.fillStyle='#1565c0';c.beginPath();c.roundRect(p.x-12,p.y,24,40,4);c.fill();
-    c.fillStyle='#ffcc80';c.beginPath();c.arc(p.x,p.y-14,headR,0,Math.PI*2);c.fill();
-    c.fillStyle='#5d4037';c.beginPath();c.arc(p.x,p.y-20,headR,Math.PI,0);c.fill();
-    c.fillStyle='#333';c.beginPath();c.arc(p.x-5,p.y-14,2.5,0,Math.PI*2);c.fill();c.beginPath();c.arc(p.x+5,p.y-14,2.5,0,Math.PI*2);c.fill();
+    c.fillStyle='#ffcc80';c.beginPath();c.arc(p.x,p.y-14,18,0,Math.PI*2);c.fill();
+    c.fillStyle='#5d4037';c.beginPath();c.arc(p.x,p.y-20,18,Math.PI,0);c.fill();
+    c.fillStyle='#333';c.beginPath();c.arc(p.x-6,p.y-14,3,0,Math.PI*2);c.fill();c.beginPath();c.arc(p.x+6,p.y-14,3,0,Math.PI*2);c.fill();
     const b=this.ball;
     c.fillStyle='#ffffff';c.beginPath();c.arc(b.x,b.y,b.r,0,Math.PI*2);c.fill();
     c.strokeStyle='#333';c.lineWidth=1.5;c.beginPath();c.arc(b.x,b.y,b.r,0,Math.PI*2);c.stroke();
@@ -1325,18 +1310,15 @@ const HEAD={
 };
 
 // ══════════════════════════════════════════════════════
-//  MINI JUEGO 2: ATRAPA LA MILANESA (dificultad progresiva)
+//  MINI JUEGO 2: ATRAPA LA MILANESA
 // ══════════════════════════════════════════════════════
 const MILA={
-  running:false,animFrame:null,score:0,items:[],spawnTimer:0,spawnRate:80,speedMultiplier:1,
-  multiSpawn:1, // cuántas caen a la vez
+  running:false,animFrame:null,score:0,items:[],spawnTimer:0,spawnRate:60,speedMultiplier:1,
   player:{x:300,y:300,w:80,h:20},canvas:null,ctx:null,mouseX:300,
   init(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.reset();},
   reset(){
-    this.running=false;this.score=0;this.items=[];this.spawnTimer=0;
-    this.spawnRate=80;this.speedMultiplier=1;this.multiSpawn=1;
-    this.player.x=300;this.player.w=80;
-    if(this.animFrame){cancelAnimationFrame(this.animFrame);this.animFrame=null;}
+    this.running=false;this.score=0;this.items=[];this.spawnTimer=0;this.spawnRate=70;this.speedMultiplier=1;
+    this.player.x=300;if(this.animFrame){cancelAnimationFrame(this.animFrame);this.animFrame=null;}
     document.getElementById('gameLiveScore').textContent='0';
     const msg=document.getElementById('gameMsg');
     msg.innerHTML=`<div class="gm-emoji">🐐</div><div class="gm-title">LAS MILANESAS</div><div class="gm-sub">Mueve el ratón o el dedo para atraparlas.<br>¡Si se te cae una al piso, pierdes!</div>`;
@@ -1346,31 +1328,13 @@ const MILA={
   loop(){if(!this.running)return;this.update();this.render();this.animFrame=requestAnimationFrame(()=>this.loop());},
   update(){
     const p=this.player,W=600,H=340;
-    p.x+=(this.mouseX-p.x)*0.2;
-    p.x=Math.max(p.w/2,Math.min(W-p.w/2,p.x));
-
+    p.x+=(this.mouseX-p.x)*.2;p.x=Math.max(p.w/2,Math.min(W-p.w/2,p.x));
     this.spawnTimer++;
     if(this.spawnTimer>=this.spawnRate){
       this.spawnTimer=0;
-      // Cada 10 milanesas: más rápido, más frecuente, más a la vez
-      const tier = Math.floor(this.score / 10);
-      this.speedMultiplier = 1 + tier * 0.28;
-      this.spawnRate = Math.max(18, 80 - tier * 7);
-      this.multiSpawn = tier >= 6 ? 3 : tier >= 3 ? 2 : 1;
-      // Plataforma más pequeña cada 15
-      p.w = Math.max(32, 80 - Math.floor(this.score/15)*6);
-
-      for(let s=0;s<this.multiSpawn;s++){
-        const baseSpeed = 2 + Math.random()*1.5;
-        this.items.push({
-          x: 30+Math.random()*(W-60),
-          y: -20 - s*30,
-          r: Math.max(9, 15 - Math.floor(this.score/20)),
-          speed: baseSpeed * this.speedMultiplier,
-          rotation: Math.random()*Math.PI*2,
-          rotSpeed: (Math.random()-.5)*0.12
-        });
-      }
+      this.items.push({x:30+Math.random()*(W-60),y:-20,r:15,speed:(2+Math.random()*2)*this.speedMultiplier,rotation:Math.random()*Math.PI*2,rotSpeed:(Math.random()-.5)*.1});
+      if(this.spawnRate>25)this.spawnRate-=1.5;
+      this.speedMultiplier+=.02;
     }
     for(let i=this.items.length-1;i>=0;i--){
       let item=this.items[i];item.y+=item.speed;item.rotation+=item.rotSpeed;
@@ -1383,7 +1347,7 @@ const MILA={
   end(){
     this.running=false;if(this.animFrame)cancelAnimationFrame(this.animFrame);
     const msg=document.getElementById('gameMsg');
-    const stars=this.score>=35?'🐐🐐🐐':this.score>=20?'⭐⭐':this.score>=8?'⭐':'';
+    const stars=this.score>=40?'🐐🐐🐐':this.score>=20?'⭐⭐':this.score>=5?'⭐':'';
     msg.innerHTML=`<div class="gm-score">${this.score}</div><div class="gm-title">${stars||'😭'}</div><div class="gm-sub">¡Se te cayó la milanesa! Inténtalo de nuevo.</div>`;
     msg.classList.remove('hidden');checkAndPromptRecord('milanesas',this.score);
   },
@@ -1394,9 +1358,6 @@ const MILA={
     c.strokeStyle='#1f2733';c.lineWidth=2;
     for(let i=0;i<W;i+=40){c.beginPath();c.moveTo(i,0);c.lineTo(i,H);c.stroke();}
     for(let i=0;i<H;i+=40){c.beginPath();c.moveTo(0,i);c.lineTo(W,i);c.stroke();}
-    // Barra de dificultad
-    const tier=Math.min(1,Math.floor(this.score/10)/10);
-    if(tier>0){c.fillStyle=`rgba(255,87,34,${tier*0.5})`;c.fillRect(0,0,W*tier,4);}
     const p=this.player;
     c.fillStyle='#b0bec5';c.beginPath();c.roundRect(p.x-p.w/2,p.y-10,p.w,12,6);c.fill();
     c.fillStyle='#4fc3f7';c.fillRect(p.x-20,p.y,40,40);
@@ -1415,19 +1376,16 @@ const MILA={
 };
 
 // ══════════════════════════════════════════════════════
-//  MINI JUEGO 3: SALTO DEL BICHO (dificultad progresiva)
+//  MINI JUEGO 3: SALTO DEL BICHO
 // ══════════════════════════════════════════════════════
 const BICH={
-  running:false,animFrame:null,score:0,balls:[],spawnTimer:0,spawnRate:110,speedMultiplier:1,
-  player:{x:120,y:280,w:30,h:60,vy:0,gravity:.55,jumpPower:-12,grounded:true},
+  running:false,animFrame:null,score:0,balls:[],spawnTimer:0,spawnRate:100,speedMultiplier:1,
+  player:{x:120,y:280,w:30,h:60,vy:0,gravity:.6,jumpPower:-12.5,grounded:true},
   feedback:[],canvas:null,ctx:null,
   init(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.reset();},
   reset(){
-    this.running=false;this.score=0;this.balls=[];this.spawnTimer=0;
-    this.spawnRate=110;this.speedMultiplier=1;
-    this.player.vy=0;this.player.y=280;this.player.grounded=true;
-    this.player.gravity=0.55;this.player.jumpPower=-12;
-    this.feedback=[];
+    this.running=false;this.score=0;this.balls=[];this.spawnTimer=0;this.spawnRate=100;this.speedMultiplier=1;
+    this.player.vy=0;this.player.y=280;this.player.grounded=true;this.feedback=[];
     if(this.animFrame){cancelAnimationFrame(this.animFrame);this.animFrame=null;}
     document.getElementById('gameLiveScore').textContent='0';
     const msg=document.getElementById('gameMsg');
@@ -1438,30 +1396,15 @@ const BICH={
   loop(){if(!this.running)return;this.update();this.render();this.animFrame=requestAnimationFrame(()=>this.loop());},
   update(){
     const p=this.player,W=600,H=340;
-
-    // Cada 5 remates: más rápido, más frecuente; cada 8: gravedad sube (salto más corto)
-    const tier = Math.floor(this.score / 5);
-    this.speedMultiplier = 1 + tier * 0.18;
-    this.spawnRate = Math.max(30, 110 - tier * 8);
-    p.gravity = Math.min(1.2, 0.55 + Math.floor(this.score/8)*0.06);
-    p.jumpPower = Math.max(-9, -12 + Math.floor(this.score/8)*0.25);
-
     p.vy+=p.gravity;p.y+=p.vy;
     if(p.y>=280){p.y=280;p.vy=0;p.grounded=true;}
-
     this.spawnTimer++;
     if(this.spawnTimer>=this.spawnRate){
       this.spawnTimer=0;
-      // A partir de score 15: pueden venir 2 pelotas juntas
-      const count = this.score>=15 && Math.random()<0.35 ? 2 : 1;
-      for(let s=0;s<count;s++){
-        // Altura variable: dificulta calcular el salto
-        const yPos = 100 + Math.random()*160;
-        const spd  = (4.5 + Math.random()*2) * this.speedMultiplier;
-        this.balls.push({x:W+20+s*60, y:yPos, vx:-spd, r:Math.max(8,12-Math.floor(this.score/10))});
-      }
+      this.balls.push({x:W+20,y:130+Math.random()*130,vx:-(5+Math.random()*2)*this.speedMultiplier,r:12});
+      if(this.spawnRate>45)this.spawnRate-=2;
+      this.speedMultiplier+=.03;
     }
-
     for(let i=this.balls.length-1;i>=0;i--){
       let b=this.balls[i];b.x+=b.vx;
       const headY=p.y-p.h;
@@ -1478,7 +1421,7 @@ const BICH={
   end(){
     this.running=false;if(this.animFrame)cancelAnimationFrame(this.animFrame);
     const msg=document.getElementById('gameMsg');
-    const stars=this.score>=25?'🚀🐐':this.score>=12?'⭐⭐':this.score>=5?'⭐':'';
+    const stars=this.score>=30?'🚀🐐':this.score>=15?'⭐⭐':this.score>=5?'⭐':'';
     msg.innerHTML=`<div class="gm-score">${this.score}</div><div class="gm-title">${stars||'🤦‍♂️'}</div><div class="gm-sub">¡Dejaste pasar el balón!</div>`;
     msg.classList.remove('hidden');checkAndPromptRecord('siu',this.score);
   },
@@ -1487,9 +1430,6 @@ const BICH={
     c.fillStyle='#0f172a';c.fillRect(0,0,W,H);
     c.fillStyle='#064e3b';c.fillRect(0,280,W,H-280);
     c.strokeStyle='#047857';c.lineWidth=4;c.beginPath();c.moveTo(0,280);c.lineTo(W,280);c.stroke();
-    // Barra de dificultad
-    const danger=Math.min(1,this.score/30);
-    if(danger>0){c.fillStyle=`rgba(255,87,34,${danger*0.6})`;c.fillRect(0,0,W*danger,4);}
     const p=this.player;
     c.fillStyle='#ef4444';c.beginPath();c.roundRect(p.x-p.w/2,p.y-p.h,p.w,p.h*.6,4);c.fill();
     c.fillStyle='#166534';c.fillRect(p.x-p.w/2,p.y-p.h*.4,p.w,p.h*.2);
