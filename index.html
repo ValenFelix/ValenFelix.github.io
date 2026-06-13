@@ -873,7 +873,7 @@ const HEAD={
   init(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.reset();this.render();},
   reset(){
     this.running=false;this.score=0;this.bounces=0;
-    this.ball={x:300,y:160,vx:0.8,vy:0,r:16};
+    this.ball={x:300,y:160,vx:1.4,vy:0,r:16};
     this.player.x=300;this.player.targetX=300;
     if(this.animFrame){cancelAnimationFrame(this.animFrame);this.animFrame=null;}
     document.getElementById('gameLiveScore').textContent='0';
@@ -1125,7 +1125,7 @@ const BICH={
         const objY=dtype.lane==='low' ? 258 : 185;
         this.objects.push({
           x:W+30,y:objY,
-          vx:-(3.5+Math.random()*1.0)*this.speedMultiplier,
+          vx:-(5.5+Math.random()*1.0)*this.speedMultiplier,
           type:'danger',dtype,
           w:dtype.w,h:dtype.h,
           emoji:dtype.emoji,passed:false
@@ -1133,7 +1133,7 @@ const BICH={
       } else {
         this.objects.push({
           x:W+20,y:120+Math.random()*100,
-          vx:-(3.5+Math.random()*1.5)*this.speedMultiplier,
+          vx:-(5.5+Math.random()*1.5)*this.speedMultiplier,
           r:12,type:'ball',passed:false
         });
       }
