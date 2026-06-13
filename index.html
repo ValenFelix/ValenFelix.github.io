@@ -877,7 +877,7 @@ const HEAD={
     if(this.animFrame){cancelAnimationFrame(this.animFrame);this.animFrame=null;}
     document.getElementById('gameLiveScore').textContent='0';
     const msg=document.getElementById('gameMsg');
-    msg.innerHTML=`<div class="gm-emoji">🤸</div><div class="gm-title">CABEZAZO</div><div class="gm-sub">Mueve el mouse para mover al jugador.<br>¡La pelota se va acelerando con cada toque!</div>`;
+    msg.innerHTML=`<div class="gm-emoji">🇧🇷</div><div class="gm-title">NEYMARZAZO</div><div class="gm-sub">Mueve el mouse para mover al jugador.<br>¡La pelota saldrá disparada hacia arriba!</div>`;
     msg.classList.remove('hidden');
     document.getElementById('btnStart').style.display='';
     document.getElementById('btnRestart').style.display='none';
@@ -888,28 +888,28 @@ const HEAD={
   update(){
     const b=this.ball,p=this.player,W=600,H=340;
     
-    // 1. GRAVEDAD MÁS ALTA: Subimos la base de 0.075 a 0.4 y el tope de 0.26 a 0.65
-    // Esto hace que caiga con mucha más aceleración desde el primer segundo.
-    const grav=Math.min(0.65, 0.40 + this.bounces * 0.015);
+    // 1. GRAVEDAD EXTREMA: Base 0.7, escala mucho más rápido. 
+    // Esto hace que, aunque suba altísimo, vuelva a caer como una piedra.
+    const grav=Math.min(1.4, 0.70 + this.bounces * 0.03);
     
     b.vy+=grav;b.x+=b.vx;b.y+=b.vy;
     if(b.x-b.r<0){b.x=b.r;b.vx=Math.abs(b.vx);}
     if(b.x+b.r>W){b.x=W-b.r;b.vx=-Math.abs(b.vx);}
     p.x+=(this.mouseX-p.x)*.18;
     p.x=Math.max(30,Math.min(W-30,p.x));
+    
     const headCY=p.y-14,headR=22,dx=b.x-p.x,dy=b.y-headCY,dist=Math.sqrt(dx*dx+dy*dy);
     if(dist<b.r+headR&&b.vy>0){
       this.bounces++;this.score++;
       document.getElementById('gameLiveScore').textContent=this.score;
       
-      // 2. REBOTE HACIA ARRIBA MÁS FUERTE: Pasó de -7 a -12 (base) y el límite de -13 a -18.
-      // Al haber más gravedad, necesita este impulso para subir bien alto y bajar con furia.
-      const newVy=Math.max(-18, -12 - this.bounces * 0.3);
+      // 2. REBOTE VERTICAL BRUTAL: Ahora arranca en -17 y crece muchísimo por cada rebote.
+      // ¡Vas a ver cómo sale volando hacia el techo!
+      const newVy=Math.max(-30, -17 - this.bounces * 0.5);
       b.vy=newVy;
       
-      b.vx+=(dx*0.05);
-      // Ajustamos ligeramente la velocidad horizontal para que vaya acorde a la nueva velocidad vertical
-      const maxVx=Math.min(9.5, 3.5+this.bounces*0.15);
+      b.vx+=(dx*0.06);
+      const maxVx=Math.min(12, 4.5+this.bounces*0.2);
       b.vx=Math.max(-maxVx,Math.min(maxVx,b.vx));
       const minVx=1.5+this.bounces*0.05;
       if(Math.abs(b.vx)<minVx)b.vx=(b.vx>=0?1:-1)*minVx;
@@ -930,21 +930,52 @@ const HEAD={
     c.fillStyle='#0a1a0e';c.fillRect(0,0,W,H);
     for(let i=0;i<8;i++){c.fillStyle=i%2===0?'rgba(0,0,0,0.08)':'transparent';c.fillRect(i*75,0,75,H);}
     c.strokeStyle='rgba(255,255,255,0.15)';c.lineWidth=2;c.beginPath();c.moveTo(0,H-5);c.lineTo(W,H-5);c.stroke();
+    
     const speedFrac=Math.min(1,this.bounces/50);
     if(speedFrac>0){
       const col=`hsl(${Math.round(120-speedFrac*120)},100%,50%)`;
       c.fillStyle=col+Math.round(speedFrac*150+80).toString(16).padStart(2,'0');
       c.fillRect(0,0,W*speedFrac,4);
     }
+    
+    // --- DIBUJANDO A NEYMAR ---
     const p=this.player;
-    c.fillStyle='#1565c0';c.beginPath();c.roundRect(p.x-12,p.y,24,40,4);c.fill();
-    c.fillStyle='#ffcc80';c.beginPath();c.arc(p.x,p.y-14,18,0,Math.PI*2);c.fill();
-    c.fillStyle='#5d4037';c.beginPath();c.arc(p.x,p.y-20,18,Math.PI,0);c.fill();
+    
+    // Camiseta Brasil (Amarilla)
+    c.fillStyle='#fde92b';c.beginPath();c.roundRect(p.x-12,p.y,24,40,4);c.fill();
+    // Cuello de la camiseta (Verde)
+    c.fillStyle='#009b3a';c.fillRect(p.x-12,p.y,24,5);
+    // Número 10
+    c.fillStyle='#009b3a';c.font='bold 14px "Barlow Condensed",sans-serif';c.textAlign='center';c.fillText('10',p.x,p.y+24);
+    
+    // Cabeza (Tono de piel bronceado)
+    c.fillStyle='#c68e58';c.beginPath();c.arc(p.x,p.y-14,18,0,Math.PI*2);c.fill();
+    
+    // Base del pelo (Laterales oscuros)
+    c.fillStyle='#2c1b18';c.beginPath();c.arc(p.x,p.y-22,14,Math.PI,0);c.fill();
+    
+    // Cresta / Mohawk (Rubio)
+    c.fillStyle='#f5d742';
+    c.beginPath();
+    c.moveTo(p.x-12, p.y-25);
+    c.lineTo(p.x-6, p.y-42);
+    c.lineTo(p.x, p.y-30);
+    c.lineTo(p.x+6, p.y-42);
+    c.lineTo(p.x+12, p.y-25);
+    c.fill();
+    
+    // Ojos
     c.fillStyle='#333';c.beginPath();c.arc(p.x-6,p.y-14,3,0,Math.PI*2);c.fill();c.beginPath();c.arc(p.x+6,p.y-14,3,0,Math.PI*2);c.fill();
+    
+    // Barba candado típica
+    c.strokeStyle='#2c1b18';c.lineWidth=2;c.beginPath();c.arc(p.x,p.y-6,5,0,Math.PI);c.stroke();
+    // --------------------------
+
     const b=this.ball;
     c.fillStyle='#ffffff';c.beginPath();c.arc(b.x,b.y,b.r,0,Math.PI*2);c.fill();
     c.strokeStyle='#333';c.lineWidth=1.5;c.beginPath();c.arc(b.x,b.y,b.r,0,Math.PI*2);c.stroke();
     c.fillStyle='#333';c.beginPath();c.arc(b.x,b.y,b.r*.45,0,Math.PI*2);c.fill();
+    
     c.fillStyle='rgba(0,0,0,0.6)';c.beginPath();c.roundRect(W/2-55,10,110,30,6);c.fill();
     c.fillStyle='#00e676';c.font='bold 17px "Barlow Condensed",sans-serif';c.textAlign='center';
     c.fillText(`TOQUES: ${this.score}`,W/2,29);
