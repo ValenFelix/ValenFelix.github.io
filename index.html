@@ -873,7 +873,7 @@ const HEAD={
   init(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.reset();this.render();},
   reset(){
     this.running=false;this.score=0;this.bounces=0;
-    this.ball={x:300,y:160,vx:2.6,vy:0,r:16};
+    this.ball={x:300,y:160,vx:20,vy:0,r:16};
     this.player.x=300;this.player.targetX=300;
     if(this.animFrame){cancelAnimationFrame(this.animFrame);this.animFrame=null;}
     document.getElementById('gameLiveScore').textContent='0';
