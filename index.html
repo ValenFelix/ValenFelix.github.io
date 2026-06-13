@@ -873,7 +873,7 @@ const HEAD={
   init(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.reset();this.render();},
   reset(){
     this.running=false;this.score=0;this.bounces=0;
-    this.ball={x:300,y:160,vx:1.4,vy:0,r:16};
+    this.ball={x:300,y:160,vx:2.6,vy:0,r:16};
     this.player.x=300;this.player.targetX=300;
     if(this.animFrame){cancelAnimationFrame(this.animFrame);this.animFrame=null;}
     document.getElementById('gameLiveScore').textContent='0';
@@ -888,8 +888,8 @@ const HEAD={
   loop(){if(!this.running)return;this.update();this.render();this.animFrame=requestAnimationFrame(()=>this.loop());},
   update(){
     const b=this.ball,p=this.player,W=600,H=340;
-    // Gravity starts gentle, ramps slowly after bounce 20
-    const grav=Math.min(0.20, 0.042+this.bounces*0.002);
+    // Gravity starts higher and ramps a bit faster after bounces
+    const grav=Math.min(0.26, 0.075+this.bounces*0.0026);
     b.vy+=grav;b.x+=b.vx;b.y+=b.vy;
     if(b.x-b.r<0){b.x=b.r;b.vx=Math.abs(b.vx);}
     if(b.x+b.r>W){b.x=W-b.r;b.vx=-Math.abs(b.vx);}
@@ -899,15 +899,15 @@ const HEAD={
     if(dist<b.r+headR&&b.vy>0){
       this.bounces++;this.score++;
       document.getElementById('gameLiveScore').textContent=this.score;
-      // Vertical launch: starts easy, very slowly increases
-      const newVy=Math.max(-13, -5.5-this.bounces*0.08);
+      // Vertical launch: starts stronger, increases a bit faster
+      const newVy=Math.max(-13, -7-this.bounces*0.1);
       b.vy=newVy;
       b.vx+=(dx*0.05);
-      // Horizontal cap grows slowly — only kicks in after bounce 15
-      const maxVx=Math.min(7, 1.0+Math.max(0,this.bounces-5)*0.07);
+      // Horizontal cap grows from the start
+      const maxVx=Math.min(7.5, 2.2+this.bounces*0.09);
       b.vx=Math.max(-maxVx,Math.min(maxVx,b.vx));
-      // Minimum horizontal speed barely grows
-      const minVx=0.4+Math.max(0,this.bounces-12)*0.025;
+      // Minimum horizontal speed starts higher
+      const minVx=1.1+this.bounces*0.03;
       if(Math.abs(b.vx)<minVx)b.vx=(b.vx>=0?1:-1)*minVx;
       b.y=headCY-b.r-headR-1;
     }
@@ -959,7 +959,7 @@ const MILA={
   init(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.reset();},
   reset(){
     this.running=false;this.score=0;this.items=[];this.spawnTimer=0;
-    this.spawnRate=100;this.speedMultiplier=1;this.frameCount=0;
+    this.spawnRate=65;this.speedMultiplier=1.5;this.frameCount=0;
     this.player.x=300;
     if(this.animFrame){cancelAnimationFrame(this.animFrame);this.animFrame=null;}
     document.getElementById('gameLiveScore').textContent='0';
@@ -975,13 +975,13 @@ const MILA={
     const p=this.player,W=600,H=340;
     p.x+=(this.mouseX-p.x)*.2;p.x=Math.max(p.w/2,Math.min(W-p.w/2,p.x));
     this.frameCount++;
-    // Gradually increase speed and spawn rate every 10 seconds (~600 frames)
-    this.speedMultiplier=1+this.frameCount*0.00015;
+    // Gradually increase speed and spawn rate over time, starting from a higher base
+    this.speedMultiplier=1.5+this.frameCount*0.00018;
     this.spawnTimer++;
     if(this.spawnTimer>=this.spawnRate){
       this.spawnTimer=0;
-      // Spawn rate decreases (more frequent) over time
-      this.spawnRate=Math.max(35,100-this.frameCount*0.025);
+      // Spawn rate decreases (more frequent) over time, starting lower
+      this.spawnRate=Math.max(30,65-this.frameCount*0.02);
       // 25% chance to spawn a yunque after score 5
       const isYunque=this.score>=12&&Math.random()<0.22;
       const speed=(isYunque?2.8:1.2+Math.random()*1.0)*this.speedMultiplier;
@@ -1085,7 +1085,7 @@ const BICH={
   init(canvas){this.canvas=canvas;this.ctx=canvas.getContext('2d');this.reset();},
   reset(){
     this.running=false;this.score=0;this.objects=[];this.spawnTimer=0;
-    this.spawnRate=130;this.speedMultiplier=1;this.frameCount=0;this.feedback=[];
+    this.spawnRate=80;this.speedMultiplier=1.4;this.frameCount=0;this.feedback=[];
     const p=this.player;p.vy=0;p.y=280;p.grounded=true;p.crouching=false;p.crouchTimer=0;
     if(this.animFrame){cancelAnimationFrame(this.animFrame);this.animFrame=null;}
     document.getElementById('gameLiveScore').textContent='0';
@@ -1110,12 +1110,12 @@ const BICH={
     p.vy+=p.gravity;p.y+=p.vy;
     if(p.y>=280){p.y=280;p.vy=0;p.grounded=true;}
     this.frameCount++;
-    this.speedMultiplier=1+this.frameCount*0.0002;
+    this.speedMultiplier=1.4+this.frameCount*0.00028;
     // Spawn
     this.spawnTimer++;
     if(this.spawnTimer>=this.spawnRate){
       this.spawnTimer=0;
-      this.spawnRate=Math.max(65,130-this.frameCount*0.03);
+      this.spawnRate=Math.max(48,80-this.frameCount*0.025);
       // After score 5, 40% chance danger object
       const isDanger=this.score>=6&&Math.random()<0.3;
       if(isDanger){
