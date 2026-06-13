@@ -877,7 +877,7 @@ const HEAD={
     if(this.animFrame){cancelAnimationFrame(this.animFrame);this.animFrame=null;}
     document.getElementById('gameLiveScore').textContent='0';
     const msg=document.getElementById('gameMsg');
-    msg.innerHTML=`<div class="gm-emoji">🇧🇷</div><div class="gm-title">NEYMARZAZO</div><div class="gm-sub">Mueve el mouse para mover al jugador.<br>¡Pelota ligera pero rapidísima!</div>`;
+    msg.innerHTML=`<div class="gm-emoji">🇧🇷</div><div class="gm-title">NEYMARZAZO</div><div class="gm-sub">Mueve el mouse para mover al jugador.<br>¡Pelota ligera y rebotes explosivos!</div>`;
     msg.classList.remove('hidden');
     document.getElementById('btnStart').style.display='';
     document.getElementById('btnRestart').style.display='none';
@@ -888,12 +888,12 @@ const HEAD={
   update(){
     const b=this.ball,p=this.player,W=600,H=340;
     
-    // 1. Gravedad moderada: Ya no cae como piedra, se siente como una pelota real.
-    const grav = 0.32 + this.bounces * 0.008;
+    // Gravedad moderada para que se sienta como pelota, pero aumenta un poco con los toques
+    const grav = 0.32 + this.bounces * 0.012;
     b.vy += grav;
     
-    // 2. Velocidad terminal (resistencia del aire): Evita que acelere infinitamente hacia abajo.
-    const maxCaida = 12 + this.bounces * 0.2;
+    // Velocidad límite de caída (aumenta con los toques para que baje rápido cuando sube mucho)
+    const maxCaida = 15 + this.bounces * 0.4;
     if(b.vy > maxCaida) b.vy = maxCaida;
     
     b.x += b.vx; b.y += b.vy;
@@ -901,7 +901,6 @@ const HEAD={
     if(b.x-b.r<0){b.x=b.r;b.vx=Math.abs(b.vx);}
     if(b.x+b.r>W){b.x=W-b.r;b.vx=-Math.abs(b.vx);}
     
-    // El jugador se mueve un poco más rápido (0.25) para que puedas reaccionar a la pelota
     p.x += (this.mouseX - p.x) * 0.25;
     p.x = Math.max(30, Math.min(W-30, p.x));
     
@@ -911,18 +910,18 @@ const HEAD={
       this.bounces++; this.score++;
       document.getElementById('gameLiveScore').textContent = this.score;
       
-      // 3. Rebote vertical rápido pero controlado.
-      const newVy = -11 - this.bounces * 0.25;
-      b.vy = Math.max(-20, newVy);
+      // --- CAMBIO PRINCIPAL: REBOTE VERTICAL MUCHO MÁS ALTO Y RÁPIDO ---
+      // Empieza en -14 (un salto muy alto) y suma -0.6 de fuerza extra por cada toque.
+      // El límite (Math.max) subió a -28, lo que es una velocidad vertical altísima.
+      const newVy = -14 - this.bounces * 0.6;
+      b.vy = Math.max(-28, newVy);
       
-      // 4. AUMENTO DE DIFICULTAD HORIZONTAL: Ahora rebota mucho más hacia los lados 
-      // (dx * 0.09). Esto te obliga a mover el mouse rápido por toda la pantalla.
-      b.vx += (dx * 0.09); 
-      const maxVx = 10 + this.bounces * 0.3;
+      // Velocidad horizontal: Aumenta la dificultad porque salta errática hacia los lados
+      b.vx += (dx * 0.1); 
+      const maxVx = 12 + this.bounces * 0.4;
       b.vx = Math.max(-maxVx, Math.min(maxVx, b.vx));
       
-      // La pelota nunca se queda quieta en el centro, siempre te obliga a moverte
-      const minVx = 3 + this.bounces * 0.1;
+      const minVx = 3.5 + this.bounces * 0.15;
       if(Math.abs(b.vx) < minVx) b.vx = (b.vx >= 0 ? 1 : -1) * minVx;
       
       b.y = headCY - b.r - headR - 1;
@@ -952,27 +951,17 @@ const HEAD={
     
     const p=this.player;
     
-    // Camiseta Brasil
     c.fillStyle='#fde92b';c.beginPath();c.roundRect(p.x-12,p.y,24,40,4);c.fill();
-    // Cuello
     c.fillStyle='#009b3a';c.fillRect(p.x-12,p.y,24,5);
-    // Número 10
     c.fillStyle='#009b3a';c.font='bold 14px "Barlow Condensed",sans-serif';c.textAlign='center';c.fillText('10',p.x,p.y+24);
     
-    // Cabeza (Tono piel)
     c.fillStyle='#c68e58';c.beginPath();c.arc(p.x,p.y-14,18,0,Math.PI*2);c.fill();
     
-    // --- PELO CORREGIDO ---
-    // Fondo oscuro (lados rapados)
     c.fillStyle='#2c1b18';c.beginPath();c.arc(p.x,p.y-14,18,Math.PI,0);c.fill();
-    // Arriba rubio corto (dibujado como una elipse achatada, sin puntas)
     c.fillStyle='#f5d742';c.beginPath();c.ellipse(p.x, p.y-22, 12, 6, 0, 0, Math.PI*2);c.fill();
-    // ----------------------
     
-    // Ojos
     c.fillStyle='#333';c.beginPath();c.arc(p.x-6,p.y-14,3,0,Math.PI*2);c.fill();c.beginPath();c.arc(p.x+6,p.y-14,3,0,Math.PI*2);c.fill();
     
-    // Barba candado
     c.strokeStyle='#2c1b18';c.lineWidth=2;c.beginPath();c.arc(p.x,p.y-6,5,0,Math.PI);c.stroke();
     
     const b=this.ball;
