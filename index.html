@@ -145,6 +145,11 @@
     .qdot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:6px;vertical-align:middle;margin-bottom:2px}
     .qdot.maybe{background:var(--blue)}
     .legend{padding:10px 20px 14px;font-size:12px;color:var(--muted);display:flex;gap:14px;background:rgba(0,0,0,0.1)}
+    .m-pagination{display:flex;justify-content:flex-end;align-items:center;gap:10px;padding:10px 20px;border-top:1px solid var(--border);background:rgba(255,255,255,0.01)}
+    .m-page-info{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
+    .m-page-arrow{background:var(--surface);border:1px solid var(--border);border-radius:8px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:var(--text);cursor:pointer;transition:all .2s;line-height:1}
+    .m-page-arrow:hover{border-color:var(--green);color:var(--green);background:rgba(0,230,118,0.06);transform:translateX(2px)}
+    .m-page-arrow:active{transform:translateX(4px)}
     .err{padding:24px;text-align:center;color:var(--muted);font-size:13px;line-height:1.6}
     .modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);z-index:1000;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s ease}
     .modal-overlay.active{opacity:1;pointer-events:auto}
@@ -698,6 +703,8 @@ let matches        = [];
 let formPicks      = {};
 let chartInstances = {};
 let curTab         = 'r';
+let mPage = { r: 0, u: 0 };
+const M_PER_PAGE = 4;
 
 // ══════════════════════════════════════════════════════
 //  UTILIDADES
@@ -881,32 +888,55 @@ function setTab(t) {
   renderMatches();
 }
 
-function renderMatches() {
-  const body = document.getElementById('mBody');
-  if (!body) return;
-
-  let list;
-  if (curTab === 'r') {
-    list = matches
+function getMatchList(tab) {
+  if (tab === 'r') {
+    return matches
       .filter(m => m.st === 'FIN' || m.st === 'LIVE')
       .sort((a, b) => {
         if (a.st === 'LIVE' && b.st !== 'LIVE') return -1;
         if (b.st === 'LIVE' && a.st !== 'LIVE') return  1;
         return b.date - a.date;
-      })
-      .slice(0, 10);
-  } else {
-    list = matches
-      .filter(m => m.st === 'SCHED')
-      .sort((a, b) => a.date - b.date)
-      .slice(0, 6);
+      });
   }
+  return matches
+    .filter(m => m.st === 'SCHED')
+    .sort((a, b) => a.date - b.date);
+}
+
+function changeMPage() {
+  const list = getMatchList(curTab);
+  const totalPages = Math.max(1, Math.ceil(list.length / M_PER_PAGE));
+  mPage[curTab] = (mPage[curTab] + 1) % totalPages;
+  renderMatches();
+}
+
+function renderMatches() {
+  const body = document.getElementById('mBody');
+  if (!body) return;
+
+  const list = getMatchList(curTab);
 
   if (!list.length) {
     body.innerHTML = `<div class="err">${curTab==='r' ? '⚽ Ningún partido ha finalizado aún.' : '📅 No hay más partidos programados.'}</div>`;
     return;
   }
-  body.innerHTML = list.map(m => matchHTML(m)).join('');
+
+  const totalPages = Math.max(1, Math.ceil(list.length / M_PER_PAGE));
+  if (mPage[curTab] >= totalPages || mPage[curTab] < 0) mPage[curTab] = 0;
+
+  const start = mPage[curTab] * M_PER_PAGE;
+  const pageItems = list.slice(start, start + M_PER_PAGE);
+
+  let html = pageItems.map(m => matchHTML(m)).join('');
+
+  if (totalPages > 1) {
+    html += `<div class="m-pagination">
+      <span class="m-page-info">Página ${mPage[curTab]+1} / ${totalPages}</span>
+      <button class="m-page-arrow" onclick="changeMPage()" title="Ver más partidos">›</button>
+    </div>`;
+  }
+
+  body.innerHTML = html;
 }
 
 function matchHTML(m) {
