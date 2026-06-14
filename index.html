@@ -1195,6 +1195,89 @@ function renderCharts(stats) {
 }
 
 // ══════════════════════════════════════════════════════
+//  SPOTLIGHT: Predicción del jugador para partidos clave
+// ══════════════════════════════════════════════════════
+function buildSpotlightHTML(picks) {
+  const liveMatches = matches.filter(m => m.st === 'LIVE');
+  const nextMatch   = matches.filter(m => m.st === 'SCHED').sort((a,b) => a.date - b.date)[0];
+  const spotlightMatches = [];
+  if (liveMatches.length) spotlightMatches.push(...liveMatches.slice(0,2).map(m => ({...m, badge:'live'})));
+  if (nextMatch) spotlightMatches.push({...nextMatch, badge:'next'});
+  if (!spotlightMatches.length) return '';
+
+  // Buscar predicción del jugador para un partido dado
+  function findPick(match) {
+    if (!picks || !picks.length) return null;
+    const homeNorm = match.h.toLowerCase();
+    const awayNorm = match.a.toLowerCase();
+    // Buscar picks que mencionen ambos equipos o alguno junto al grupo
+    for (const p of picks) {
+      const qLow = p.q.toLowerCase();
+      const aLow = (p.a || '').toLowerCase();
+      // Coincidencia directa: la pregunta menciona uno de los equipos
+      if (qLow.includes(homeNorm) || qLow.includes(awayNorm)) return p.a;
+      // La pregunta tiene el grupo y la respuesta menciona algún equipo del partido
+      if (qLow.includes(`[grupo ${match.g.toLowerCase()}]`) || qLow.includes(`grupo ${match.g.toLowerCase()}`)) {
+        if (aLow.includes(homeNorm) || aLow.includes(awayNorm)) return p.a;
+      }
+      // La respuesta nombra directamente alguno de los equipos (resultado tipo "2-1 México")
+      if (aLow.includes(homeNorm) || aLow.includes(awayNorm)) {
+        // Solo si la pregunta parece de resultado de partido (tiene guion o vs o marcador)
+        if (/marcador|resultado|goles|vs\s|score|\d-\d/.test(qLow)) return p.a;
+      }
+    }
+    return null;
+  }
+
+  const rows = spotlightMatches.map(m => {
+    const isLive = m.badge === 'live';
+    const pred   = findPick(m);
+    const badgeHTML = isLive
+      ? `<span class="live-badge" style="font-size:9px;padding:3px 7px">EN VIVO</span>`
+      : `<span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--green);text-transform:uppercase;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,0.25);border-radius:4px;padding:2px 7px">PRÓXIMO</span>`;
+
+    const scoreStr = (m.sH !== null && m.sA !== null) ? `${m.sH} – ${m.sA}` : null;
+
+    const predHTML = pred
+      ? `<div style="margin-top:7px;display:flex;align-items:center;gap:5px">
+           <span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted)">Su predicción:</span>
+           <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:var(--gold)">${pred}</span>
+         </div>`
+      : `<div style="margin-top:7px;font-size:11px;color:var(--muted);font-style:italic">Sin predicción registrada</div>`;
+
+    return `<div style="
+        background:${isLive ? 'rgba(255,23,68,0.05)' : 'rgba(0,230,118,0.03)'};
+        border:1px solid ${isLive ? 'rgba(255,23,68,0.3)' : 'rgba(0,230,118,0.2)'};
+        border-radius:10px;padding:12px 14px;margin-bottom:8px;
+      ">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        ${badgeHTML}
+        <span style="font-size:11px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-weight:700">Grupo ${m.g}</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:6px">
+        <div style="display:flex;align-items:center;gap:5px;min-width:0">
+          <span style="font-size:16px">${fl(m.h)}</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${m.h}</span>
+        </div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:${scoreStr ? '18px' : '12px'};font-weight:900;color:${isLive ? 'var(--live-red)' : 'var(--muted)'};text-align:center;white-space:nowrap;min-width:42px">
+          ${scoreStr || 'VS'}
+        </div>
+        <div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;min-width:0">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right">${m.a}</span>
+          <span style="font-size:16px">${fl(m.a)}</span>
+        </div>
+      </div>
+      ${predHTML}
+    </div>`;
+  }).join('');
+
+  return `<div style="margin-bottom:12px">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:8px;padding-left:2px">⚡ Partidos Destacados</div>
+    ${rows}
+  </div>`;
+}
+  
+// ══════════════════════════════════════════════════════
 //  MODAL FICHA JUGADOR
 // ══════════════════════════════════════════════════════
 function openPlayerCard(rawName, pts, rank, gPts, pPts) {
@@ -1244,6 +1327,9 @@ function openPlayerCard(rawName, pts, rank, gPts, pPts) {
       </div>
     </div>
     <div class="fc-body">`;
+
+// ── SPOTLIGHT: partidos live / próximo ──
+  html += buildSpotlightHTML(picks);
 
   if (!picks.length) {
     html += '<div class="err">Aún no se procesan las predicciones para este jugador.</div>';
