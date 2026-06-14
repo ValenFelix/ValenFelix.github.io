@@ -1376,7 +1376,7 @@ function checkAndPromptRecord(game, score) {
   if(isRecord(game, score)){
     pendingRecord={game,score};
     document.getElementById('rmScoreDisplay').textContent=score;
-    const lbl={cabezazo:'Cabezazo 🤸',milanesas:'Milanesas 🥩',siu:'Salto del Bicho 🚀'}[game];
+    const lbl={cabezazo:'Neymarzazo 👑',milanesas:'Milanesas 🥩',siu:'Salto del Bicho 🚀'}[game];
     document.getElementById('rmSub').textContent=`¡Estás en el Top 5 de ${lbl}! Ingresa tu nombre para quedar en la historia.`;
     document.getElementById('rmNameInput').value='';
     document.getElementById('recordModal').classList.add('active');
@@ -1843,7 +1843,7 @@ const HINTS={
 function selectGame(game){
   currentGame=game;
   ['cabezazo','milanesas','siu'].forEach(g=>document.getElementById('btn'+g.charAt(0).toUpperCase()+g.slice(1)).classList.toggle('selected',g===game));
-  const titles={cabezazo:'🤸 Cabezazo',milanesas:'🥩 Milanesas',siu:'🚀 Salto del Bicho'};
+  const titles={cabezazo:'👑 Neymarzazo',milanesas:'🥩 Milanesas',siu:'🚀 Salto del Bicho'};
   document.getElementById('gameTitle').textContent=titles[game];
   document.getElementById('gameLiveScore').textContent='0';
   const hint=document.getElementById('gameHint');
