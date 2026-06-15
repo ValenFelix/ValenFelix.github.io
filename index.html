@@ -1106,12 +1106,9 @@ function processLB(rows) {
     if (!players.length) { body.innerHTML = '<div class="err">No hay participantes.</div>'; return; }
     // ── Calcular rangos reales (empates comparten el mismo lugar) ──
 // ── Calcular rangos reales (empates comparten el mismo lugar) ──
-const realRanks = [];
-let realRank = 1;
-for (let i = 0; i < players.length; i++) {
-  if (i > 0 && players[i].total < players[i-1].total) realRank = i + 1;
-  realRanks.push(realRank);
-}
+const realRanks = players.map((p, i) => {
+  return players.filter(q => q.total > p.total).length + 1;
+});
 const tieCounts = {};
 for (const r of realRanks) tieCounts[r] = (tieCounts[r] || 0) + 1;
 
