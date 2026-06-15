@@ -1104,19 +1104,45 @@ function processLB(rows) {
       <div><div style="font-size:16px;">🥉</div><span style="font-size:11px;color:#aaa">3º (20%)</span><br><strong style="color:#fff;font-size:14px;">$${p3.toLocaleString('es-MX')}</strong></div>`;
 
     if (!players.length) { body.innerHTML = '<div class="err">No hay participantes.</div>'; return; }
-    body.innerHTML = players.map((p, i) => {
-      const rank = i+1;
-      const cls  = rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
-      const rc   = rank===1?'g':rank===2?'s':rank===3?'b':'';
-      const em   = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
-      return `<div class="lb-row ${cls}" title="Ver Ficha" onclick="openPlayerCard('${p.name.replace(/'/g,"\\'")}',${p.total},${rank},${p.grupos},${p.pPartidos})">
-        <div class="rank ${rc}">${em||rank}</div>
-        <div class="name-wrap"><div class="name">${p.name}</div><div class="bar-bg"><div class="bar"></div></div></div>
-        <div class="sub">${p.grupos>0?p.grupos:'—'}</div>
-        <div class="sub">${p.pPartidos>0?p.pPartidos:'—'}</div>
-        <div class="pts">${p.total}</div>
-      </div>`;
-    }).join('');
+    // ── Calcular rangos reales (empates comparten el mismo lugar) ──
+const realRanks = [];
+let realRank = 1;
+for (let i = 0; i < players.length; i++) {
+  if (i > 0 && players[i].total < players[i-1].total) realRank = i + 1;
+  realRanks.push(realRank);
+}
+const tieCounts = {};
+for (const r of realRanks) tieCounts[r] = (tieCounts[r] || 0) + 1;
+
+body.innerHTML = players.map((p, i) => {
+  const rank    = i + 1;
+  const real    = realRanks[i];
+  const isTied  = tieCounts[real] > 1;
+  const cls     = real===1?'r1':real===2?'r2':real===3?'r3':'';
+  const rc      = real===1?'g':real===2?'s':real===3?'b':'';
+  const em      = real===1?'🥇':real===2?'🥈':real===3?'🥉':'';
+
+  // Etiqueta discreta de empate
+  const ordinal = real===1?'1er':real===2?'2do':real===3?'3er':`${real}to`;
+  const tieBadge = isTied
+    ? `<div style="display:inline-flex;align-items:center;gap:4px;margin-top:3px;">
+         <span style="width:5px;height:5px;border-radius:50%;background:var(--blue);opacity:.7;display:inline-block;flex-shrink:0"></span>
+         <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim)">Empate — ${ordinal} lugar</span>
+       </div>`
+    : '';
+
+  return `<div class="lb-row ${cls}" title="Ver Ficha" onclick="openPlayerCard('${p.name.replace(/'/g,"\\'")}',${p.total},${rank},${p.grupos},${p.pPartidos})">
+    <div class="rank ${rc}">${em||real}</div>
+    <div class="name-wrap">
+      <div class="name">${p.name}</div>
+      <div class="bar-bg"><div class="bar"></div></div>
+      ${tieBadge}
+    </div>
+    <div class="sub">${p.grupos>0?p.grupos:'—'}</div>
+    <div class="sub">${p.pPartidos>0?p.pPartidos:'—'}</div>
+    <div class="pts">${p.total}</div>
+  </div>`;
+}).join('');
   }
 }
 
