@@ -433,6 +433,213 @@
     .fb-status{margin-top:8px;font-size:12px;text-align:center;color:var(--dim);min-height:16px}
     .fb-status.ok{color:var(--green)}
     .fb-status.err{color:var(--accent)}
+    /* ── BANNERS ESPECIALES DE EQUIPOS ── */
+#specialBannersWrap {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+ 
+.special-banner {
+  border-radius: 14px;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  cursor: default;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+.special-banner:hover {
+  transform: translateY(-2px);
+}
+ 
+/* Portugal */
+.special-banner.portugal {
+  background: linear-gradient(135deg, #006600 0%, #003300 40%, #cc0000 100%);
+  border: 1px solid rgba(255,215,0,0.4);
+  box-shadow: 0 6px 30px rgba(204,0,0,0.3), 0 0 0 0 rgba(204,0,0,0);
+  animation: banner-glow-port 2.5s ease-in-out infinite;
+}
+@keyframes banner-glow-port {
+  0%,100% { box-shadow: 0 6px 30px rgba(204,0,0,0.25), 0 0 0 0 rgba(204,0,0,0.1); }
+  50%      { box-shadow: 0 8px 40px rgba(204,0,0,0.45), 0 0 18px 4px rgba(204,0,0,0.15); }
+}
+ 
+/* México */
+.special-banner.mexico {
+  background: linear-gradient(135deg, #006847 0%, #003d2a 40%, #ce1126 100%);
+  border: 1px solid rgba(255,255,255,0.2);
+  box-shadow: 0 6px 30px rgba(0,104,71,0.35), 0 0 0 0 rgba(0,104,71,0);
+  animation: banner-glow-mex 2.5s ease-in-out infinite;
+}
+@keyframes banner-glow-mex {
+  0%,100% { box-shadow: 0 6px 30px rgba(0,104,71,0.25), 0 0 0 0 rgba(0,104,71,0.1); }
+  50%      { box-shadow: 0 8px 40px rgba(0,104,71,0.5), 0 0 18px 4px rgba(0,104,71,0.2); }
+}
+ 
+/* Live override — más intenso */
+.special-banner.is-live-banner.portugal {
+  animation: banner-live-port 1.2s ease-in-out infinite;
+  border-color: rgba(255,23,68,0.7);
+}
+@keyframes banner-live-port {
+  0%,100% { box-shadow: 0 0 18px rgba(255,23,68,0.4), 0 0 0 0 rgba(255,23,68,0); }
+  50%      { box-shadow: 0 0 32px rgba(255,23,68,0.7), 0 0 12px 4px rgba(255,23,68,0.2); }
+}
+.special-banner.is-live-banner.mexico {
+  animation: banner-live-mex 1.2s ease-in-out infinite;
+  border-color: rgba(206,17,38,0.7);
+}
+@keyframes banner-live-mex {
+  0%,100% { box-shadow: 0 0 18px rgba(206,17,38,0.4), 0 0 0 0 rgba(206,17,38,0); }
+  50%      { box-shadow: 0 0 32px rgba(206,17,38,0.7), 0 0 12px 4px rgba(206,17,38,0.2); }
+}
+ 
+.special-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 24px;
+  position: relative;
+  z-index: 1;
+}
+ 
+/* Fondo decorativo de escudo/patrón */
+.special-banner::before {
+  content: attr(data-emoji);
+  position: absolute;
+  right: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 120px;
+  opacity: 0.07;
+  line-height: 1;
+  pointer-events: none;
+  z-index: 0;
+  filter: blur(1px);
+}
+ 
+.sbn-flag {
+  font-size: 52px;
+  line-height: 1;
+  flex-shrink: 0;
+  filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+  animation: flag-bounce 1.8s ease-in-out infinite;
+}
+@keyframes flag-bounce {
+  0%,100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-5px) rotate(2deg); }
+}
+ 
+.sbn-content {
+  flex: 1;
+  min-width: 0;
+}
+ 
+.sbn-eyebrow {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.6);
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+ 
+.sbn-main {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: clamp(22px, 4vw, 34px);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.05;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+ 
+.sbn-match {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.sbn-team {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.9);
+}
+.sbn-score-box {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+  color: #fff;
+  background: rgba(0,0,0,0.35);
+  border-radius: 6px;
+  padding: 3px 10px;
+  letter-spacing: 1px;
+}
+.sbn-vs {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 2px;
+}
+ 
+.sbn-time {
+  margin-top: 5px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+  font-weight: 500;
+}
+ 
+.sbn-live-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: #ff1744;
+  color: #fff;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 5px;
+  animation: live-dot 1.2s ease-in-out infinite;
+}
+.sbn-live-chip::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  animation: live-dot 1.2s ease-in-out infinite;
+}
+ 
+.sbn-starburst {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 32px;
+  opacity: 0;
+  animation: starburst-pop 3s ease-in-out infinite;
+}
+@keyframes starburst-pop {
+  0%,85%,100% { opacity: 0; transform: translateY(-50%) scale(0.5); }
+  90%          { opacity: 1; transform: translateY(-60%) scale(1.3); }
+  95%          { opacity: 0.6; transform: translateY(-50%) scale(1); }
+}
   </style>
 </head>
 <body>
@@ -454,6 +661,7 @@
 </div>
   </div>
 </header>
+<div id="specialBannersWrap"></div>
 <div id="dailyMessage"></div>
 
 <nav class="main-nav">
@@ -1082,9 +1290,8 @@ function matchHTML(m) {
 }
 
 function renderDailyMessage() {
-  const box = document.getElementById('dailyMessage');
-  if (!box) return;
-  if (!matches || !matches.length) return;
+  const box = document.getElementById('specialBannersWrap');
+  if (!box || !matches?.length) return;
 
   const today = new Date();
 
@@ -1102,11 +1309,31 @@ function renderDailyMessage() {
 
   if (portugalMatch) {
     html += `
-      <div class="daily-banner portugal">
-        <div class="daily-banner-title">
-          🐐 🇵🇹 HOY JUEGA EL BICHO · SIUUUU
-        </div>
-        <div class="daily-banner-sub">
+      <div class="special-banner portugal" data-emoji="🐐">
+        <div class="special-banner-inner">
+
+          <div class="sbn-flag">🇵🇹</div>
+
+          <div class="sbn-content">
+
+            <div class="sbn-eyebrow">
+              DESTACADO DEL DÍA
+            </div>
+
+            <div class="sbn-main">
+              HOY JUEGA EL BICHO · SIUUUU
+            </div>
+
+            <div class="sbn-match">
+              <div class="sbn-team">${portugalMatch.h}</div>
+              <div class="sbn-vs">VS</div>
+              <div class="sbn-team">${portugalMatch.a}</div>
+            </div>
+
+          </div>
+
+          <div class="sbn-starburst">⚽</div>
+
         </div>
       </div>
     `;
@@ -1119,12 +1346,31 @@ function renderDailyMessage() {
 
   if (mexicoMatch) {
     html += `
-      <div class="daily-banner mexico">
-        <div class="daily-banner-title">
-          🌵 🇲🇽 LA PRIMERA YA DESCANSA EN TENOCHTITLÁN
-        </div>
-        <div class="daily-banner-sub">
-          Hoy juega el Tri.
+      <div class="special-banner mexico" data-emoji="🌵">
+        <div class="special-banner-inner">
+
+          <div class="sbn-flag">🇲🇽</div>
+
+          <div class="sbn-content">
+
+            <div class="sbn-eyebrow">
+              DESTACADO DEL DÍA
+            </div>
+
+            <div class="sbn-main">
+              LA PRIMERA YA DESCANSA EN TENOCHTITLÁN
+            </div>
+
+            <div class="sbn-match">
+              <div class="sbn-team">${mexicoMatch.h}</div>
+              <div class="sbn-vs">VS</div>
+              <div class="sbn-team">${mexicoMatch.a}</div>
+            </div>
+
+          </div>
+
+          <div class="sbn-starburst">🔥</div>
+
         </div>
       </div>
     `;
