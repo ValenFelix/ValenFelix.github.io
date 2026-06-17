@@ -400,7 +400,9 @@
     .fb-status{margin-top:8px;font-size:12px;text-align:center;color:var(--dim);min-height:16px}
     .fb-status.ok{color:var(--green)}
     .fb-status.err{color:var(--accent)}
-  </style>
+   existente,
+     justo antes del cierre 
+</style>
 </head>
 <body>
 
@@ -421,6 +423,8 @@
 </div>
   </div>
 </header>
+
+<div id="specialBannersWrap"></div>
 
 <nav class="main-nav">
   <button class="main-tab on" id="navQuiniela" onclick="switchSection('quiniela')">🏆 Quiniela</button>
@@ -2485,6 +2489,125 @@ function updateHeader(){
   if(sDate) sDate.textContent=new Date().toLocaleDateString('es-MX',{timeZone:'America/Mexico_City',weekday:'short',day:'numeric',month:'long'});
 }
 
+
+     existente. Pégala justo ANTES de la función init()
+     ══════════════════════════════════════════════════════ -->
+
+<script>
+// ══════════════════════════════════════════════════════
+//  BANNERS ESPECIALES — Portugal & México
+// ══════════════════════════════════════════════════════
+
+const SPECIAL_TEAMS = {
+  'Portugal': {
+    css: 'portugal',
+    flag: '🇵🇹',
+    emoji: '🐐',
+    eyebrow: 'Atención Quinieleros',
+    message: 'HOY JUEGA EL BICHO&nbsp;&nbsp;SIU!',
+    messageEmoji: '🐐',
+    suffix: '⚡ CR7 MODE',
+  },
+  'México': {
+    css: 'mexico',
+    flag: '🇲🇽',
+    emoji: '🦅',
+    eyebrow: 'Arriba el Tri',
+    message: 'LA PRIMERA YA DESCANSA EN TENOCHTITLÁN',
+    messageEmoji: '🦅',
+    suffix: '¡ÁNIMO MÉXICO!',
+  },
+};
+
+function isSameDay(dateA, dateB) {
+  // Compara en zona horaria de Ciudad de México
+  const optA = dateA.toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City' });
+  const optB = dateB.toLocaleDateString('es-MX', { timeZone: 'America/Mexico_City' });
+  return optA === optB;
+}
+
+function renderSpecialBanners() {
+  const wrap = document.getElementById('specialBannersWrap');
+  if (!wrap || !matches.length) return;
+
+  const today = new Date();
+  const bannersHTML = [];
+
+  for (const [teamName, cfg] of Object.entries(SPECIAL_TEAMS)) {
+    // Buscar partido del equipo que sea hoy (cualquier estado)
+    const match = matches.find(m =>
+      (m.h === teamName || m.a === teamName) &&
+      isSameDay(m.date, today)
+    );
+
+    if (!match) continue;
+
+    const isLive   = match.st === 'LIVE';
+    const isFin    = match.st === 'FIN';
+    const hasSc    = match.sH !== null && match.sA !== null;
+    const opponent = match.h === teamName ? match.a : match.h;
+    const teamIsHome = match.h === teamName;
+
+    // Construir chip de estado
+    let statusChip = '';
+    if (isLive) {
+      statusChip = `<span class="sbn-live-chip">EN VIVO</span>`;
+    } else if (isFin) {
+      statusChip = `<span style="background:rgba(0,0,0,0.35);color:rgba(255,255,255,0.6);font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 8px;border-radius:5px">FINALIZADO</span>`;
+    } else {
+      // Próximo: mostrar hora
+      const hora = match.date.toLocaleTimeString('es-MX', {
+        timeZone: 'America/Mexico_City',
+        hour: '2-digit', minute: '2-digit', hour12: true
+      });
+      statusChip = `<span style="color:rgba(255,255,255,0.55);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700">⏱ ${hora} (CDMX)</span>`;
+    }
+
+    // Bloque de marcador o VS
+    let matchBlock = '';
+    if (hasSc) {
+      const scoreH = teamIsHome ? match.sH : match.sA;
+      const scoreA = teamIsHome ? match.sA : match.sH;
+      matchBlock = `
+        <div class="sbn-match">
+          <div class="sbn-team">${cfg.flag} ${teamName}</div>
+          <div class="sbn-score-box" style="${isLive ? 'color:#ff6b6b' : ''}">${scoreH} – ${scoreA}</div>
+          <div class="sbn-team">${fl(opponent)} ${opponent}</div>
+        </div>`;
+    } else {
+      matchBlock = `
+        <div class="sbn-match">
+          <div class="sbn-team">${cfg.flag} ${teamName}</div>
+          <span class="sbn-vs">VS</span>
+          <div class="sbn-team">${fl(opponent)} ${opponent}</div>
+          <span style="font-size:11px;color:rgba(255,255,255,0.45);font-family:'Barlow Condensed',sans-serif">· Grupo ${match.g}</span>
+        </div>`;
+    }
+
+    const liveClass = isLive ? ' is-live-banner' : '';
+
+    bannersHTML.push(`
+      <div class="special-banner ${cfg.css}${liveClass}" data-emoji="${cfg.emoji}">
+        <div class="special-banner-inner">
+          <div class="sbn-flag">${cfg.flag}</div>
+          <div class="sbn-content">
+            <div class="sbn-eyebrow">
+              ${cfg.eyebrow}
+              ${statusChip}
+            </div>
+            <div class="sbn-main">${cfg.messageEmoji} ${cfg.message}</div>
+            ${matchBlock}
+          </div>
+        </div>
+        <div class="sbn-starburst">⚡</div>
+      </div>
+    `);
+  }
+
+  wrap.innerHTML = bannersHTML.join('');
+}
+
+
 async function run(){
   const sDot=document.getElementById('sDot'),sStatus=document.getElementById('sStatus');
   if(sDot)sDot.classList.remove('live');if(sStatus)sStatus.textContent='Actualizando…';
@@ -2495,6 +2618,7 @@ async function run(){
     fetchGamesLeaderboard()
   ]);
   if(sStatus)sStatus.textContent='Sincronizado';if(sDot)sDot.classList.add('live');
+    renderSpecialBanners();
 }
 
 function init(){
