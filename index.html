@@ -88,6 +88,39 @@
       font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:800;letter-spacing:0.5px;
       display:flex;align-items:center;gap:10px;
     }
+    #dailyMessage{
+  margin:12px 0 18px;
+}
+
+.daily-banner{
+  border-radius:14px;
+  padding:16px;
+  margin-bottom:10px;
+  text-align:center;
+  font-weight:800;
+  box-shadow:0 10px 25px rgba(0,0,0,.18);
+}
+
+.daily-banner.portugal{
+  background:linear-gradient(135deg,#046a38,#0c8f4f);
+  color:#fff;
+}
+
+.daily-banner.mexico{
+  background:linear-gradient(135deg,#006847,#ce1126);
+  color:#fff;
+}
+
+.daily-banner-title{
+  font-size:22px;
+  line-height:1.1;
+}
+
+.daily-banner-sub{
+  margin-top:6px;
+  opacity:.85;
+  font-size:13px;
+}
 
     .wrap{max-width:1100px;margin:0 auto;padding:30px 16px;display:grid;grid-template-columns:1fr 380px;gap:24px;align-items:start}
     @media(max-width:850px){.wrap{grid-template-columns:1fr}}
@@ -421,6 +454,7 @@
 </div>
   </div>
 </header>
+<div id="dailyMessage"></div>
 
 <nav class="main-nav">
   <button class="main-tab on" id="navQuiniela" onclick="switchSection('quiniela')">🏆 Quiniela</button>
@@ -877,7 +911,8 @@ async function fetchPartidosFromSheets() {
     generateFallbackMatches();
   }
   renderMatches();
-  renderLiveScores();   // ← nuevo: actualiza el bloque live encima del leaderboard
+  renderLiveScores();
+  renderDailyMessage();
   renderStd();
   renderBracket();
   startCountdown();
@@ -1044,6 +1079,59 @@ function matchHTML(m) {
       <div class="team away"><span class="fl">${fl(m.a)}</span><span class="tn">${m.a}</span></div>
     </div>
   </div>`;
+}
+
+function renderDailyMessage() {
+  const box = document.getElementById('dailyMessage');
+  if (!box) return;
+  if (!matches || !matches.length) return;
+
+  const today = new Date();
+
+  const sameDay = (a,b)=>
+    a.getFullYear()===b.getFullYear() &&
+    a.getMonth()===b.getMonth() &&
+    a.getDate()===b.getDate();
+
+  let html = '';
+
+  const portugalMatch = matches.find(m =>
+    (m.h === 'Portugal' || m.a === 'Portugal') &&
+    sameDay(m.date, today)
+  );
+
+  if (portugalMatch) {
+    html += `
+      <div class="daily-banner portugal">
+        <div class="daily-banner-title">
+          🐐 🇵🇹 HOY JUEGA EL BICHO · SIUUUU
+        </div>
+        <div class="daily-banner-sub">
+          Cristiano está en modo protagonista.
+        </div>
+      </div>
+    `;
+  }
+
+  const mexicoMatch = matches.find(m =>
+    (m.h === 'México' || m.a === 'México') &&
+    sameDay(m.date, today)
+  );
+
+  if (mexicoMatch) {
+    html += `
+      <div class="daily-banner mexico">
+        <div class="daily-banner-title">
+          🌵 🇲🇽 LA PRIMERA YA DESCANSA EN TENOCHTITLÁN
+        </div>
+        <div class="daily-banner-sub">
+          Hoy juega el Tri.
+        </div>
+      </div>
+    `;
+  }
+
+  box.innerHTML = html;
 }
 
 // ══════════════════════════════════════════════════════
