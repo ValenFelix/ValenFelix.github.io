@@ -633,12 +633,28 @@
   transform: translateY(-50%);
   font-size: 32px;
   opacity: 0;
-  animation: starburst-pop 3s ease-in-out infinite;
+  animation: starburst-pop 6s ease-in-out infinite;
 }
 @keyframes starburst-pop {
-  0%,85%,100% { opacity: 0; transform: translateY(-50%) scale(0.5); }
-  90%          { opacity: 1; transform: translateY(-60%) scale(1.3); }
-  95%          { opacity: 0.6; transform: translateY(-50%) scale(1); }
+  0%,60%,100% {
+    opacity: 0;
+    transform: translateY(-50%) scale(0.7);
+  }
+
+  70% {
+    opacity: 1;
+    transform: translateY(-58%) scale(1.25);
+  }
+
+  85% {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+
+  95% {
+    opacity: 0.4;
+    transform: translateY(-50%) scale(0.95);
+  }
 }
   </style>
 </head>
