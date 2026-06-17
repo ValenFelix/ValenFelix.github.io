@@ -260,6 +260,42 @@
     .duel-cell.right .duel-a{justify-content:flex-end}
     .duel-icon{font-size:16px;text-align:center}
     .duel-empty-msg{text-align:center;padding:20px;color:var(--muted);font-size:13px;background:var(--card);border:1px solid var(--border);border-radius:10px}
+    /* ── BRACKET dieciseisavos ── */
+    .bracket-wrap{max-width:1100px;margin:0 auto;padding:30px 16px 60px;display:flex;flex-direction:column;gap:18px}
+    .bracket-top-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+    .bracket-status-pill{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:5px 14px;color:var(--dim)}
+    .bracket-notice{background:rgba(79,195,247,0.08);border:1px solid rgba(79,195,247,0.3);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--text);line-height:1.5}
+    .bracket-notice b{color:var(--blue)}
+    .bracket-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+    @media(max-width:700px){.bracket-grid{grid-template-columns:1fr}}
+    .bracket-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
+    .bracket-card.is-proj{border-color:rgba(79,195,247,0.35)}
+    .bracket-card-head{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border)}
+    .bracket-match-id{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:1px;color:var(--muted)}
+    .bracket-tag{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;border-radius:5px;padding:2px 7px}
+    .bracket-tag.real{background:rgba(0,230,118,0.12);color:var(--green);border:1px solid rgba(0,230,118,0.3)}
+    .bracket-tag.proj{background:rgba(79,195,247,0.12);color:var(--blue);border:1px solid rgba(79,195,247,0.3)}
+    .bracket-team-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
+    .bracket-team-row:last-child{border-bottom:none}
+    .bracket-slot-code{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:5px;width:30px;text-align:center;padding:3px 0;flex-shrink:0}
+    .bracket-team-flag{font-size:18px;flex-shrink:0}
+    .bracket-team-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .bracket-team-name.tbd{color:var(--muted);font-weight:600;font-style:italic}
+    .bracket-team-name.is-proj-team{color:var(--blue)}
+    .bracket-third-pool{font-size:10px;color:var(--muted);margin-left:auto;padding-left:8px;flex-shrink:0;white-space:nowrap}
+    .bracket-thirds-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:6px}
+    .bracket-thirds-row{display:grid;grid-template-columns:30px 1fr 60px 60px;align-items:center;padding:9px 16px;border-bottom:1px solid var(--border);font-family:'Barlow Condensed',sans-serif}
+    .bracket-thirds-row:last-child{border-bottom:none}
+    .bracket-thirds-row.qualified{background:rgba(0,230,118,0.04)}
+    .bracket-thirds-row .bt-rank{font-size:13px;font-weight:900;color:var(--muted)}
+    .bracket-thirds-row.qualified .bt-rank{color:var(--green)}
+    .bracket-thirds-row .bt-team{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
+    .bracket-thirds-row .bt-pts{font-size:13px;font-weight:800;text-align:right;color:var(--dim)}
+    .bracket-thirds-row.qualified .bt-pts{color:var(--text)}
+    .bracket-thirds-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.01)}
+    .bracket-legend{display:flex;gap:18px;font-size:12px;color:var(--muted);padding:4px 2px}
+    .bl-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+    .bl-real{background:var(--green)}.bl-proj{background:var(--blue)}
     /* ── ACCORDION EN FICHA JUGADOR ── */
 .acc-section{margin-bottom:10px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
 .acc-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(255,255,255,0.04);cursor:pointer;user-select:none;transition:background .2s}
@@ -390,6 +426,7 @@
   <button class="main-tab on" id="navQuiniela" onclick="switchSection('quiniela')">🏆 Quiniela</button>
   <button class="main-tab games-tab" id="navGames" onclick="switchSection('games')">🎮 Mini Juegos</button>
   <button class="main-tab" id="navDuel" onclick="switchSection('duel')">⚔️ 1v1</button>
+  <button class="main-tab" id="navBracket" onclick="switchSection('bracket')">🏟️ Bracket</button>
 </nav>
 
 <div class="section active" id="secQuiniela">
@@ -573,6 +610,21 @@
   </div>
 </div>
 
+<div class="section" id="secBracket">
+  <div class="bracket-wrap">
+    <div class="bracket-top-bar">
+      <div class="eyebrow-sm" style="margin-bottom:0">dieciseisavos de Final — Proyección Automática</div>
+      <span class="bracket-status-pill" id="bracketStatusPill">Calculando…</span>
+    </div>
+    <div id="bracketNotice" class="bracket-notice" style="display:none"></div>
+    <div id="bracketGrid" class="bracket-grid"></div>
+    <div class="bracket-legend">
+      <span><span class="bl-dot bl-real"></span>Confirmado por partidos jugados</span>
+      <span><span class="bl-dot bl-proj"></span>Proyección con datos actuales</span>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="playerModal" onclick="if(event.target===this)closePlayerCard()">
   <div class="fifa-card" id="fcContent"></div>
 </div>
@@ -622,7 +674,7 @@
             <tr><td>Posición correcta en grupo</td><td>5 / equipo</td></tr>
             <tr><td>Tercero que clasifica (×8)</td><td>+2 bonus c/u</td></tr>
             <tr><td colspan="2"><span class="pts-cat">🏆 Eliminación directa</span></td></tr>
-            <tr><td>Octavos — equipo acertado (×16)</td><td>6 / equipo</td></tr>
+            <tr><td>dieciseisavos — equipo acertado (×16)</td><td>6 / equipo</td></tr>
             <tr><td>Cuartos — equipo acertado (×8)</td><td>8 / equipo</td></tr>
             <tr><td>Semis — equipo acertado (×4)</td><td>11 / equipo</td></tr>
             <tr><td>Finalista acertado (×2)</td><td>15 / equipo</td></tr>
@@ -827,6 +879,7 @@ async function fetchPartidosFromSheets() {
   renderMatches();
   renderLiveScores();   // ← nuevo: actualiza el bloque live encima del leaderboard
   renderStd();
+  renderBracket();
   startCountdown();
 }
 
@@ -996,12 +1049,8 @@ function matchHTML(m) {
 // ══════════════════════════════════════════════════════
 //  POSICIONES DE GRUPO
 // ══════════════════════════════════════════════════════
-function renderStd() {
-  const body = document.getElementById('stdBody');
-  if (!body) return;
-  const g = document.getElementById('gSel') ? document.getElementById('gSel').value : 'A';
+function computeGroupTable(g) {
   const baseTeams = GROUPS[g] || [];
-
   const table = {};
   baseTeams.forEach(t => { table[t] = { pts:0, pj:0, gf:0, gc:0 }; });
 
@@ -1018,19 +1067,27 @@ function renderStd() {
       else                  { table[m.h].pts += 1; table[m.a].pts += 1; }
     });
 
-  const rows = Object.entries(table)
+  return Object.entries(table)
+    .map(([team, s]) => ({ team, ...s, gd: s.gf - s.gc }))
     .sort((a, b) => {
-      if (b[1].pts !== a[1].pts) return b[1].pts - a[1].pts;
-      return (b[1].gf - b[1].gc) - (a[1].gf - a[1].gc);
+      if (b.pts !== a.pts) return b.pts - a.pts;
+      return b.gd - a.gd;
     });
+}
+
+function renderStd() {
+  const body = document.getElementById('stdBody');
+  if (!body) return;
+  const g = document.getElementById('gSel') ? document.getElementById('gSel').value : 'A';
+  const rows = computeGroupTable(g);
 
   body.innerHTML = `<table class="std-table">
     <thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>Pts</th></tr></thead>
-    <tbody>${rows.map(([team, s], i) => {
+    <tbody>${rows.map((s, i) => {
       const dot = i<2 ? `<span class="qdot"></span>` : i===2 ? `<span class="qdot maybe"></span>` : '';
       return `<tr>
         <td style="font-size:13px;color:var(--muted)">${i+1}</td>
-        <td><span>${fl(team)}</span> ${dot}<span style="font-weight:700">${team}</span></td>
+        <td><span>${fl(s.team)}</span> ${dot}<span style="font-weight:700">${s.team}</span></td>
         <td>${s.pj}</td>
         <td class="ptd">${s.pts}</td>
       </tr>`;
@@ -1041,6 +1098,190 @@ function renderStd() {
     <span><span class="qdot maybe" style="display:inline-block"></span>Posible 3ro</span>
   </div>`;
 }
+
+// ══════════════════════════════════════════════════════
+//  BRACKET DE dieciseisavos — FIFA WORLD CUP 2026 (48 equipos)
+// ══════════════════════════════════════════════════════
+// Cruces oficiales de dieciseisavos (32 partidos). "3xxxxx" = mejor 3er lugar entre esos grupos,
+// según el bracket publicado por la FIFA para el Mundial 2026.
+const BRACKET_FIXTURES_OFFICIAL = [
+  { id:'M1',  a:{type:'pos', g:'E', pos:1}, b:{type:'third', pool:'ABCDF'} },
+  { id:'M2',  a:{type:'pos', g:'I', pos:1}, b:{type:'third', pool:'CDFGH'} },
+  { id:'M3',  a:{type:'pos', g:'A', pos:2}, b:{type:'pos', g:'B', pos:2} },
+  { id:'M4',  a:{type:'pos', g:'F', pos:1}, b:{type:'pos', g:'C', pos:2} },
+  { id:'M5',  a:{type:'pos', g:'K', pos:2}, b:{type:'pos', g:'L', pos:2} },
+  { id:'M6',  a:{type:'pos', g:'H', pos:1}, b:{type:'pos', g:'J', pos:2} },
+  { id:'M7',  a:{type:'pos', g:'D', pos:1}, b:{type:'third', pool:'BEFIJ'} },
+  { id:'M8',  a:{type:'pos', g:'G', pos:1}, b:{type:'third', pool:'AEHIJ'} },
+  { id:'M9',  a:{type:'pos', g:'C', pos:1}, b:{type:'pos', g:'F', pos:2} },
+  { id:'M10', a:{type:'pos', g:'E', pos:2}, b:{type:'pos', g:'I', pos:2} },
+  { id:'M11', a:{type:'pos', g:'A', pos:1}, b:{type:'third', pool:'CEFHI'} },
+  { id:'M12', a:{type:'pos', g:'L', pos:1}, b:{type:'third', pool:'EHIJK'} },
+  { id:'M13', a:{type:'pos', g:'J', pos:1}, b:{type:'pos', g:'H', pos:2} },
+  { id:'M14', a:{type:'pos', g:'D', pos:2}, b:{type:'pos', g:'G', pos:2} },
+  { id:'M15', a:{type:'pos', g:'B', pos:1}, b:{type:'third', pool:'EFGIJ'} },
+  { id:'M16', a:{type:'pos', g:'K', pos:1}, b:{type:'third', pool:'DEIJL'} },
+];
+
+function getGroupQualifiers() {
+  // Devuelve { A: {first, second, third}, ... } a partir de computeGroupTable
+  const out = {};
+  Object.keys(GROUPS).forEach(g => {
+    const t = computeGroupTable(g);
+    out[g] = { first: t[0] || null, second: t[1] || null, third: t[2] || null, finished: matchesPlayedInGroup(g) };
+  });
+  return out;
+}
+
+function matchesPlayedInGroup(g) {
+  const total = matches.filter(m => m.g === g).length;
+  const played = matches.filter(m => m.g === g && m.st === 'FIN').length;
+  return { played, total };
+}
+
+function getBestThirds(qualifiers) {
+  // Toma el 3er lugar de cada uno de los 12 grupos y ordena para sacar los 8 mejores
+  const thirds = Object.keys(GROUPS)
+    .map(g => qualifiers[g].third ? { group: g, ...qualifiers[g].third } : null)
+    .filter(Boolean)
+    .sort((x, y) => (y.pts - x.pts) || (y.gd - x.gd) || (y.gf - x.gf));
+  return thirds;
+}
+
+function allGroupsFinished(qualifiers) {
+  return Object.keys(GROUPS).every(g => {
+    const f = qualifiers[g].finished;
+    return f.total > 0 && f.played === f.total;
+  });
+}
+
+// Asigna cada uno de los 8 mejores terceros a UN solo pool del bracket, respetando
+// el orden real de la FIFA: se recorren los 8 mejores terceros en orden de ranking
+// y cada uno se coloca en el primer pool (en el orden en que aparece en el bracket)
+// que lo contenga y que todavía no tenga equipo asignado.
+function assignThirdsToPools(bestThirds, thirdSlotsInOrder) {
+  const assignment = {}; // poolKey -> { team, group, pts, gd, gf, rank }
+  const usedPools = new Set();
+  const top8 = bestThirds.slice(0, 8);
+
+  top8.forEach((t, rankIdx) => {
+    const pool = thirdSlotsInOrder.find(p => !usedPools.has(p) && p.split('').includes(t.group));
+    if (pool) {
+      usedPools.add(pool);
+      assignment[pool] = { ...t, rank: rankIdx + 1 };
+    }
+  });
+
+  return assignment;
+}
+
+function resolveSlot(slot, qualifiers, bestThirds, thirdAssignment) {
+  // Devuelve { team, code, isProj } o null si aún no hay datos suficientes
+  if (slot.type === 'pos') {
+    const q = qualifiers[slot.g];
+    const entry = slot.pos === 1 ? q.first : q.second;
+    const code = `${slot.pos}${slot.g}`;
+    if (!entry) return { team: null, code, isProj: true };
+    const groupComplete = q.finished.played === q.finished.total && q.finished.total > 0;
+    return { team: entry.team, code, isProj: !groupComplete };
+  }
+  if (slot.type === 'third') {
+    const poolLetters = slot.pool.split('');
+    const code = `3${slot.pool}`;
+    const winner = thirdAssignment[slot.pool];
+    if (!winner) return { team: null, code, isProj: true };
+    const groupsReady = poolLetters.every(g => qualifiers[g].finished.played === qualifiers[g].finished.total && qualifiers[g].finished.total > 0);
+    return { team: winner.team, code, isProj: !groupsReady };
+  }
+  return { team: null, code: '?', isProj: true };
+}
+
+
+function renderBracket() {
+  const grid    = document.getElementById('bracketGrid');
+  const notice  = document.getElementById('bracketNotice');
+  const pill    = document.getElementById('bracketStatusPill');
+  if (!grid) return;
+
+  const qualifiers = getGroupQualifiers();
+  const bestThirds  = getBestThirds(qualifiers);
+  const allDone     = allGroupsFinished(qualifiers);
+  const groupsWithData = Object.keys(GROUPS).filter(g => qualifiers[g].finished.played > 0).length;
+
+  // Orden de los pools "third" tal como aparecen en el bracket oficial (de arriba a abajo)
+  const thirdSlotsInOrder = BRACKET_FIXTURES_OFFICIAL
+    .flatMap(fx => [fx.a, fx.b])
+    .filter(s => s.type === 'third')
+    .map(s => s.pool);
+  const thirdAssignment = assignThirdsToPools(bestThirds, thirdSlotsInOrder);
+
+  if (pill) {
+    pill.textContent = allDone
+      ? 'Fase de grupos completa — cruces confirmados'
+      : `Proyección en vivo (${groupsWithData}/12 grupos con partidos jugados)`;
+    pill.style.color = allDone ? 'var(--green)' : 'var(--blue)';
+    pill.style.borderColor = allDone ? 'rgba(0,230,118,0.35)' : 'rgba(79,195,247,0.35)';
+  }
+
+  if (notice) {
+    if (!allDone) {
+      notice.style.display = 'block';
+      notice.innerHTML = `⚠️ <b>Bracket provisional.</b> Los cruces se calculan con los resultados reales disponibles y, donde aún falta información, con una proyección basada en la tabla actual (incluye el ranking de los 8 mejores terceros lugares). Esto puede cambiar conforme se jueguen más partidos.`;
+    } else {
+      notice.style.display = 'none';
+    }
+  }
+
+  const cardsHTML = BRACKET_FIXTURES_OFFICIAL.map(fx => {
+    const ra = resolveSlot(fx.a, qualifiers, bestThirds, thirdAssignment);
+    const rb = resolveSlot(fx.b, qualifiers, bestThirds, thirdAssignment);
+    const isProjMatch = ra.isProj || rb.isProj;
+
+    const teamRow = (r) => {
+      const name = r.team
+        ? `<span class="bracket-team-name${r.isProj ? ' is-proj-team' : ''}">${r.team}</span>`
+        : `<span class="bracket-team-name tbd">Por definir</span>`;
+      const flag = r.team ? `<span class="bracket-team-flag">${fl(r.team)}</span>` : `<span class="bracket-team-flag">🏳️</span>`;
+      return `<div class="bracket-team-row">
+        <span class="bracket-slot-code">${r.code}</span>
+        ${flag}
+        ${name}
+      </div>`;
+    };
+
+    return `<div class="bracket-card${isProjMatch ? ' is-proj' : ''}">
+      <div class="bracket-card-head">
+        <span class="bracket-match-id">dieciseisavos · ${fx.id}</span>
+        <span class="bracket-tag ${isProjMatch ? 'proj' : 'real'}">${isProjMatch ? 'Proyección' : 'Confirmado'}</span>
+      </div>
+      ${teamRow(ra)}
+      ${teamRow(rb)}
+    </div>`;
+  }).join('');
+
+  const thirdsHTML = `
+    <div class="bracket-thirds-card">
+      <div class="bracket-thirds-head">
+        <span class="card-title" style="font-size:16px">🥉 Ranking de Terceros Lugares (mejores 8 clasifican)</span>
+      </div>
+      ${bestThirds.length ? bestThirds.map((t, i) => {
+        const assignedPool = Object.keys(thirdAssignment).find(pool => thirdAssignment[pool].team === t.team);
+        const qualified = !!assignedPool;
+        const crossInfo = assignedPool ? `→ Cruce 3${assignedPool}` : '';
+        return `<div class="bracket-thirds-row${qualified ? ' qualified' : ''}">
+          <span class="bt-rank">${i+1}</span>
+          <span class="bt-team">${fl(t.team)} ${t.team} <span style="font-size:10px;color:var(--muted)">(Grupo ${t.group}) ${crossInfo}</span></span>
+          <span class="bt-pts">${t.pts} pts</span>
+          <span class="bt-pts">DG ${t.gd>0?'+':''}${t.gd}</span>
+        </div>`;
+      }).join('') : `<div class="bracket-thirds-row"><span class="bt-rank">—</span><span class="bt-team" style="color:var(--muted)">Aún no hay datos de terceros lugares</span></div>`}
+    </div>`;
+
+  grid.innerHTML = `<div style="grid-column:1/-1;display:grid;grid-template-columns:repeat(2,1fr);gap:14px">${cardsHTML}</div>` +
+                    `<div style="grid-column:1/-1">${thirdsHTML}</div>`;
+}
+
+
 
 // ══════════════════════════════════════════════════════
 //  LEADERBOARD
