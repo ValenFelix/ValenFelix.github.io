@@ -656,6 +656,100 @@
     transform: translateY(-50%) scale(0.95);
   }
 }
+
+/* ══════════════════════════════════════════════════════
+   MODO MÉXICO — paleta completa verde/blanco/rojo
+   Se activa con la clase .modo-mexico en <html> el día
+   que juega México (renderDailyMessage la enciende/apaga)
+   ══════════════════════════════════════════════════════ */
+html.modo-mexico{
+  --bg:#070f0a;--surface:#0d2016;--card:#12281c;--border:#214a36;
+  --gold:#f6f6f0;--green:#00c853;--blue:#ef3e45;--muted:#5f8a72;
+  --text:#f4f7f2;--dim:#a4c7b0;--accent:#ef3e45;
+}
+html.modo-mexico header{
+  background:linear-gradient(160deg,#0f2a1c 0%,#0a150f 55%,#240b0c 100%);
+}
+html.modo-mexico .main-tab.on{
+  box-shadow:0 0 12px rgba(0,200,83,0.25);
+}
+html.modo-mexico .main-tab.games-tab.on{
+  box-shadow:0 0 12px rgba(239,62,69,0.25);
+}
+html.modo-mexico .fifa-card{
+  background:linear-gradient(135deg,#143222 0%,#10120f 100%);
+}
+html.modo-mexico .record-modal{
+  box-shadow:0 0 40px rgba(0,200,83,0.25);
+}
+html.modo-mexico .mascot-tab.on{
+  background:rgba(0,200,83,0.12);
+}
+html.modo-mexico .live-scores-card{
+  box-shadow:0 0 20px rgba(239,62,69,0.16);
+}
+/* el bicho del escudo en is-live se intensifica un poco más fuerte solo el día tricolor */
+html.modo-mexico-live .eyebrow{
+  color:var(--green);
+}
+
+/* ── PAPEL PICADO — guirnalda decorativa, solo en Modo México ── */
+.papel-picado-bar{
+  display:none;
+  max-width:1100px;
+  margin:0 auto;
+  padding:6px 16px 0;
+  gap:5px;
+  overflow:hidden;
+  position:relative;
+}
+html.modo-mexico .papel-picado-bar{display:flex}
+.papel-picado-bar::before{
+  content:'';
+  position:absolute;
+  left:16px;right:16px;top:9px;
+  height:1px;
+  background:rgba(255,255,255,0.22);
+  z-index:0;
+}
+.pp-flag{
+  position:relative;z-index:1;
+  flex:0 0 24px;height:18px;margin-top:2px;
+  clip-path:polygon(0 0,100% 0,50% 100%);
+  filter:drop-shadow(0 2px 3px rgba(0,0,0,0.3));
+}
+.pp-flag:nth-child(3n+1){background:#00c853}
+.pp-flag:nth-child(3n+2){background:#f6f6f0}
+.pp-flag:nth-child(3n+3){background:#ef3e45}
+
+/* ── CELEBRACIÓN DE GOL ── */
+.gol-toast{
+  position:fixed;top:16px;left:50%;
+  transform:translate(-50%,-40px);
+  z-index:2100;
+  background:linear-gradient(135deg,#00763f 0%,#04401f 50%,#ab1322 100%);
+  color:#fff;border-radius:16px;padding:14px 28px;text-align:center;
+  box-shadow:0 14px 44px rgba(0,0,0,0.5);
+  opacity:0;transition:opacity .35s ease,transform .35s ease;
+  pointer-events:none;
+}
+.gol-toast.show{opacity:1;transform:translate(-50%,0)}
+.gol-toast-emoji{font-size:26px;line-height:1}
+.gol-toast-text{
+  font-family:'Barlow Condensed',sans-serif;font-size:23px;font-weight:900;
+  letter-spacing:1px;margin-top:2px;text-shadow:0 2px 6px rgba(0,0,0,0.4);
+}
+.gol-toast-score{font-size:13px;font-weight:600;opacity:.9;margin-top:4px}
+
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:2050;overflow:hidden}
+.confetti-piece{
+  position:absolute;top:-14px;width:8px;height:14px;border-radius:2px;opacity:.95;
+  animation-name:confetti-fall;animation-timing-function:linear;animation-fill-mode:forwards;
+}
+@keyframes confetti-fall{
+  0%{transform:translateY(-10px) rotate(0deg);opacity:1}
+  100%{transform:translateY(112vh) rotate(560deg);opacity:.15}
+}
   </style>
 </head>
 <body>
@@ -677,6 +771,7 @@
 </div>
   </div>
 </header>
+<div class="papel-picado-bar" id="papelPicadoBar"></div>
 <div id="specialBannersWrap"></div>
 <div id="dailyMessage"></div>
 
@@ -1017,6 +1112,7 @@ let chartInstances = {};
 let curTab         = 'r';
 let mPage = { r: 0, u: 0 };
 const M_PER_PAGE = 4;
+let lastMexicoGoals = null;
 
 // ══════════════════════════════════════════════════════
 //  UTILIDADES
@@ -1360,9 +1456,13 @@ function renderDailyMessage() {
     sameDay(m.date, today)
   );
 
+  applyModoMexico(mexicoMatch);
+
   if (mexicoMatch) {
+    const mxLive = mexicoMatch.st === 'LIVE';
+    const hayMarcador = mexicoMatch.sH !== null && mexicoMatch.sA !== null;
     html += `
-      <div class="special-banner mexico" data-emoji="🌵">
+      <div class="special-banner mexico${mxLive ? ' is-live-banner' : ''}" data-emoji="🌵">
         <div class="special-banner-inner">
 
           <div class="sbn-flag">🇲🇽</div>
@@ -1371,6 +1471,7 @@ function renderDailyMessage() {
 
             <div class="sbn-eyebrow">
               DESTACADO DEL DÍA
+              ${mxLive ? '<span class="sbn-live-chip">EN VIVO</span>' : ''}
             </div>
 
             <div class="sbn-main">
@@ -1379,7 +1480,9 @@ function renderDailyMessage() {
 
             <div class="sbn-match">
               <div class="sbn-team">${mexicoMatch.h}</div>
-              <div class="sbn-vs">VS</div>
+              ${hayMarcador
+                ? `<div class="sbn-score-box">${mexicoMatch.sH} - ${mexicoMatch.sA}</div>`
+                : '<div class="sbn-vs">VS</div>'}
               <div class="sbn-team">${mexicoMatch.a}</div>
             </div>
 
@@ -1393,6 +1496,85 @@ function renderDailyMessage() {
   }
 
   box.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════
+//  MODO MÉXICO — paleta tricolor + celebración de gol
+// ══════════════════════════════════════════════════════
+function applyModoMexico(mexicoMatch) {
+  const root       = document.documentElement;
+  const metaTheme  = document.querySelector('meta[name="theme-color"]');
+
+  if (!mexicoMatch) {
+    root.classList.remove('modo-mexico', 'modo-mexico-live');
+    if (metaTheme) metaTheme.setAttribute('content', '#0a0c10');
+    lastMexicoGoals = null;
+    return;
+  }
+
+  root.classList.add('modo-mexico');
+  const mxLive = mexicoMatch.st === 'LIVE';
+  root.classList.toggle('modo-mexico-live', mxLive);
+  if (metaTheme) metaTheme.setAttribute('content', '#070f0a');
+
+  checkMexicoGoal(mexicoMatch);
+}
+
+function checkMexicoGoal(m) {
+  if (m.st !== 'LIVE') { lastMexicoGoals = null; return; }
+  const golesMx = m.h === 'México' ? m.sH : m.sA;
+  if (golesMx === null || golesMx === undefined) return;
+  if (lastMexicoGoals !== null && golesMx > lastMexicoGoals) {
+    celebrarGolMexico(m);
+  }
+  lastMexicoGoals = golesMx;
+}
+
+function celebrarGolMexico(m) {
+  const toast = document.createElement('div');
+  toast.className = 'gol-toast';
+  toast.innerHTML = `
+    <div class="gol-toast-emoji">⚽🇲🇽</div>
+    <div class="gol-toast-text">¡GOOOOL DE MÉXICO!</div>
+    <div class="gol-toast-score">${m.h} ${m.sH} – ${m.sA} ${m.a}</div>
+  `;
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  spawnConfetti();
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 500);
+  }, 4200);
+}
+
+function spawnConfetti() {
+  const wrap = document.createElement('div');
+  wrap.className = 'confetti-wrap';
+  const colors = ['#00c853', '#f6f6f0', '#ef3e45'];
+  for (let i = 0; i < 70; i++) {
+    const p = document.createElement('span');
+    p.className = 'confetti-piece';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.background = colors[i % 3];
+    p.style.animationDelay = (Math.random() * 0.4) + 's';
+    p.style.animationDuration = (2.2 + Math.random() * 1.4) + 's';
+    p.style.transform = `rotate(${Math.random() * 360}deg)`;
+    wrap.appendChild(p);
+  }
+  document.body.appendChild(wrap);
+  setTimeout(() => wrap.remove(), 4000);
+}
+
+function buildPapelPicado() {
+  const bar = document.getElementById('papelPicadoBar');
+  if (!bar || bar.children.length) return;
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 40; i++) {
+    const f = document.createElement('div');
+    f.className = 'pp-flag';
+    frag.appendChild(f);
+  }
+  bar.appendChild(frag);
 }
 
 // ══════════════════════════════════════════════════════
@@ -2851,6 +3033,7 @@ function init(){
   setInterval(run,REFRESH_INTERVAL);
   const btn=document.getElementById('btnRefresh');if(btn)btn.addEventListener('click',run);
   const gSel=document.getElementById('gSel');if(gSel)gSel.addEventListener('change',renderStd);
+  buildPapelPicado();
   selectGame('cabezazo');
   setTimeout(showMascotBubble, 4000);
   scheduleMascotBubble();
