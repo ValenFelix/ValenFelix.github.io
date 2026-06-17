@@ -750,6 +750,22 @@ html.modo-mexico .papel-picado-bar{display:flex}
   0%{transform:translateY(-10px) rotate(0deg);opacity:1}
   100%{transform:translateY(112vh) rotate(560deg);opacity:.15}
 }
+
+/* ── BOTÓN DE LA PORRA ── */
+.sbn-porra-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  margin-top:12px;
+  padding:9px 20px;
+  border:none;border-radius:999px;
+  background:linear-gradient(135deg,#00a64f 0%,#ef3e45 100%);
+  color:#fff;font-family:'Barlow Condensed',sans-serif;
+  font-weight:800;font-size:14px;letter-spacing:.5px;
+  cursor:pointer;
+  box-shadow:0 6px 18px rgba(0,0,0,0.35);
+  transition:transform .12s ease,box-shadow .12s ease;
+}
+.sbn-porra-btn:hover{box-shadow:0 8px 22px rgba(0,0,0,0.45)}
+.sbn-porra-btn:active{transform:scale(0.92)}
   </style>
 </head>
 <body>
@@ -1112,7 +1128,7 @@ let chartInstances = {};
 let curTab         = 'r';
 let mPage = { r: 0, u: 0 };
 const M_PER_PAGE = 4;
-let lastMexicoGoals = null;
+let bienvenidaEvaluada = false;
 
 // ══════════════════════════════════════════════════════
 //  UTILIDADES
@@ -1486,6 +1502,8 @@ function renderDailyMessage() {
               <div class="sbn-team">${mexicoMatch.a}</div>
             </div>
 
+            <button type="button" class="sbn-porra-btn" onclick="playPorra()">📣 ¡PORRA!</button>
+
           </div>
 
           <div class="sbn-starburst">🔥</div>
@@ -1499,7 +1517,7 @@ function renderDailyMessage() {
 }
 
 // ══════════════════════════════════════════════════════
-//  MODO MÉXICO — paleta tricolor + celebración de gol
+//  MODO MÉXICO — paleta tricolor + bienvenida si va ganando
 // ══════════════════════════════════════════════════════
 function applyModoMexico(mexicoMatch) {
   const root       = document.documentElement;
@@ -1508,7 +1526,6 @@ function applyModoMexico(mexicoMatch) {
   if (!mexicoMatch) {
     root.classList.remove('modo-mexico', 'modo-mexico-live');
     if (metaTheme) metaTheme.setAttribute('content', '#0a0c10');
-    lastMexicoGoals = null;
     return;
   }
 
@@ -1517,25 +1534,25 @@ function applyModoMexico(mexicoMatch) {
   root.classList.toggle('modo-mexico-live', mxLive);
   if (metaTheme) metaTheme.setAttribute('content', '#070f0a');
 
-  checkMexicoGoal(mexicoMatch);
-}
-
-function checkMexicoGoal(m) {
-  if (m.st !== 'LIVE') { lastMexicoGoals = null; return; }
-  const golesMx = m.h === 'México' ? m.sH : m.sA;
-  if (golesMx === null || golesMx === undefined) return;
-  if (lastMexicoGoals !== null && golesMx > lastMexicoGoals) {
-    celebrarGolMexico(m);
+  // Solo se evalúa una vez por carga de página (al "entrar")
+  if (!bienvenidaEvaluada) {
+    bienvenidaEvaluada = true;
+    if (mxLive) {
+      const golesMx    = mexicoMatch.h === 'México' ? mexicoMatch.sH : mexicoMatch.sA;
+      const golesRival = mexicoMatch.h === 'México' ? mexicoMatch.sA : mexicoMatch.sH;
+      if (golesMx !== null && golesRival !== null && golesMx > golesRival) {
+        celebrarMexicoGanando(mexicoMatch);
+      }
+    }
   }
-  lastMexicoGoals = golesMx;
 }
 
-function celebrarGolMexico(m) {
+function celebrarMexicoGanando(m) {
   const toast = document.createElement('div');
   toast.className = 'gol-toast';
   toast.innerHTML = `
-    <div class="gol-toast-emoji">⚽🇲🇽</div>
-    <div class="gol-toast-text">¡GOOOOL DE MÉXICO!</div>
+    <div class="gol-toast-emoji">🇲🇽⚽</div>
+    <div class="gol-toast-text">¡MÉXICO VA GANANDO!</div>
     <div class="gol-toast-score">${m.h} ${m.sH} – ${m.sA} ${m.a}</div>
   `;
   document.body.appendChild(toast);
@@ -1563,6 +1580,16 @@ function spawnConfetti() {
   }
   document.body.appendChild(wrap);
   setTimeout(() => wrap.remove(), 4000);
+}
+
+// ── BOTÓN DE LA PORRA ──
+// Coloca el archivo "porra.wav" en la misma carpeta que este HTML
+// (o cambia la ruta de abajo si lo guardas en otra carpeta del repo).
+let porraAudio = null;
+function playPorra() {
+  if (!porraAudio) porraAudio = new Audio('porra.wav');
+  porraAudio.currentTime = 0;
+  porraAudio.play().catch(() => {});
 }
 
 function buildPapelPicado() {
