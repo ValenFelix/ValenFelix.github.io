@@ -766,6 +766,27 @@ html.modo-mexico .papel-picado-bar{display:flex}
 }
 .sbn-porra-btn:hover{box-shadow:0 8px 22px rgba(0,0,0,0.45)}
 .sbn-porra-btn:active{transform:scale(0.92)}
+    
+/* ── BOTÓN DE JUANGA ── */
+.sbn-juanga-btn{
+  display:inline-flex;align-items:center;gap:7px;
+  margin-top:8px;
+  padding:9px 20px;
+  border:none;border-radius:999px;
+  background:linear-gradient(135deg,#ffd700 0%,#ff6b00 60%,#cc0000 100%);
+  color:#fff;font-family:'Barlow Condensed',sans-serif;
+  font-weight:900;font-size:15px;letter-spacing:.8px;text-shadow:0 1px 4px rgba(0,0,0,0.4);
+  cursor:pointer;
+  box-shadow:0 6px 22px rgba(255,160,0,0.45);
+  transition:transform .12s ease,box-shadow .12s ease;
+  animation:juanga-glow 2s ease-in-out infinite;
+}
+@keyframes juanga-glow{
+  0%,100%{box-shadow:0 6px 22px rgba(255,160,0,0.45);}
+  50%{box-shadow:0 8px 32px rgba(255,160,0,0.75),0 0 18px rgba(255,200,0,0.3);}
+}
+.sbn-juanga-btn:hover{box-shadow:0 10px 28px rgba(255,160,0,0.6);transform:translateY(-2px) scale(1.03)}
+.sbn-juanga-btn:active{transform:scale(0.92)}
   </style>
 </head>
 <body>
@@ -1509,6 +1530,7 @@ function renderDailyMessage() {
             </div>
 
             <button type="button" class="sbn-porra-btn" onclick="playPorra()">📣 ¡PORRA!</button>
+            <button type="button" class="sbn-juanga-btn" onclick="playJuanga()">✨ EL DIVO DE JUÁREZ ✨</button>
 
           </div>
 
@@ -1596,6 +1618,12 @@ function playPorra() {
   if (!porraAudio) porraAudio = new Audio('porra.wav');
   porraAudio.currentTime = 0;
   porraAudio.play().catch(() => {});
+}
+  let juangaAudio = null;
+function playJuanga() {
+  if (!juangaAudio) juangaAudio = new Audio('CuandoTeEncontre.wav');
+  juangaAudio.currentTime = 0;
+  juangaAudio.play().catch(() => {});
 }
 
 function buildPapelPicado() {
