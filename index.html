@@ -1927,12 +1927,42 @@ body.innerHTML = players.map((p, i) => {
        </div>`
     : '';
 
-  return `<div class="lb-row ${cls}" title="Ver Ficha" onclick="openPlayerCard('${p.name.replace(/'/g,"\\'")}',${p.total},${rank},${p.grupos},${p.pPartidos})">
+// Predicción del jugador para partido(s) live
+    const liveMatches = matches.filter(m => m.st === 'LIVE');
+    const normName = p.name.trim().toLowerCase();
+    const playerPicks = formPicks[normName] || [];
+    const livePredictions = liveMatches.map(m => {
+      const pick = playerPicks.find(pk => {
+        const q = pk.q.toLowerCase();
+        const mH = m.h.toLowerCase(), mA = m.a.toLowerCase();
+        return (q.includes(mH) || q.includes(mA)) && /\d+\s*[-–]\s*\d+/.test(pk.a);
+      });
+      if (!pick) return null;
+      const score = parseScore(pick.a);
+      if (!score) return null;
+      return { match: m, pred: `${score[0]}–${score[1]}` };
+    }).filter(Boolean);
+
+    const livePredHTML = livePredictions.length ? `
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
+        ${livePredictions.map(lp => `
+          <span style="
+            display:inline-flex;align-items:center;gap:4px;
+            font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
+            color:var(--dim);letter-spacing:.3px;line-height:1;
+          ">
+            <span style="width:5px;height:5px;border-radius:50%;background:var(--live-red);flex-shrink:0;animation:pulse 1.5s infinite"></span>
+            ${fl(lp.match.h)}${lp.match.h.split(' ')[0]} <span style="color:var(--text)">${lp.pred}</span> ${fl(lp.match.a)}${lp.match.a.split(' ')[0]}
+          </span>
+        `).join('')}
+      </div>` : '';
+
+    return `<div class="lb-row ${cls}" title="Ver Ficha" onclick="openPlayerCard('${p.name.replace(/'/g,"\\'")}',${p.total},${rank},${p.grupos},${p.pPartidos})">
     <div class="rank ${rc}">${em||rank}</div>
     <div class="name-wrap">
       <div class="name">${p.name}</div>
       <div class="bar-bg"><div class="bar"></div></div>
-      ${tieBadge}
+      ${tieBadge}${livePredHTML}
     </div>
     <div class="sub">${p.grupos>0?p.grupos:'—'}</div>
     <div class="sub">${p.pPartidos>0?p.pPartidos:'—'}</div>
