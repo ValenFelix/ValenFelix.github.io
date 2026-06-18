@@ -2126,10 +2126,24 @@ function calcMatchPoints(predH, predA, realH, realA) {
 function buildMatchPointsHTML(picks, borderColor) {
   const matchPicks = picks.filter(p => {
     const q = p.q.toLowerCase();
-    return /\d+\s*[-–]\s*\d+/.test(p.a) ||
+    const isMatchPick = /\d+\s*[-–]\s*\d+/.test(p.a) ||
            q.includes('marcador') ||
            q.includes('resultado') ||
            (q.includes('vs') && /\d/.test(p.a));
+    if (!isMatchPick) return false;
+
+    // Solo incluir si el partido ya se jugó
+    const predScore = parseScore(p.a);
+    if (!predScore) return false;
+    const [teamH, teamA] = teamsFromQuestion(p.q);
+    return matches.some(m => {
+      const mH = m.h.toLowerCase(), mA = m.a.toLowerCase();
+      const qH = (teamH||'').toLowerCase(), qA = (teamA||'').toLowerCase();
+      return m.st === 'FIN' && m.sH !== null && (
+        ((mH.includes(qH)||qH.includes(mH)) && (mA.includes(qA)||qA.includes(mA))) ||
+        ((mH.includes(qA)||qA.includes(mH)) && (mA.includes(qH)||qH.includes(mA)))
+      );
+    });
   });
 
   if (!matchPicks.length) {
