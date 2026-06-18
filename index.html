@@ -1436,9 +1436,9 @@ function renderDailyMessage() {
 
   let html = '';
 
-  const portugalMatch = matches.find(m =>
+ const portugalMatch = matches.find(m =>
     (m.h === 'Portugal' || m.a === 'Portugal') &&
-    sameDay(m.date, today)
+    sameDay(m.date)
   );
 
   if (portugalMatch) {
@@ -1475,7 +1475,7 @@ function renderDailyMessage() {
 
   const mexicoMatch = matches.find(m =>
     (m.h === 'México' || m.a === 'México') &&
-    sameDay(m.date, today)
+    sameDay(m.date)
   );
 
   applyModoMexico(mexicoMatch);
