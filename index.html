@@ -2124,12 +2124,8 @@ function calcMatchPoints(predH, predA, realH, realA) {
 }
 
 function buildMatchPointsHTML(picks, borderColor) {
-  // Busca picks que sean predicciones de marcador de partido
-  // Las preguntas suelen tener formato "[Grupo X] Equipo A vs Equipo B" o similares
   const matchPicks = picks.filter(p => {
     const q = p.q.toLowerCase();
-    const a = (p.a || '').toLowerCase();
-    // Tiene marcador en la respuesta (número-número)
     return /\d+\s*[-–]\s*\d+/.test(p.a) ||
            q.includes('marcador') ||
            q.includes('resultado') ||
@@ -2142,30 +2138,60 @@ function buildMatchPointsHTML(picks, borderColor) {
     </div>`;
   }
 
+  // Extrae los dos equipos del texto de la pregunta
+  function teamsFromQuestion(q) {
+    // Quita el tag [Grupo X] y busca "Equipo A vs Equipo B"
+    const clean = q.replace(/\[.*?\]\s*/g, '').trim();
+    const vsMatch = clean.match(/^(.+?)\s+vs\.?\s+(.+?)(?:\s*[?:].*)?$/i);
+    if (!vsMatch) return [null, null];
+    // Normalizar: capitalizar primera letra de cada palabra
+    const normalize = s => s.trim().replace(/\b\w/g, c => c.toUpperCase());
+    return [normalize(vsMatch[1]), normalize(vsMatch[2])];
+  }
+
   let totalPts = 0;
   const rows = matchPicks.map(p => {
     const predScore = parseScore(p.a);
     if (!predScore) return null;
 
-    // Intentar encontrar el partido real correspondiente
-    const q = p.q.toLowerCase();
+    const [teamH, teamA] = teamsFromQuestion(p.q);
+    const cleanQ = p.q.replace(/\[.*?\]\s*/g, '').replace(/\s*\?.*$/, '').trim();
+
+    // Busca el partido real cruzando por nombre de equipos
     const realMatch = matches.find(m => {
-      const hN = m.h.toLowerCase(), aN = m.a.toLowerCase();
-      return (q.includes(hN) || q.includes(aN)) && m.st === 'FIN';
+      const mH = m.h.toLowerCase(), mA = m.a.toLowerCase();
+      const qH = (teamH||'').toLowerCase(), qA = (teamA||'').toLowerCase();
+      return (
+        (mH.includes(qH) || qH.includes(mH)) &&
+        (mA.includes(qA) || qA.includes(mA)) &&
+        m.st === 'FIN'
+      ) || (
+        (mH.includes(qA) || qA.includes(mH)) &&
+        (mA.includes(qH) || qH.includes(mA)) &&
+        m.st === 'FIN'
+      );
     });
 
-    const cleanQ = p.q.replace(/\[.*?\]\s*/g, '').replace(/\s*vs\.?\s*/i, ' vs ').trim();
+    // Banderas: primero intenta desde los equipos de la pregunta,
+    // luego del partido real, nunca mezcla
+    const flagH = (teamH && FLAGS[teamH])
+      ? FLAGS[teamH]
+      : (realMatch ? fl(realMatch.h) : '');
+    const flagA = (teamA && FLAGS[teamA])
+      ? FLAGS[teamA]
+      : (realMatch ? fl(realMatch.a) : '');
+
     const predH = predScore[0], predA = predScore[1];
     const realH = realMatch ? realMatch.sH : null;
     const realA = realMatch ? realMatch.sA : null;
-    const pts = (realMatch && realH !== null && realA !== null)
+    const pts = (realH !== null && realA !== null)
       ? calcMatchPoints(predH, predA, realH, realA)
       : null;
 
     if (pts !== null) totalPts += pts;
 
     const ptsBadge = pts === null
-      ? `<span style="font-size:11px;color:var(--muted);font-style:italic">Sin resultado aún</span>`
+      ? `<span style="font-size:11px;color:var(--muted);font-style:italic">Pendiente</span>`
       : pts === 4
         ? `<span style="background:rgba(245,200,66,.15);color:var(--gold);border:1px solid rgba(245,200,66,.4);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+4 ⭐</span>`
         : pts === 3
@@ -2179,32 +2205,29 @@ function buildMatchPointsHTML(picks, borderColor) {
     const realStr = (realH !== null && realA !== null) ? `${realH}–${realA}` : '?–?';
     const predStr = `${predH}–${predA}`;
 
-    const localFlag = realMatch ? fl(realMatch.h) : '';
-    const awayFlag  = realMatch ? fl(realMatch.a) : '';
+    const borderLeft = pts === 4 ? 'var(--gold)' :
+                       pts === 3 ? 'var(--green)' :
+                       pts === 2 ? 'var(--blue)' :
+                       pts === 1 ? 'var(--accent)' :
+                       pts === 0 ? 'var(--muted)' : 'var(--border)';
 
     return `<div style="
         display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;
         background:rgba(255,255,255,0.025);border-radius:8px;
         padding:10px 12px;margin-bottom:8px;
-        border-left:3px solid ${
-          pts === 4 ? 'var(--gold)' :
-          pts === 3 ? 'var(--green)' :
-          pts === 2 ? 'var(--blue)' :
-          pts === 1 ? 'var(--accent)' :
-          pts === 0 ? 'var(--muted)' : 'var(--border)'
-        };
+        border-left:3px solid ${borderLeft};
       ">
       <div>
         <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px">${cleanQ}</div>
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
           <div style="display:flex;align-items:center;gap:5px">
             <span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim)">Tu pick:</span>
-            <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--text)">${localFlag} ${predStr} ${awayFlag}</span>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--text)">${flagH} ${predStr} ${flagA}</span>
           </div>
           ${(realH !== null && realA !== null) ? `
           <div style="display:flex;align-items:center;gap:5px">
             <span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim)">Real:</span>
-            <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--text)">${localFlag} ${realStr} ${awayFlag}</span>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--text)">${flagH} ${realStr} ${flagA}</span>
           </div>` : ''}
         </div>
       </div>
@@ -2212,31 +2235,33 @@ function buildMatchPointsHTML(picks, borderColor) {
     </div>`;
   }).filter(Boolean).join('');
 
-  const finishedPicks = matchPicks.filter(p => {
+  const finishedCount = matchPicks.filter(p => {
     const predScore = parseScore(p.a);
     if (!predScore) return false;
-    const q = p.q.toLowerCase();
-    const realMatch = matches.find(m => {
-      const hN = m.h.toLowerCase(), aN = m.a.toLowerCase();
-      return (q.includes(hN) || q.includes(aN)) && m.st === 'FIN';
+    const [teamH, teamA] = teamsFromQuestion(p.q);
+    return matches.some(m => {
+      const mH = m.h.toLowerCase(), mA = m.a.toLowerCase();
+      const qH = (teamH||'').toLowerCase(), qA = (teamA||'').toLowerCase();
+      return m.st === 'FIN' && m.sH !== null && (
+        ((mH.includes(qH)||qH.includes(mH)) && (mA.includes(qA)||qA.includes(mA))) ||
+        ((mH.includes(qA)||qA.includes(mH)) && (mA.includes(qH)||qH.includes(mA)))
+      );
     });
-    return realMatch && realMatch.sH !== null;
   }).length;
 
-  const summaryBar = finishedPicks > 0 ? `
+  const summaryBar = finishedCount > 0 ? `
     <div style="
       display:flex;justify-content:space-between;align-items:center;
       background:rgba(255,255,255,0.04);border-radius:8px;
       padding:10px 14px;margin-bottom:12px;
       border:1px solid rgba(255,255,255,0.08);
     ">
-      <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--dim)">${finishedPicks} partido${finishedPicks!==1?'s':''} evaluado${finishedPicks!==1?'s':''}</span>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--dim)">${finishedCount} partido${finishedCount!==1?'s':''} evaluado${finishedCount!==1?'s':''}</span>
       <span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--gold)">${totalPts} pts de partidos</span>
     </div>` : '';
 
-  return summaryBar + (rows || `<div style="padding:12px;font-size:13px;color:var(--muted);text-align:center;font-style:italic">Aún no hay partidos finalizados con predicciones registradas.</div>`);
+  return summaryBar + (rows || `<div style="padding:12px;font-size:13px;color:var(--muted);text-align:center;font-style:italic">Aún no hay partidos finalizados.</div>`);
 }
-  
 // ══════════════════════════════════════════════════════
 //  MODAL FICHA JUGADOR
 // ══════════════════════════════════════════════════════
