@@ -1853,28 +1853,61 @@ async function fetchLeaderboard() {
   duelLoadFromLB(rows);
 }
 
-function processLB(rows) {
-  let hdr = -1;
-  for (let i = 0; i < rows.length; i++) {
-    if (rows[i].some(c => /participante/i.test(c))) { hdr = i; break; }
-  }
-  const players = [];
-  if (hdr >= 0) {
-    for (let i = hdr+1; i < rows.length; i++) {
-      const row = rows[i];
-      if (!row || row.length < 2) continue;
-      const col1 = (row[1] || '');
-      if (row[0].includes('📋') || col1.includes('📋') || /pts\s*\//.test(col1)) break;
-      const name = col1.replace(/^[\u{1F947}\u{1F948}\u{1F949}\u{1F3C5}🥇🥈🥉🏅]+/gu, '').trim();
-      if (!name) continue;
-      players.push({
-        name,
-        total:     parseFloat(row[2]) || 0,
-        grupos:    parseFloat(row[4]) || 0,
-        pPartidos: row[12] !== undefined ? parseFloat(row[12]) : 0
-      });
+
+function getLivePrediction(playerName) {
+  const liveMatches = matches.filter(m => m.st === 'LIVE');
+  if (!liveMatches.length) return '';
+  const normName = playerName.trim().toLowerCase();
+  const playerPicks = formPicks[normName] || [];
+  if (!playerPicks.length) return '';
+
+  const preds = liveMatches.map(m => {
+    const mH = m.h.toLowerCase(), mA = m.a.toLowerCase();
+    const pick = playerPicks.find(pk => {
+      const q = pk.q.toLowerCase();
+      return (q.includes(mH) || q.includes(mA)) && /\d+\s*[-–]\s*\d+/.test(pk.a);
+    });
+    if (!pick) return null;
+    const nums = (pick.a || '').match(/(\d+)\s*[-–]\s*(\d+)/);
+    if (!nums) return null;
+    return `${nums[1]}-${nums[2]}`;
+  }).filter(Boolean);
+
+  if (!preds.length) return '';
+
+  return `<div style="margin-top:3px;display:flex;gap:6px;flex-wrap:wrap">
+    ${preds.map(pred => `<span style="
+      font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;
+      color:var(--live-red);letter-spacing:.5px;line-height:1;
+      display:inline-flex;align-items:center;gap:3px;
+    "><span style="font-size:9px;animation:pulse 1.5s infinite">🔴</span> LIVE ${pred}</span>`).join('')}
+  </div>`;
+}
+
+  
+  
+  function processLB(rows) {
+    let hdr = -1;
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i].some(c => /participante/i.test(c))) { hdr = i; break; }
     }
-  }
+    const players = [];
+    if (hdr >= 0) {
+      for (let i = hdr+1; i < rows.length; i++) {
+        const row = rows[i];
+        if (!row || row.length < 2) continue;
+        const col1 = (row[1] || '');
+        if (row[0].includes('📋') || col1.includes('📋') || /pts\s*\//.test(col1)) break;
+        const name = col1.replace(/^[\u{1F947}\u{1F948}\u{1F949}\u{1F3C5}🥇🥈🥉🏅]+/gu, '').trim();
+        if (!name) continue;
+        players.push({
+          name,
+          total:     parseFloat(row[2]) || 0,
+          grupos:    parseFloat(row[4]) || 0,
+          pPartidos: row[12] !== undefined ? parseFloat(row[12]) : 0
+        });
+      }
+    }
 
   const sPlayers = document.getElementById('sPlayers');
   if (sPlayers) sPlayers.textContent = `${players.length} participante${players.length!==1?'s':''}`;
@@ -1928,41 +1961,14 @@ body.innerHTML = players.map((p, i) => {
     : '';
 
 // Predicción del jugador para partido(s) live
-    const liveMatches = matches.filter(m => m.st === 'LIVE');
-    const normName = p.name.trim().toLowerCase();
-    const playerPicks = formPicks[normName] || [];
-    const livePredictions = liveMatches.map(m => {
-      const pick = playerPicks.find(pk => {
-        const q = pk.q.toLowerCase();
-        const mH = m.h.toLowerCase(), mA = m.a.toLowerCase();
-        return (q.includes(mH) || q.includes(mA)) && /\d+\s*[-–]\s*\d+/.test(pk.a);
-      });
-      if (!pick) return null;
-      const score = parseScore(pick.a);
-      if (!score) return null;
-      return { match: m, pred: `${score[0]}–${score[1]}` };
-    }).filter(Boolean);
+   
 
-    const livePredHTML = livePredictions.length ? `
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
-        ${livePredictions.map(lp => `
-          <span style="
-            display:inline-flex;align-items:center;gap:4px;
-            font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
-            color:var(--dim);letter-spacing:.3px;line-height:1;
-          ">
-            <span style="width:5px;height:5px;border-radius:50%;background:var(--live-red);flex-shrink:0;animation:pulse 1.5s infinite"></span>
-            ${fl(lp.match.h)}${lp.match.h.split(' ')[0]} <span style="color:var(--text)">${lp.pred}</span> ${fl(lp.match.a)}${lp.match.a.split(' ')[0]}
-          </span>
-        `).join('')}
-      </div>` : '';
-
-    return `<div class="lb-row ${cls}" title="Ver Ficha" onclick="openPlayerCard('${p.name.replace(/'/g,"\\'")}',${p.total},${rank},${p.grupos},${p.pPartidos})">
+ return `<div class="lb-row ${cls}" title="Ver Ficha" onclick="openPlayerCard('${p.name.replace(/'/g,"\\'")}',${p.total},${rank},${p.grupos},${p.pPartidos})">
     <div class="rank ${rc}">${em||rank}</div>
     <div class="name-wrap">
       <div class="name">${p.name}</div>
       <div class="bar-bg"><div class="bar"></div></div>
-      ${tieBadge}${livePredHTML}
+      ${tieBadge}${getLivePrediction(p.name)}
     </div>
     <div class="sub">${p.grupos>0?p.grupos:'—'}</div>
     <div class="sub">${p.pPartidos>0?p.pPartidos:'—'}</div>
@@ -2011,6 +2017,13 @@ async function fetchDatosFormulario() {
     }
     renderCharts(globalStats);
     duelInjectPicks();
+// Re-renderizar leaderboard para mostrar predicciones live actualizadas
+    const lbRows = document.querySelectorAll('.lb-row');
+    if (lbRows.length && matches.some(m => m.st === 'LIVE')) {
+      // Hay live y ya tenemos picks — re-fetch leaderboard para pintar predicciones
+      fetchLeaderboard();
+    }
+    
   } catch(e) {
     console.error('Error formulario', e);
     document.getElementById('chartsContainer').innerHTML = '<div class="err">No se pudieron cargar las tendencias.</div>';
