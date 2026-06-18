@@ -789,30 +789,7 @@ html.modo-mexico .papel-picado-bar{display:flex}
 .sbn-juanga-btn:active{transform:scale(0.92)}
  
   /* ── QUETZALCÓATL — Modo México ── */
-.quetzalcoatl-wrap {
-  display: none;
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  pointer-events: none;
-  overflow: hidden;
-  border-radius: 12px;
-  z-index: 2;
-}
-html.modo-mexico .quetzalcoatl-wrap { display: block; }
 
-.quetzalcoatl-svg {
-  position: absolute;
-  animation: quetzal-fly 20s linear infinite;
-  top: 45%;
-  transform: translateY(-50%);
-  filter: drop-shadow(0 0 10px rgba(0,200,83,0.5))
-          drop-shadow(0 0 20px rgba(239,62,69,0.3));
-  opacity: 0.88;
-}
-@keyframes quetzal-fly {
-  0%   { left: -540px; }
-  100% { left: calc(100% + 20px); }
-}
   </style>
 </head>
 <body>
@@ -866,7 +843,7 @@ html.modo-mexico .quetzalcoatl-wrap { display: block; }
 
       <div>
         <div class="eyebrow-sm">Clasificación General</div>
-        <div class="card" style="position:relative">
+        <div class="card">
           <div class="card-head">
             <span class="card-title">🏆 Tabla de Líderes</span>
             <span id="lbTime" style="font-size:11px;color:var(--muted)">—</span>
