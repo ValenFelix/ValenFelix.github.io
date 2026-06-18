@@ -787,6 +787,31 @@ html.modo-mexico .papel-picado-bar{display:flex}
 }
 .sbn-juanga-btn:hover{box-shadow:0 10px 28px rgba(255,160,0,0.6);transform:translateY(-2px) scale(1.03)}
 .sbn-juanga-btn:active{transform:scale(0.92)}
+  /* ── QUETZALCÓATL — Modo México ── */
+.quetzalcoatl-wrap {
+  display: none;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 12px;
+  z-index: 2;
+}
+html.modo-mexico .quetzalcoatl-wrap { display: block; }
+
+.quetzalcoatl-svg {
+  position: absolute;
+  animation: quetzal-fly 18s linear infinite;
+  top: 50%;
+  transform: translateY(-50%);
+  filter: drop-shadow(0 0 8px rgba(0,200,83,0.6));
+  opacity: 0.82;
+}
+@keyframes quetzal-fly {
+  0%   { left: -220px; }
+  100% { left: calc(100% + 220px); }
+}
+  
   </style>
 </head>
 <body>
@@ -840,7 +865,7 @@ html.modo-mexico .papel-picado-bar{display:flex}
 
       <div>
         <div class="eyebrow-sm">Clasificación General</div>
-        <div class="card">
+        <div class="card" style="position:relative">
           <div class="card-head">
             <span class="card-title">🏆 Tabla de Líderes</span>
             <span id="lbTime" style="font-size:11px;color:var(--muted)">—</span>
@@ -850,6 +875,59 @@ html.modo-mexico .papel-picado-bar{display:flex}
             <span>Grupos</span><span>Partidos</span><span>Total</span>
           </div>
           <div id="lbBody"><div class="err">⏳ Conectando con Google Sheets…</div></div>
+          <!-- ── QUETZALCÓATL (Modo México) ── -->
+<div class="quetzalcoatl-wrap">
+  <svg class="quetzalcoatl-svg" width="200" height="60"
+       viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+
+    <!-- Cuerpo segmentado de la serpiente -->
+    <ellipse cx="30"  cy="30" rx="16" ry="11" fill="#006847" stroke="#00c853" stroke-width="1.2"/>
+    <ellipse cx="55"  cy="30" rx="14" ry="10" fill="#006847" stroke="#00c853" stroke-width="1.2"/>
+    <ellipse cx="78"  cy="30" rx="13" ry="10" fill="#00783a" stroke="#00c853" stroke-width="1.2"/>
+    <ellipse cx="100" cy="30" rx="12" ry="9"  fill="#006847" stroke="#00c853" stroke-width="1.2"/>
+    <ellipse cx="120" cy="30" rx="11" ry="8"  fill="#00783a" stroke="#00c853" stroke-width="1.2"/>
+    <ellipse cx="138" cy="30" rx="10" ry="7"  fill="#006847" stroke="#00c853" stroke-width="1.2"/>
+    <ellipse cx="154" cy="30" rx="8"  ry="6"  fill="#00783a" stroke="#00c853" stroke-width="1.2"/>
+    <!-- Cola -->
+    <polygon points="162,30 175,24 180,30 175,36" fill="#006847" stroke="#00c853" stroke-width="1"/>
+
+    <!-- Cabeza -->
+    <ellipse cx="14" cy="30" rx="13" ry="12" fill="#00a64f" stroke="#00c853" stroke-width="1.5"/>
+    <!-- Hocico alargado -->
+    <path d="M2,27 Q-12,30 -10,33 Q-5,36 2,33 Z" fill="#00a64f" stroke="#00c853" stroke-width="1"/>
+    <!-- Lengua bífida -->
+    <path d="M-10,30 L-22,26 M-10,30 L-22,34" stroke="#ef3e45" stroke-width="1.5" stroke-linecap="round"/>
+    <!-- Ojo -->
+    <circle cx="10" cy="27" r="3.5" fill="#f6f6f0"/>
+    <circle cx="11" cy="27" r="2" fill="#1a0a00"/>
+    <circle cx="12" cy="26" r="0.7" fill="#fff"/>
+
+    <!-- Plumas en la cabeza (Quetzalcóatl) -->
+    <path d="M8,18 Q0,-4 10,2"   fill="#ef3e45" opacity="0.9"/>
+    <path d="M14,17 Q10,-6 18,1" fill="#f6f6f0" opacity="0.85"/>
+    <path d="M19,18 Q18,-3 26,3" fill="#00c853" opacity="0.9"/>
+    <path d="M24,20 Q26,-1 32,5" fill="#f5c842" opacity="0.85"/>
+    <path d="M6,19  Q-2,-2 6,4"  fill="#00a64f" opacity="0.8"/>
+
+    <!-- Plumas en el lomo -->
+    <path d="M55,20 Q52,10 60,14" fill="#ef3e45" opacity="0.7"/>
+    <path d="M78,20 Q76,11 83,15" fill="#00c853" opacity="0.7"/>
+    <path d="M100,21 Q99,12 106,16" fill="#f5c842" opacity="0.65"/>
+    <path d="M120,22 Q119,14 125,18" fill="#ef3e45" opacity="0.6"/>
+
+    <!-- Escamas decorativas -->
+    <path d="M30,20 Q40,17 50,20" fill="none" stroke="#00c853" stroke-width="0.8" opacity="0.6"/>
+    <path d="M55,21 Q65,18 75,21" fill="none" stroke="#00c853" stroke-width="0.8" opacity="0.6"/>
+    <path d="M78,22 Q88,19 98,22" fill="none" stroke="#00c853" stroke-width="0.8" opacity="0.6"/>
+
+    <!-- Texto sagrado -->
+    <text x="60" y="56" font-family="'Barlow Condensed', sans-serif"
+          font-size="9" font-weight="800" letter-spacing="2"
+          fill="#f5c842" opacity="0.75" text-anchor="middle">
+      ¡VIVA MÉXICO! 🦅
+    </text>
+  </svg>
+</div>
         </div>
       </div>
     </div>
