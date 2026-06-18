@@ -1421,12 +1421,18 @@ function renderDailyMessage() {
   const box = document.getElementById('specialBannersWrap');
   if (!box || !matches?.length) return;
 
-  const today = new Date();
+// Comparar siempre en hora CDMX (UTC-6), independiente del dispositivo
+  const toCDMX = (date) => {
+    const cdmx = new Date(date.toLocaleString('en-US', { timeZone: 'America/Mexico_City' }));
+    return { y: cdmx.getFullYear(), m: cdmx.getMonth(), d: cdmx.getDate() };
+  };
 
-  const sameDay = (a,b)=>
-    a.getFullYear()===b.getFullYear() &&
-    a.getMonth()===b.getMonth() &&
-    a.getDate()===b.getDate();
+  const todayCDMX = toCDMX(new Date());
+
+  const sameDay = (a, b) => {
+    const da = toCDMX(a);
+    return da.y === todayCDMX.y && da.m === todayCDMX.m && da.d === todayCDMX.d;
+  };
 
   let html = '';
 
