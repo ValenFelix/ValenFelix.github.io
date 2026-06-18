@@ -1616,15 +1616,42 @@ function spawnConfetti() {
 let porraAudio = null;
 function playPorra() {
   if (!porraAudio) porraAudio = new Audio('porra.wav');
+  if (!porraAudio.paused) {
+    porraAudio.pause();
+    porraAudio.currentTime = 0;
+    return;
+  }
   porraAudio.currentTime = 0;
   porraAudio.play().catch(() => {});
 }
-  let juangaAudio = null;
+
+let juangaAudio = null;
 function playJuanga() {
   if (!juangaAudio) juangaAudio = new Audio('CuandoTeEncontre.wav');
+  if (!juangaAudio.paused) {
+    juangaAudio.pause();
+    juangaAudio.currentTime = 0;
+    return;
+  }
   juangaAudio.currentTime = 0;
   juangaAudio.play().catch(() => {});
 }
+
+function stopAllAudio() {
+  if (porraAudio && !porraAudio.paused) {
+    porraAudio.pause();
+    porraAudio.currentTime = 0;
+  }
+  if (juangaAudio && !juangaAudio.paused) {
+    juangaAudio.pause();
+    juangaAudio.currentTime = 0;
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) stopAllAudio();
+});
+window.addEventListener('pagehide', stopAllAudio);
 
 function buildPapelPicado() {
   const bar = document.getElementById('papelPicadoBar');
