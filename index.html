@@ -1930,7 +1930,7 @@ function getLivePrediction(playerName) {
     const mH = m.h.toLowerCase(), mA = m.a.toLowerCase();
     const pick = playerPicks.find(pk => {
       const q = pk.q.toLowerCase();
-      return (q.includes(mH) || q.includes(mA)) && /\d+\s*[-–]\s*\d+/.test(pk.a);
+      return (q.includes(mH) && q.includes(mA)) && /\d+\s*[-–]\s*\d+/.test(pk.a);
     });
     if (!pick) return null;
     const nums = (pick.a || '').match(/(\d+)\s*[-–]\s*(\d+)/);
@@ -2136,28 +2136,26 @@ function buildSpotlightHTML(picks) {
   if (!spotlightMatches.length) return '';
 
   // Buscar predicción del jugador para un partido dado
-  function findPick(match) {
-    if (!picks || !picks.length) return null;
-    const homeNorm = match.h.toLowerCase();
-    const awayNorm = match.a.toLowerCase();
-    // Buscar picks que mencionen ambos equipos o alguno junto al grupo
-    for (const p of picks) {
-      const qLow = p.q.toLowerCase();
-      const aLow = (p.a || '').toLowerCase();
-      // Coincidencia directa: la pregunta menciona uno de los equipos
-      if (qLow.includes(homeNorm) || qLow.includes(awayNorm)) return p.a;
-      // La pregunta tiene el grupo y la respuesta menciona algún equipo del partido
-      if (qLow.includes(`[grupo ${match.g.toLowerCase()}]`) || qLow.includes(`grupo ${match.g.toLowerCase()}`)) {
-        if (aLow.includes(homeNorm) || aLow.includes(awayNorm)) return p.a;
-      }
-      // La respuesta nombra directamente alguno de los equipos (resultado tipo "2-1 México")
-      if (aLow.includes(homeNorm) || aLow.includes(awayNorm)) {
-        // Solo si la pregunta parece de resultado de partido (tiene guion o vs o marcador)
-        if (/marcador|resultado|goles|vs\s|score|\d-\d/.test(qLow)) return p.a;
-      }
-    }
-    return null;
+ function findPick(match) {
+  if (!picks || !picks.length) return null;
+  const homeNorm = match.h.toLowerCase();
+  const awayNorm = match.a.toLowerCase();
+  // Prioridad 1: la pregunta menciona AMBOS equipos
+  for (const p of picks) {
+    const qLow = p.q.toLowerCase();
+    if (qLow.includes(homeNorm) && qLow.includes(awayNorm)) return p.a;
   }
+  // Prioridad 2: mismo grupo, respuesta con marcador, y al menos un equipo
+  for (const p of picks) {
+    const qLow = p.q.toLowerCase();
+    if (
+      (qLow.includes(`[grupo ${match.g.toLowerCase()}]`) || qLow.includes(`grupo ${match.g.toLowerCase()}`)) &&
+      (qLow.includes(homeNorm) || qLow.includes(awayNorm)) &&
+      /\d+\s*[-–]\s*\d+/.test(p.a)
+    ) return p.a;
+  }
+  return null;
+}
 
   const rows = spotlightMatches.map(m => {
     const isLive = m.badge === 'live';
