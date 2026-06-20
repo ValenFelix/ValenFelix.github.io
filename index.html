@@ -1089,7 +1089,7 @@ html.modo-mexico .papel-picado-bar{display:flex}
         </div>
         <span class="bracket-status-pill" id="statsTime">Calculando…</span>
       </div>
-      <div class="bracket-notice" style="margin:14px 18px">⚠️ <b>Estimado.</b> Solo considera los partidos con marcador pendiente de cada jugador; no incluye bonos finales (campeón, goleador, sorpresa, etc.) que también pueden sumar puntos al cierre del torneo.</div>
+      <div class="bracket-notice" style="margin:14px 18px">⚠️ <b>Estimado.</b> Solo considera los partidos con marcador pendiente de cada jugador, y descarta los que tienen el <b>mismo marcador exacto que el líder</b> (ese resultado les daría los mismos puntos a ambos, así que no cierra la brecha). No incluye bonos finales (campeón, goleador, sorpresa, etc.) que también pueden sumar puntos al cierre del torneo.</div>
       <div id="comebackBody"></div>
     </div>
 
@@ -2044,10 +2044,19 @@ function statsFindMatch(teamH, teamA) {
 }
 
 // Para un jugador: partidos ya evaluados (con pts) y cuántos le quedan pendientes (LIVE/SCHED)
-function getPlayerStatsData(nameLower) {
+// Para un jugador: partidos ya evaluados (con pts), cuántos le quedan pendientes (LIVE/SCHED)
+// y cuántos de esos pendientes realmente pueden achicar la brecha con el líder.
+// Si el jugador puso el MISMO marcador exacto que el líder en un partido pendiente,
+// ese partido sumará los mismos puntos a ambos sin importar el resultado real,
+// así que no ayuda a cerrar la diferencia (no cuenta como "útil").
+function getPlayerStatsData(nameLower, leaderNameLower) {
   const picks = (formPicks[nameLower] || []).filter(statsIsScorePick);
+  const leaderPicks = (leaderNameLower && leaderNameLower !== nameLower)
+    ? (formPicks[leaderNameLower] || []).filter(statsIsScorePick)
+    : null;
   const finished = []; // { pts, date }
   let pending = 0;
+  let pendingUseful = 0;
   picks.forEach(p => {
     const predScore = parseScore(p.a);
     if (!predScore) return;
@@ -2059,11 +2068,25 @@ function getPlayerStatsData(nameLower) {
       if (pts !== null) finished.push({ pts, date: m.date });
     } else {
       pending++;
+      let sameAsLeader = false;
+      if (leaderPicks) {
+        const leaderPick = leaderPicks.find(lp => {
+          const [lh, la] = statsTeamsFromQuestion(lp.q);
+          return statsFindMatch(lh, la) === m;
+        });
+        if (leaderPick) {
+          const leaderScore = parseScore(leaderPick.a);
+          if (leaderScore && leaderScore[0] === predScore[0] && leaderScore[1] === predScore[1]) {
+            sameAsLeader = true;
+          }
+        }
+      }
+      if (!sameAsLeader) pendingUseful++;
     }
   });
-  return { finished, pending };
+  if (!leaderPicks) pendingUseful = pending; // sin líder de referencia, comportamiento normal
+  return { finished, pending, pendingUseful };
 }
-
 function renderStats() {
   if (!lbPlayers.length) return;
   renderComebackTable();
@@ -2083,14 +2106,16 @@ function renderComebackTable() {
   }
 
   const leaderTotal = Math.max(...lbPlayers.map(p => p.total));
+  const leaderNameLower = lbPlayers[0] ? lbPlayers[0].name.trim().toLowerCase() : null;
 
   body.innerHTML = lbPlayers.map((p, i) => {
     const rank = i + 1;
     const nameLower = p.name.trim().toLowerCase();
-    const { pending } = getPlayerStatsData(nameLower);
+    const { pending, pendingUseful } = getPlayerStatsData(nameLower, leaderNameLower);
     const maxAdicional = pending * 4;
     const maxFinal = p.total + maxAdicional;
     const gap = leaderTotal - p.total;
+    const sharedCount = pending - pendingUseful;
 
     let statusHTML, barPct, pctLabel;
     if (rank === 1) {
@@ -2099,18 +2124,24 @@ function renderComebackTable() {
     } else if (gap <= 0) {
       statusHTML = `<span class="cb-badge cb-tied">🤝 Empatado arriba</span>`;
       barPct = 100; pctLabel = '';
-    } else if (maxAdicional <= 0) {
-      statusHTML = `<span class="cb-badge cb-dead">❌ Eliminado</span>`;
-      barPct = 0; pctLabel = '';
     } else {
-      const needed = (gap / maxAdicional) * 100;
-      barPct = Math.max(0, Math.min(100, 100 - needed));
-      if (needed > 100) { statusHTML = `<span class="cb-badge cb-dead">❌ Eliminado</span>`; pctLabel = ''; }
-      else if (needed > 60) { statusHTML = `<span class="cb-badge cb-hard">⚠️ Muy difícil</span>`; pctLabel = `necesita ${needed.toFixed(0)}% de su tope`; }
-      else { statusHTML = `<span class="cb-badge cb-ok">✅ Posible</span>`; pctLabel = `necesita ${needed.toFixed(0)}% de su tope`; }
+      const usefulMax = pendingUseful * 4;
+      if (usefulMax <= 0) {
+        statusHTML = `<span class="cb-badge cb-dead">❌ Eliminado</span>`;
+        barPct = 0; pctLabel = '';
+      } else {
+        const needed = (gap / usefulMax) * 100;
+        barPct = Math.max(0, Math.min(100, 100 - needed));
+        if (needed > 100) { statusHTML = `<span class="cb-badge cb-dead">❌ Eliminado</span>`; pctLabel = ''; }
+        else if (needed > 60) { statusHTML = `<span class="cb-badge cb-hard">⚠️ Muy difícil</span>`; pctLabel = `necesita ${needed.toFixed(0)}% de su tope útil`; }
+        else { statusHTML = `<span class="cb-badge cb-ok">✅ Posible</span>`; pctLabel = `necesita ${needed.toFixed(0)}% de su tope útil`; }
+      }
     }
 
     const gapTxt = rank === 1 ? '—' : (gap > 0 ? `-${gap} pts` : `+${Math.abs(gap)} pts`);
+    const sharedNote = (rank !== 1 && sharedCount > 0)
+      ? ` · <span style="color:var(--muted)">${sharedCount} igual${sharedCount!==1?'es':''} al líder (no suma a la remontada)</span>`
+      : '';
 
     return `<div class="cb-row${rank===1?' is-leader':''}">
       <div class="cb-rank">${rank}</div>
@@ -2119,7 +2150,7 @@ function renderComebackTable() {
           <span class="cb-name-txt">${p.name}</span>
           <span class="cb-gap-txt">${gapTxt}</span>
         </div>
-        <div class="cb-meta">${p.total} pts actuales · ${pending} partido${pending!==1?'s':''} pendiente${pending!==1?'s':''} · tope máx. ${maxFinal} pts</div>
+        <div class="cb-meta">${p.total} pts actuales · ${pending} partido${pending!==1?'s':''} pendiente${pending!==1?'s':''} · tope máx. ${maxFinal} pts${sharedNote}</div>
         <div class="cb-bar-bg"><div class="cb-bar-fill" style="width:${barPct}%"></div></div>
       </div>
       <div class="cb-status-col">
@@ -2129,7 +2160,6 @@ function renderComebackTable() {
     </div>`;
   }).join('');
 }
-
 function renderPointsRaceChart() {
   const canvas = document.getElementById('pointsRaceChart');
   const emptyEl = document.getElementById('pointsRaceEmpty');
