@@ -2262,7 +2262,11 @@ function renderFunStats() {
     for (let i = sorted.length - 1; i >= 0; i--) {
       if (sorted[i].pts > 0) streak++; else break;
     }
-    return { name: p.name, evaluated, fours, avg, streak };
+    let badStreak = 0;
+    for (let i = sorted.length - 1; i >= 0; i--) {
+      if (sorted[i].pts === 0) badStreak++; else break;
+    }
+    return { name: p.name, evaluated, fours, avg, streak, badStreak };
   });
 
   const withMin = perPlayer.filter(p => p.evaluated >= 3);
@@ -2272,6 +2276,11 @@ function renderFunStats() {
   const totalFours = perPlayer.reduce((s, p) => s + p.fours, 0);
 
   const cards = [];
+  const worstStreaker = [...perPlayer].sort((a, b) => b.badStreak - a.badStreak)[0];
+  if (worstStreaker && worstStreaker.badStreak >= 2) {
+    cards.push(`<div class="fun-stat-card"><div class="fun-stat-icon">💀</div><div class="fun-stat-label">Racha de la Muerte</div><div class="fun-stat-value">${worstStreaker.name}</div><div class="fun-stat-sub">${worstStreaker.badStreak} partidos seguidos a cero. Ánimo... o no.</div></div>`);
+  }
+
   if (sniper && sniper.fours > 0) {
     cards.push(`<div class="fun-stat-card"><div class="fun-stat-icon">🎯</div><div class="fun-stat-label">Francotirador del Torneo</div><div class="fun-stat-value">${sniper.name}</div><div class="fun-stat-sub">${sniper.fours} marcador${sniper.fours!==1?'es':''} exacto${sniper.fours!==1?'s':''} (+4 pts)</div></div>`);
   }
