@@ -830,7 +830,80 @@ html.modo-mexico .papel-picado-bar{display:flex}
 .sbn-juanga-btn:hover{box-shadow:0 10px 28px rgba(255,160,0,0.6);transform:translateY(-2px) scale(1.03)}
 .sbn-juanga-btn:active{transform:scale(0.92)}
  
-  /* ── QUETZALCÓATL — Modo México ── */
+/* ── CR7 GOL — CELEBRACIÓN ÉPICA ── */
+.cr7-overlay{
+  position:fixed;inset:0;z-index:2200;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0);backdrop-filter:blur(0px);
+  opacity:0;pointer-events:none;
+  transition:opacity .4s ease,backdrop-filter .4s ease,background .4s ease;
+}
+.cr7-overlay.show{
+  opacity:1;pointer-events:auto;
+  background:rgba(0,0,0,0.82);backdrop-filter:blur(10px);
+}
+.cr7-card{
+  background:linear-gradient(150deg,#003300 0%,#001a00 28%,#3a0000 68%,#8b0000 100%);
+  border:2px solid #ffd700;border-radius:24px;
+  padding:36px 44px;text-align:center;
+  box-shadow:0 0 80px rgba(255,215,0,.35),0 0 140px rgba(180,0,0,.25),0 20px 60px rgba(0,0,0,.7);
+  max-width:460px;width:88%;position:relative;overflow:hidden;
+  transform:scale(0.25) rotate(-15deg);opacity:0;cursor:pointer;
+  transition:transform .55s cubic-bezier(.34,1.56,.64,1),opacity .4s ease;
+}
+.cr7-overlay.show .cr7-card{transform:scale(1) rotate(0deg);opacity:1;}
+.cr7-bg-7{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-family:'Barlow Condensed',sans-serif;font-size:300px;font-weight:900;
+  color:rgba(255,215,0,.055);line-height:1;pointer-events:none;user-select:none;
+}
+.cr7-flags{font-size:38px;letter-spacing:10px;margin-bottom:14px;position:relative;z-index:1;}
+.cr7-label{
+  font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;
+  letter-spacing:5px;text-transform:uppercase;color:rgba(255,255,255,.5);
+  margin-bottom:6px;position:relative;z-index:1;
+}
+.cr7-name{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(38px,9vw,70px);font-weight:900;
+  color:#fff;line-height:.92;letter-spacing:1px;margin-bottom:22px;
+  text-shadow:0 4px 22px rgba(0,0,0,.55);position:relative;z-index:1;
+}
+.cr7-siu{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(54px,14vw,112px);font-weight:900;
+  color:#ffd700;line-height:1;letter-spacing:6px;
+  text-shadow:0 0 40px rgba(255,215,0,.95),0 0 80px rgba(255,180,0,.55);
+  animation:cr7-siu-glow .7s ease-in-out infinite alternate;
+  position:relative;z-index:1;
+}
+@keyframes cr7-siu-glow{
+  from{text-shadow:0 0 30px rgba(255,215,0,.8),0 0 60px rgba(255,180,0,.4);transform:scale(1);}
+  to  {text-shadow:0 0 70px rgba(255,215,0,1),0 0 130px rgba(255,200,0,.7);transform:scale(1.07);}
+}
+.cr7-stars{
+  font-size:24px;letter-spacing:6px;margin-top:18px;
+  position:relative;z-index:1;
+  animation:cr7-pop .4s ease .5s both;
+}
+.cr7-goat-badge{
+  display:inline-flex;align-items:center;gap:8px;margin-top:18px;
+  background:rgba(255,215,0,.12);border:1px solid rgba(255,215,0,.5);
+  border-radius:100px;padding:8px 22px;
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;
+  letter-spacing:2px;text-transform:uppercase;color:#ffd700;
+  box-shadow:0 0 22px rgba(255,215,0,.2);
+  position:relative;z-index:1;
+  animation:cr7-pop .4s ease .7s both;
+}
+.cr7-tap-hint{
+  margin-top:18px;font-size:11px;color:rgba(255,255,255,.28);
+  font-family:'Barlow Condensed',sans-serif;font-weight:700;
+  letter-spacing:2px;text-transform:uppercase;
+  position:relative;z-index:1;
+  animation:cr7-pop .4s ease .9s both;
+}
+@keyframes cr7-pop{from{opacity:0;transform:scale(.5) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
 
   </style>
 </head>
@@ -1739,45 +1812,53 @@ function spawnConfetti() {
   setTimeout(() => wrap.remove(), 4000);
 }
 
-  function celebrarGolCR7() {
-  const toast = document.createElement('div');
-  toast.className = 'gol-toast';
-  toast.style.background = 'linear-gradient(135deg,#006600 0%,#004d00 35%,#8b0000 70%,#cc0000 100%)';
-  toast.innerHTML = `
-    <div class="gol-toast-emoji">🇵🇹⚽</div>
-    <div class="gol-toast-text" style="font-size:20px;letter-spacing:2px">¡GOL DE CRISTIANO RONALDO!</div>
-    <div class="gol-toast-score" style="font-size:28px;letter-spacing:4px;color:#ffd700;
-      text-shadow:0 0 18px rgba(255,215,0,0.8);animation:live-pulse 0.8s infinite">
-      SIUUUU 🚀
+ function celebrarGolCR7() {
+  const overlay = document.createElement('div');
+  overlay.className = 'cr7-overlay';
+  overlay.innerHTML = `
+    <div class="cr7-card" title="Toca para cerrar">
+      <div class="cr7-bg-7">7</div>
+      <div class="cr7-flags">🇵🇹 ⚽ 🇵🇹</div>
+      <div class="cr7-label">⚡ Gol de ⚡</div>
+      <div class="cr7-name">CRISTIANO<br>RONALDO</div>
+      <div class="cr7-siu">SIUUUU</div>
+      <div class="cr7-stars">⭐ ⭐ ⭐ ⭐ ⭐</div>
+      <div class="cr7-goat-badge">🐐 EL MEJOR DE TODOS LOS TIEMPOS</div>
+      <div class="cr7-tap-hint">Toca para cerrar</div>
     </div>
   `;
-  document.body.appendChild(toast);
-  requestAnimationFrame(() => toast.classList.add('show'));
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('show'));
   spawnConfettiPortugal();
-  setTimeout(() => {
-    toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 500);
-  }, 5500);
+
+  const dismiss = () => {
+    overlay.classList.remove('show');
+    setTimeout(() => overlay.remove(), 500);
+  };
+  overlay.addEventListener('click', dismiss);
+  setTimeout(dismiss, 2500);
 }
 
 function spawnConfettiPortugal() {
   const wrap = document.createElement('div');
   wrap.className = 'confetti-wrap';
-  const colors = ['#006600','#cc0000','#ffffff','#ffd700','#003300','#990000'];
-  for (let i = 0; i < 90; i++) {
+  const colors = ['#006600','#cc0000','#ffffff','#ffd700','#003300','#990000','#ffee44','#00aa44'];
+  for (let i = 0; i < 140; i++) {
     const p = document.createElement('span');
     p.className = 'confetti-piece';
     p.style.left = Math.random() * 100 + '%';
     p.style.background = colors[i % colors.length];
-    p.style.width  = (6 + Math.random() * 6) + 'px';
-    p.style.height = (8 + Math.random() * 8) + 'px';
-    p.style.animationDelay    = (Math.random() * 0.5) + 's';
-    p.style.animationDuration = (2.0 + Math.random() * 1.6) + 's';
+    p.style.width  = (5 + Math.random() * 10) + 'px';
+    p.style.height = (8 + Math.random() * 12) + 'px';
+    p.style.borderRadius = Math.random() > 0.65 ? '50%' : '2px';
+    p.style.animationDelay    = (Math.random() * 0.9) + 's';
+    p.style.animationDuration = (1.8 + Math.random() * 2.0) + 's';
     p.style.transform = `rotate(${Math.random() * 360}deg)`;
+    p.style.opacity = (0.75 + Math.random() * 0.25).toString();
     wrap.appendChild(p);
   }
   document.body.appendChild(wrap);
-  setTimeout(() => wrap.remove(), 5500);
+  setTimeout(() => wrap.remove(), 8000);
 }
 
 // ── BOTÓN DE LA PORRA ──
