@@ -1241,6 +1241,7 @@ let curTab         = 'r';
 let mPage = { r: 0, u: 0 };
 const M_PER_PAGE = 4;
 let bienvenidaEvaluada = false;
+let cr7GolEvaluado = false;
 
 // ══════════════════════════════════════════════════════
 //  UTILIDADES
@@ -1327,6 +1328,7 @@ async function fetchPartidosFromSheets() {
     const iGolL   = hdr.findIndex(h => h.includes('marcador local') || (h.includes('gol') && h.includes('local')));
     const iGolV   = hdr.findIndex(h => h.includes('marcador visitante') || (h.includes('gol') && h.includes('visit')));
     const iEstado = hdr.findIndex(h => h.includes('estado'));
+    const iGolCR7 = hdr.findIndex(h => h.toLowerCase().includes('cr7') || h.toLowerCase().includes('gol cr'));
 
     const g   = iGrupo  >= 0 ? iGrupo  : 0;
     const f   = iFecha  >= 0 ? iFecha  : 1;
@@ -1375,10 +1377,21 @@ async function fetchPartidosFromSheets() {
         st,
         dateStr: fechaStr,
         date: dateObj,
+        golCR7: iGolCR7 >= 0 ? (row[iGolCR7]||'').trim().toLowerCase() === 'sí' || (row[iGolCR7]||'').trim().toLowerCase() === 'si' : false,
       });
     }
 
     matches = newMatches;
+// ── Celebración Gol CR7 ──
+  if (!cr7GolEvaluado) {
+    const cr7Match = matches.find(m =>
+      m.golCR7 && (m.h === 'Portugal' || m.a === 'Portugal')
+    );
+    if (cr7Match) {
+      cr7GolEvaluado = true;
+      celebrarGolCR7();
+    }
+  }
   } catch(e) {
     console.error('Error leyendo Partidos desde Sheets:', e);
     generateFallbackMatches();
@@ -1724,6 +1737,47 @@ function spawnConfetti() {
   }
   document.body.appendChild(wrap);
   setTimeout(() => wrap.remove(), 4000);
+}
+
+  function celebrarGolCR7() {
+  const toast = document.createElement('div');
+  toast.className = 'gol-toast';
+  toast.style.background = 'linear-gradient(135deg,#006600 0%,#004d00 35%,#8b0000 70%,#cc0000 100%)';
+  toast.innerHTML = `
+    <div class="gol-toast-emoji">🇵🇹⚽</div>
+    <div class="gol-toast-text" style="font-size:20px;letter-spacing:2px">¡GOL DE CRISTIANO RONALDO!</div>
+    <div class="gol-toast-score" style="font-size:28px;letter-spacing:4px;color:#ffd700;
+      text-shadow:0 0 18px rgba(255,215,0,0.8);animation:live-pulse 0.8s infinite">
+      SIUUUU 🚀
+    </div>
+  `;
+  document.body.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  spawnConfettiPortugal();
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 500);
+  }, 5500);
+}
+
+function spawnConfettiPortugal() {
+  const wrap = document.createElement('div');
+  wrap.className = 'confetti-wrap';
+  const colors = ['#006600','#cc0000','#ffffff','#ffd700','#003300','#990000'];
+  for (let i = 0; i < 90; i++) {
+    const p = document.createElement('span');
+    p.className = 'confetti-piece';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.background = colors[i % colors.length];
+    p.style.width  = (6 + Math.random() * 6) + 'px';
+    p.style.height = (8 + Math.random() * 8) + 'px';
+    p.style.animationDelay    = (Math.random() * 0.5) + 's';
+    p.style.animationDuration = (2.0 + Math.random() * 1.6) + 's';
+    p.style.transform = `rotate(${Math.random() * 360}deg)`;
+    wrap.appendChild(p);
+  }
+  document.body.appendChild(wrap);
+  setTimeout(() => wrap.remove(), 5500);
 }
 
 // ── BOTÓN DE LA PORRA ──
