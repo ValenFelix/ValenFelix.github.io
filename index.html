@@ -945,6 +945,10 @@ html.modo-mexico .papel-picado-bar{display:flex}
         <span class="omi-emoji">📊</span>
         <span class="omi-text"><b>Estadísticas</b><small>Posibilidad de remontada y datos curiosos</small></span>
       </button>
+      <button class="otras-menu-item" id="omiPosibleLB" onclick="selectOtraOpcion('posiblelb')">
+  <span class="omi-emoji">🔮</span>
+  <span class="omi-text"><b>Posible Leaderboard</b><small>¿Cómo quedarías si cerraran grupos hoy?</small></span>
+</button>
     </div>
   </div>
 </nav>
@@ -1178,6 +1182,13 @@ html.modo-mexico .papel-picado-bar{display:flex}
   </div>
 </div>
 
+  <div class="section" id="secPosiblelb">
+  <div class="bracket-wrap">
+    <div class="eyebrow-sm">🔮 Posible Leaderboard — Simulación con Grupos Actuales</div>
+    <div id="posibleLBContent"><div class="err">⏳ Cargando datos…</div></div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="playerModal" onclick="if(event.target===this)closePlayerCard()">
   <div class="fifa-card" id="fcContent"></div>
 </div>
@@ -1319,7 +1330,7 @@ let cr7GolEvaluado = false;
 // ══════════════════════════════════════════════════════
 //  UTILIDADES
 // ══════════════════════════════════════════════════════
-const OTRAS_OPCIONES = ['bracket', 'stats'];
+const OTRAS_OPCIONES = ['bracket', 'stats', 'posiblelb'];
 function switchSection(name) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('on'));
@@ -1329,10 +1340,14 @@ function switchSection(name) {
   if (navEl) navEl.classList.add('on');
   document.querySelectorAll('.otras-menu-item').forEach(it => it.classList.remove('active'));
   if (OTRAS_OPCIONES.includes(name)) {
-    const item = document.getElementById(name === 'bracket' ? 'omiBracket' : 'omiStats');
+    const item = document.getElementById(
+      name === 'bracket' ? 'omiBracket' :
+      name === 'stats'   ? 'omiStats'   : 'omiPosibleLB'
+    );
     if (item) item.classList.add('active');
   }
-  if (name === 'stats') renderStats();
+  if (name === 'stats')     renderStats();
+  if (name === 'posiblelb') renderPosibleLB();
 }
 
 function toggleOtrasMenu(e) {
@@ -3857,6 +3872,175 @@ async function sendFeedback() {
   }
 }
 
+// ══════════════════════════════════════════════════════
+//  POSIBLE LEADERBOARD — simulación con grupos actuales
+// ══════════════════════════════════════════════════════
+
+// Detecta si la pregunta corresponde a la posición 1, 2 o 3 de grupo
+function detectGroupPickPosition(q) {
+  const s = q.toLowerCase().replace(/\[.*?\]/g, '');
+  if (/primer|1\s*°|1\s*er|1\s*ro|1\s*lugar|ganar[aá]?\s*(el\s+)?grupo|ganador\s*(del\s+)?grupo/.test(s)) return 1;
+  if (/segund|2\s*°|2\s*do|2\s*lugar/.test(s)) return 2;
+  if (/tercer|3\s*°|3\s*er|3\s*ro|3\s*lugar/.test(s)) return 3;
+  return null;
+}
+
+// Calcula cuántos puntos de grupos tendría un jugador si los grupos cerraran hoy
+function calcSimulatedGroupPoints(playerPicks) {
+  let groupPts = 0;
+  const breakdown = [];
+
+  const qualifiers   = getGroupQualifiers();
+  const bestThirds   = getBestThirds(qualifiers)
+                         .slice(0, 8)
+                         .map(t => t.team.toLowerCase());
+
+  Object.keys(GROUPS).forEach(g => {
+    const table = computeGroupTable(g);
+    if (!table.length) return;
+
+    // Picks de este jugador para este grupo
+    const gPicks = playerPicks.filter(p => {
+      const m = p.q.match(/\[([^\]]+)\]/);
+      if (!m) return false;
+      const tag = m[1].trim().toUpperCase();
+      const letter = tag.match(/^GRUPO\s*([A-L])$/)?.[1] || tag.match(/^([A-L])$/)?.[1];
+      return letter === g;
+    });
+
+    gPicks.forEach(p => {
+      const pos = detectGroupPickPosition(p.q);
+      if (!pos || pos > 3) return;
+
+      const predicted = (p.a || '').trim().toLowerCase();
+      const actual    = (table[pos - 1]?.team || '').toLowerCase();
+      if (!actual || !predicted) return;
+
+      const hit = actual === predicted ||
+                  actual.includes(predicted) ||
+                  predicted.includes(actual);
+
+      // +5 por posición correcta
+      if (hit) {
+        groupPts += 5;
+        breakdown.push({ g, pos, team: table[pos - 1].team, pts: 5, type: 'pos' });
+
+        // +2 bonus si es 3° Y ese equipo está entre los 8 mejores terceros que clasifican
+        if (pos === 3 && bestThirds.some(t => t === actual || t.includes(predicted) || predicted.includes(t))) {
+          groupPts += 2;
+          breakdown.push({ g, pos: 3, team: table[pos - 1].team, pts: 2, type: 'bonus' });
+        }
+      }
+    });
+  });
+
+  return { pts: groupPts, breakdown };
+}
+
+function renderPosibleLB() {
+  const el = document.getElementById('posibleLBContent');
+  if (!el) return;
+
+  if (!lbPlayers.length || !Object.keys(formPicks).length) {
+    el.innerHTML = '<div class="err">⏳ Esperando datos del leaderboard y predicciones…</div>';
+    return;
+  }
+
+  const t = new Date().toLocaleTimeString('es-MX', { timeZone:'America/Mexico_City', hour:'2-digit', minute:'2-digit', hour12:true });
+
+  // Simular para cada jugador
+  const simData = lbPlayers.map(p => {
+    const nameLower = p.name.trim().toLowerCase();
+    const picks     = formPicks[nameLower] || [];
+    const { pts: simGroupPts, breakdown } = calcSimulatedGroupPoints(picks);
+    const otrosPts  = (p.total || 0) - (p.grupos || 0); // partidos + cualquier otro bono
+    const simTotal  = Math.max(0, otrosPts) + simGroupPts;
+    return { name: p.name, realTotal: p.total, realGrupos: p.grupos || 0, simGroupPts, simTotal, partidos: p.pPartidos || 0, breakdown };
+  }).sort((a, b) => b.simTotal - a.simTotal);
+
+  // Ranking denso (sin huecos por empates)
+  const distinctTotals = [...new Set(simData.map(p => p.simTotal))].sort((a, b) => b - a);
+  const simRanks = simData.map(p => distinctTotals.indexOf(p.simTotal) + 1);
+  const tieCounts = {};
+  for (const r of simRanks) tieCounts[r] = (tieCounts[r] || 0) + 1;
+
+  const maxSim = simData[0]?.simTotal || 1;
+
+  const rowsHTML = simData.map((p, i) => {
+    const rank   = simRanks[i];
+    const isTied = tieCounts[rank] > 1;
+    const cls    = rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
+    const rc     = rank===1?'g':rank===2?'s':rank===3?'b':'';
+    const em     = rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':'';
+    const tieBadge = isTied
+      ? `<span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;letter-spacing:1px;color:var(--dim)"> · Empate</span>`
+      : '';
+    return `<div class="lb-row ${cls}">
+      <div class="rank ${rc}">${em || rank}</div>
+      <div class="name-wrap">
+        <div class="name">${p.name}${tieBadge}</div>
+        <div class="bar-bg"><div class="bar" style="width:${maxSim > 0 ? Math.round((p.simTotal/maxSim)*100) : 0}%"></div></div>
+      </div>
+      <div class="sub">${p.simGroupPts > 0 ? p.simGroupPts : '—'}</div>
+      <div class="sub">${p.partidos > 0 ? p.partidos : '—'}</div>
+      <div class="pts">${p.simTotal}</div>
+    </div>`;
+  }).join('');
+
+  const tableRows = simData.map((p, i) => {
+    const diff = p.simGroupPts - p.realGrupos;
+    const dColor = diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--accent)' : 'var(--muted)';
+    return `<tr style="border-top:1px solid var(--border)">
+      <td style="padding:9px 16px;color:var(--muted);font-family:'Barlow Condensed',sans-serif;font-size:13px">${simRanks[i]}</td>
+      <td style="padding:9px 16px;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700">${p.name}</td>
+      <td style="padding:9px 10px;text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:15px;color:var(--dim)">${p.realGrupos}</td>
+      <td style="padding:9px 10px;text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:var(--text)">${p.simGroupPts}</td>
+      <td style="padding:9px 10px;text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:${dColor}">${diff > 0 ? '+' : ''}${diff}</td>
+      <td style="padding:9px 16px;text-align:right;font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:900;color:var(--gold)">${p.simTotal}</td>
+    </tr>`;
+  }).join('');
+
+  el.innerHTML = `
+    <div class="bracket-notice" style="margin-bottom:16px">
+      ⚠️ <b>Simulación.</b> Calcula los puntos de grupos usando las posiciones <b>actuales</b> de cada tabla. 
+      Los puntos de partidos y otros bonos ya obtenidos se mantienen intactos. 
+      Solo aplica la regla de <b>5 pts por posición correcta</b> y el <b>+2 bonus por tercero que clasifica</b>. 
+      No modifica el leaderboard real.
+    </div>
+
+    <div class="card" style="margin-bottom:18px">
+      <div class="card-head">
+        <span class="card-title">🔮 Tabla Simulada — Si Grupos Cerraran Hoy</span>
+        <span style="font-size:11px;color:var(--muted)">Act: ${t} (CDMX)</span>
+      </div>
+      <div class="lb-cols">
+        <span>#</span><span>Participante</span>
+        <span>Grupos (sim)</span><span>Partidos</span><span>Total (sim)</span>
+      </div>
+      ${rowsHTML}
+    </div>
+
+    <div class="card">
+      <div class="card-head"><span class="card-title">📊 Comparativa — Real vs Simulado</span></div>
+      <div style="overflow-x:auto">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="background:var(--surface);font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)">
+              <th style="padding:9px 16px;text-align:left">#</th>
+              <th style="padding:9px 16px;text-align:left">Jugador</th>
+              <th style="padding:9px 10px;text-align:right">Grupos (real)</th>
+              <th style="padding:9px 10px;text-align:right">Grupos (sim)</th>
+              <th style="padding:9px 10px;text-align:right">Δ Grupos</th>
+              <th style="padding:9px 16px;text-align:right">Total (sim)</th>
+            </tr>
+          </thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+  
 // ══════════════════════════════════════════════════════
 //  ARRANQUE
 // ══════════════════════════════════════════════════════
