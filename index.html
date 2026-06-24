@@ -3876,13 +3876,11 @@ async function sendFeedback() {
 //  POSIBLE LEADERBOARD — simulación con grupos actuales
 // ══════════════════════════════════════════════════════
 
-// Detecta si la pregunta corresponde a la posición 1, 2 o 3 de grupo
-function detectGroupPickPosition(q) {
-  const s = q.toLowerCase().replace(/\[.*?\]/g, '');
-  if (/primer|1\s*°|1\s*er|1\s*ro|1\s*lugar|ganar[aá]?\s*(el\s+)?grupo|ganador\s*(del\s+)?grupo/.test(s)) return 1;
-  if (/segund|2\s*°|2\s*do|2\s*lugar/.test(s)) return 2;
-  if (/tercer|3\s*°|3\s*er|3\s*ro|3\s*lugar/.test(s)) return 3;
-  return null;
+// Parsea encabezados tipo "G-A 1°", "G-B 3°", etc. → { group:'A', pos:1 }
+function parseGroupPick(q) {
+  const m = (q || '').trim().match(/^G-([A-L])\s*(\d)\s*°?$/i);
+  if (!m) return null;
+  return { group: m[1].toUpperCase(), pos: parseInt(m[2], 10) };
 }
 
 // Calcula cuántos puntos de grupos tendría un jugador si los grupos cerraran hoy
@@ -3890,48 +3888,40 @@ function calcSimulatedGroupPoints(playerPicks) {
   let groupPts = 0;
   const breakdown = [];
 
-  const qualifiers   = getGroupQualifiers();
-  const bestThirds   = getBestThirds(qualifiers)
-                         .slice(0, 8)
-                         .map(t => t.team.toLowerCase());
+  const qualifiers = getGroupQualifiers();
+  const bestThirds = getBestThirds(qualifiers)
+                       .slice(0, 8)
+                       .map(t => t.team.toLowerCase());
 
-  Object.keys(GROUPS).forEach(g => {
-    const table = computeGroupTable(g);
-    if (!table.length) return;
+  // Pre-calcular la tabla de cada grupo una sola vez
+  const tables = {};
+  Object.keys(GROUPS).forEach(g => { tables[g] = computeGroupTable(g); });
 
-    // Picks de este jugador para este grupo
-    const gPicks = playerPicks.filter(p => {
-      const m = p.q.match(/\[([^\]]+)\]/);
-      if (!m) return false;
-      const tag = m[1].trim().toUpperCase();
-      const letter = tag.match(/^GRUPO\s*([A-L])$/)?.[1] || tag.match(/^([A-L])$/)?.[1];
-      return letter === g;
-    });
+  playerPicks.forEach(p => {
+    const parsed = parseGroupPick(p.q);
+    if (!parsed || parsed.pos > 3) return; // solo nos interesan 1°, 2°, 3° (4° no da puntos)
 
-    gPicks.forEach(p => {
-      const pos = detectGroupPickPosition(p.q);
-      if (!pos || pos > 3) return;
+    const { group: g, pos } = parsed;
+    const table = tables[g];
+    if (!table || !table.length) return;
 
-      const predicted = (p.a || '').trim().toLowerCase();
-      const actual    = (table[pos - 1]?.team || '').toLowerCase();
-      if (!actual || !predicted) return;
+    const predicted = (p.a || '').trim().toLowerCase();
+    const actual = (table[pos - 1]?.team || '').toLowerCase();
+    if (!actual || !predicted) return;
 
-      const hit = actual === predicted ||
-                  actual.includes(predicted) ||
-                  predicted.includes(actual);
+    const hit = actual === predicted ||
+                actual.includes(predicted) ||
+                predicted.includes(actual);
 
-      // +5 por posición correcta
-      if (hit) {
-        groupPts += 5;
-        breakdown.push({ g, pos, team: table[pos - 1].team, pts: 5, type: 'pos' });
+    if (hit) {
+      groupPts += 5;
+      breakdown.push({ g, pos, team: table[pos - 1].team, pts: 5, type: 'pos' });
 
-        // +2 bonus si es 3° Y ese equipo está entre los 8 mejores terceros que clasifican
-        if (pos === 3 && bestThirds.some(t => t === actual || t.includes(predicted) || predicted.includes(t))) {
-          groupPts += 2;
-          breakdown.push({ g, pos: 3, team: table[pos - 1].team, pts: 2, type: 'bonus' });
-        }
+      if (pos === 3 && bestThirds.some(t => t === actual || t.includes(predicted) || predicted.includes(t))) {
+        groupPts += 2;
+        breakdown.push({ g, pos: 3, team: table[pos - 1].team, pts: 2, type: 'bonus' });
       }
-    });
+    }
   });
 
   return { pts: groupPts, breakdown };
