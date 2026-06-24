@@ -2467,15 +2467,37 @@ async function fetchResultadosReales() {
     if (!r.ok) return;
     const rows = parseCSV(await r.text());
     const locked = {};
+ 
     for (const row of rows) {
-      const slot = (row[0] || '').trim().toUpperCase();
-      const team = (row[1] || '').trim();
-      if (/^G-[A-L]-[1-4]$/.test(slot) && team) {
-        locked[slot] = team;
+      // Buscar en qué columna de esta fila está el slot tipo G-A-1
+      let slotIdx = -1;
+      let slot = '';
+      for (let i = 0; i < row.length; i++) {
+        const candidate = (row[i] || '').trim().toUpperCase();
+        if (/^G-[A-L]-[1-4]$/.test(candidate)) {
+          slotIdx = i;
+          slot = candidate;
+          break;
+        }
       }
+      if (slotIdx === -1) continue;
+ 
+      // El equipo es la celda INMEDIATAMENTE siguiente a la del slot.
+      // (No saltamos columnas vacías: si esa celda está vacía, significa
+      // que ese slot todavía no tiene equipo asignado en el sheet.)
+      const team = (row[slotIdx + 1] || '').trim();
+ 
+      if (team) locked[slot] = team;
     }
+ 
     lockedGroupPositions = locked;
-  } catch(e) { console.error('Error fetchResultadosReales:', e); }
+ 
+    // 🔎 Log de diagnóstico — puedes borrar esta línea cuando confirmes que funciona
+    console.log('✅ lockedGroupPositions cargado:', lockedGroupPositions);
+ 
+  } catch(e) {
+    console.error('Error fetchResultadosReales:', e);
+  }
 }
 // ══════════════════════════════════════════════════════
 //  LEADERBOARD
