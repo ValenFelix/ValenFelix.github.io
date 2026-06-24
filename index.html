@@ -2463,7 +2463,7 @@ function renderFunStats() {
 }
 async function fetchResultadosReales() {
   try {
-    const r = await fetch(csvUrl(SID, GID_RESULTADOS));
+    const r = await fetch(`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=Resultados_Reales`);
     if (!r.ok) return;
     const rows = parseCSV(await r.text());
     const locked = {};
