@@ -2463,7 +2463,7 @@ function renderFunStats() {
 }
 async function fetchResultadosReales() {
   try {
-    const r = await fetch(`https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&sheet=Resultados_Reales`);
+    const r = await fetch(csvUrl(SID, GID_RESULTADOS));
     if (!r.ok) return;
     const rows = parseCSV(await r.text());
     const locked = {};
@@ -3098,7 +3098,6 @@ function buildGroupPointsHTML(picks) {
 //  PUNTOS POR GRUPO (ficha jugador)
 // ══════════════════════════════════════════════════════
 function buildGroupPointsHTML(picks) {
-  // Construir lookup: 'G-A-1' → 'México' desde las picks del jugador
   const playerPicks = {};
   picks.forEach(p => {
     const m = (p.q || '').trim().match(/^G-([A-L])\s*(\d)\s*°?$/i);
@@ -3115,8 +3114,17 @@ function buildGroupPointsHTML(picks) {
   let grandTotal = 0;
   let totalLocked = 0;
 
+  // Pre-calcular tablas de grupos para fallback cuando el grupo ya terminó en partidos
+  const groupTables = {};
+  const groupDoneStatus = {};
+  Object.keys(GROUPS).forEach(g => {
+    const gMatches = matches.filter(m => m.g === g);
+    const done = gMatches.length > 0 && gMatches.every(m => m.st === 'FIN');
+    groupDoneStatus[g] = done;
+    if (done) groupTables[g] = computeGroupTable(g);
+  });
+
   const subsHTML = Object.keys(GROUPS).sort().map(g => {
-    // Solo mostrar grupos donde el jugador tiene al menos una pick
     const hasPicks = [1,2,3,4].some(p => playerPicks[`G-${g}-${p}`]);
     if (!hasPicks) return '';
 
@@ -3126,12 +3134,23 @@ function buildGroupPointsHTML(picks) {
     const rowsHTML = [1,2,3,4].map(pos => {
       const slot      = `G-${g}-${pos}`;
       const predicted = playerPicks[slot] || null;
-      const locked    = lockedGroupPositions[slot] || null;
-      const flagPred  = predicted && FLAGS[predicted] ? `${FLAGS[predicted]} ` : '';
+
+      // Fuente 1: sheet Resultados_Reales (manual, prioridad máxima)
+      const sheetTeam = lockedGroupPositions[slot] || null;
+      // Fuente 2: cálculo automático si el grupo terminó en partidos
+      const computedTeam = (!sheetTeam && groupDoneStatus[g] && groupTables[g])
+        ? (groupTables[g][pos - 1]?.team || null)
+        : null;
+
+      const locked = sheetTeam || computedTeam;
+      const lockedSource = sheetTeam ? 'sheet' : (computedTeam ? 'matches' : null);
+
+      const flagPred = predicted && FLAGS[predicted] ? `${FLAGS[predicted]} ` : '';
 
       let resultBadge, borderCol;
 
       if (!locked) {
+        // El grupo aún no termina
         borderCol = 'rgba(79,195,247,.2)';
         resultBadge = `<span style="font-size:11px;color:var(--dim);font-style:italic">⏳ Por definir</span>`;
       } else {
@@ -3141,12 +3160,17 @@ function buildGroupPointsHTML(picks) {
           locked.toLowerCase().includes(predicted.toLowerCase()) ||
           predicted.toLowerCase().includes(locked.toLowerCase())
         );
+
+        const sourceTag = lockedSource === 'matches'
+          ? `<span style="font-size:9px;color:var(--blue);opacity:.7;margin-left:4px">(auto)</span>`
+          : '';
+
         if (hit) {
           groupPts += 5;
           borderCol = 'var(--green)';
           resultBadge = `<span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;
             background:rgba(0,230,118,.13);color:var(--green);border:1px solid rgba(0,230,118,.4);
-            border-radius:6px;padding:3px 9px;white-space:nowrap">✅ +5 pts</span>`;
+            border-radius:6px;padding:3px 9px;white-space:nowrap">✅ +5 pts${sourceTag}</span>`;
         } else {
           borderCol = 'rgba(84,110,122,.4)';
           const lf = FLAGS[locked] ? `${FLAGS[locked]} ` : '';
@@ -3154,7 +3178,7 @@ function buildGroupPointsHTML(picks) {
             <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;
               color:var(--muted);border:1px solid rgba(84,110,122,.3);border-radius:6px;
               padding:3px 9px;white-space:nowrap">❌ 0 pts</span>
-            <div style="font-size:10px;color:var(--dim);margin-top:2px">fue: ${lf}${locked}</div>
+            <div style="font-size:10px;color:var(--dim);margin-top:2px">fue: ${lf}${locked}${sourceTag}</div>
           </div>`;
         }
       }
@@ -3180,10 +3204,13 @@ function buildGroupPointsHTML(picks) {
 
     const ptsColor = groupPts > 0 ? 'var(--green)' : groupLocked > 0 ? 'var(--dim)' : 'var(--blue)';
     const icon     = groupLocked === 0 ? '⏳' : groupPts > 0 ? '✅' : '—';
+    const doneTag  = groupDoneStatus[g]
+      ? `<span style="font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--green);background:rgba(0,230,118,.1);border:1px solid rgba(0,230,118,.3);border-radius:4px;padding:1px 5px;margin-left:5px;vertical-align:middle">CERRADO</span>`
+      : `<span style="font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--blue);background:rgba(79,195,247,.1);border:1px solid rgba(79,195,247,.3);border-radius:4px;padding:1px 5px;margin-left:5px;vertical-align:middle">EN CURSO</span>`;
 
     return `<div class="acc-sub">
       <div class="acc-sub-header" onclick="toggleAccSub(this)">
-        <span class="acc-sub-title">Grupo ${g}</span>
+        <span class="acc-sub-title">Grupo ${g}${doneTag}</span>
         <span style="display:flex;align-items:center;gap:8px;flex-shrink:0">
           <span style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;color:${ptsColor}">${icon} ${groupPts} pts</span>
           <span class="acc-sub-arrow">▼</span>
