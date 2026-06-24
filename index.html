@@ -217,6 +217,20 @@
     .std-table td:first-child{font-weight:700;color:var(--text)}
     .std-table tbody tr{border-top:1px solid var(--border)}
     .ptd{font-weight:900!important;color:var(--text)!important}
+    .std-table tr.confirmed-team{
+  background:rgba(0,230,118,0.07);
+}
+.std-table tr.confirmed-team td:first-child{
+  box-shadow:inset 3px 0 0 0 var(--green);
+}
+.confirmed-badge{
+  display:inline-flex;align-items:center;gap:3px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:9px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;
+  color:var(--green);background:rgba(0,230,118,.12);
+  border:1px solid rgba(0,230,118,.35);border-radius:100px;
+  padding:2px 7px;margin-left:6px;white-space:nowrap;
+}
     .qdot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:6px;vertical-align:middle;margin-bottom:2px}
     .qdot.maybe{background:var(--blue)}
     .legend{padding:10px 20px 14px;font-size:12px;color:var(--muted);display:flex;gap:14px;background:rgba(0,0,0,0.1)}
@@ -1306,7 +1320,10 @@ const FLAGS = {
   'Inglaterra':'🏴󠁧󠁢󠁥󠁮󠁧󠁿','Croacia':'🇭🇷','Ghana':'🇬🇭','Panamá':'🇵🇦',
 };
 const fl = n => FLAGS[n] || '🏳️';
-
+const CONFIRMED_POS = new Set([
+  'México', 'Haití', 'Estados Unidos', 'Turquía',
+  'Alemania', 'Túnez', 'Argentina', 'Panamá'
+]);
 Chart.defaults.color = '#8a9ab0';
 Chart.defaults.font.family = "'Barlow Condensed', sans-serif";
 
@@ -1966,9 +1983,11 @@ function renderStd() {
     <thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>Pts</th></tr></thead>
     <tbody>${rows.map((s, i) => {
       const dot = i<2 ? `<span class="qdot"></span>` : i===2 ? `<span class="qdot maybe"></span>` : '';
-      return `<tr>
+      const isConfirmed = CONFIRMED_POS.has(s.team);
+      const badge = isConfirmed ? `<span class="confirmed-badge">✅ Asegurado</span>` : '';
+      return `<tr class="${isConfirmed ? 'confirmed-team' : ''}">
         <td style="font-size:13px;color:var(--muted)">${i+1}</td>
-        <td><span>${fl(s.team)}</span> ${dot}<span style="font-weight:700">${s.team}</span></td>
+        <td><span>${fl(s.team)}</span> ${dot}<span style="font-weight:700">${s.team}</span>${badge}</td>
         <td>${s.pj}</td>
         <td class="ptd">${s.pts}</td>
       </tr>`;
