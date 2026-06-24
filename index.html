@@ -1277,6 +1277,7 @@ const SID             = '1Lxz_7Hf20m685XGDQQmNFL0IclDY8RzK0IXIo0jnZg4';
 const GID_LEADERBOARD = '1369482165';
 const GID_DATOS       = '0';
 const GID_PARTIDOS    = '164525355';
+const GID_RESULTADOS  = '1510594452'; // Abre Resultados_Reales en Sheets → URL → busca gid=XXXXXXXX
 
 const GAMES_SID        = '1pDcY7q9SMP1mLGL12jKY3GKeD4RywOZtA_V7QjAYfDQ';
 const GAMES_GID        = '0';
@@ -1331,6 +1332,7 @@ Chart.defaults.font.family = "'Barlow Condensed', sans-serif";
 //  ESTADO GLOBAL
 // ══════════════════════════════════════════════════════
 let matches        = [];
+let lockedGroupPositions = {}; // { 'G-A-1': 'México', 'G-D-4': 'Turquía', ... }
 let formPicks      = {};
 let lbPlayers       = [];
 let chartInstances = {};
@@ -2459,7 +2461,22 @@ function renderFunStats() {
 
   grid.innerHTML = cards.length ? cards.join('') : '<div class="err">Aún no hay suficientes partidos evaluados.</div>';
 }
-
+async function fetchResultadosReales() {
+  try {
+    const r = await fetch(csvUrl(SID, GID_RESULTADOS));
+    if (!r.ok) return;
+    const rows = parseCSV(await r.text());
+    const locked = {};
+    for (const row of rows) {
+      const slot = (row[0] || '').trim().toUpperCase();
+      const team = (row[1] || '').trim();
+      if (/^G-[A-L]-[1-4]$/.test(slot) && team) {
+        locked[slot] = team;
+      }
+    }
+    lockedGroupPositions = locked;
+  } catch(e) { console.error('Error fetchResultadosReales:', e); }
+}
 // ══════════════════════════════════════════════════════
 //  LEADERBOARD
 // ══════════════════════════════════════════════════════
@@ -3077,6 +3094,118 @@ function buildGroupPointsHTML(picks) {
 
   return summaryBar + subsHTML;
 }
+  // ══════════════════════════════════════════════════════
+//  PUNTOS POR GRUPO (ficha jugador)
+// ══════════════════════════════════════════════════════
+function buildGroupPointsHTML(picks) {
+  // Construir lookup: 'G-A-1' → 'México' desde las picks del jugador
+  const playerPicks = {};
+  picks.forEach(p => {
+    const m = (p.q || '').trim().match(/^G-([A-L])\s*(\d)\s*°?$/i);
+    if (!m) return;
+    const slot = `G-${m[1].toUpperCase()}-${m[2]}`;
+    playerPicks[slot] = (p.a || '').trim();
+  });
+
+  if (!Object.keys(playerPicks).length) {
+    return `<div style="padding:14px;font-size:13px;color:var(--muted);text-align:center;font-style:italic">No se encontraron predicciones de grupo.</div>`;
+  }
+
+  const posLabel = { 1:'🥇 1° Lugar', 2:'🥈 2° Lugar', 3:'🥉 3° Lugar', 4:'4° Lugar' };
+  let grandTotal = 0;
+  let totalLocked = 0;
+
+  const subsHTML = Object.keys(GROUPS).sort().map(g => {
+    // Solo mostrar grupos donde el jugador tiene al menos una pick
+    const hasPicks = [1,2,3,4].some(p => playerPicks[`G-${g}-${p}`]);
+    if (!hasPicks) return '';
+
+    let groupPts = 0;
+    let groupLocked = 0;
+
+    const rowsHTML = [1,2,3,4].map(pos => {
+      const slot      = `G-${g}-${pos}`;
+      const predicted = playerPicks[slot] || null;
+      const locked    = lockedGroupPositions[slot] || null;
+      const flagPred  = predicted && FLAGS[predicted] ? `${FLAGS[predicted]} ` : '';
+
+      let resultBadge, borderCol;
+
+      if (!locked) {
+        borderCol = 'rgba(79,195,247,.2)';
+        resultBadge = `<span style="font-size:11px;color:var(--dim);font-style:italic">⏳ Por definir</span>`;
+      } else {
+        groupLocked++;
+        const hit = predicted && (
+          locked.toLowerCase() === predicted.toLowerCase() ||
+          locked.toLowerCase().includes(predicted.toLowerCase()) ||
+          predicted.toLowerCase().includes(locked.toLowerCase())
+        );
+        if (hit) {
+          groupPts += 5;
+          borderCol = 'var(--green)';
+          resultBadge = `<span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;
+            background:rgba(0,230,118,.13);color:var(--green);border:1px solid rgba(0,230,118,.4);
+            border-radius:6px;padding:3px 9px;white-space:nowrap">✅ +5 pts</span>`;
+        } else {
+          borderCol = 'rgba(84,110,122,.4)';
+          const lf = FLAGS[locked] ? `${FLAGS[locked]} ` : '';
+          resultBadge = `<div style="text-align:right">
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;
+              color:var(--muted);border:1px solid rgba(84,110,122,.3);border-radius:6px;
+              padding:3px 9px;white-space:nowrap">❌ 0 pts</span>
+            <div style="font-size:10px;color:var(--dim);margin-top:2px">fue: ${lf}${locked}</div>
+          </div>`;
+        }
+      }
+
+      return `<div style="display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;
+        padding:9px 12px;margin-bottom:3px;background:rgba(255,255,255,.025);
+        border-radius:0 6px 6px 0;border-left:3px solid ${borderCol};">
+        <div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+            color:var(--muted);margin-bottom:2px">${posLabel[pos]}</div>
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;color:var(--text)">
+            ${predicted
+              ? `${flagPred}${predicted}`
+              : `<span style="font-size:11px;color:var(--muted);font-style:italic">Sin predicción</span>`}
+          </div>
+        </div>
+        <div>${resultBadge}</div>
+      </div>`;
+    }).join('');
+
+    grandTotal  += groupPts;
+    totalLocked += groupLocked;
+
+    const ptsColor = groupPts > 0 ? 'var(--green)' : groupLocked > 0 ? 'var(--dim)' : 'var(--blue)';
+    const icon     = groupLocked === 0 ? '⏳' : groupPts > 0 ? '✅' : '—';
+
+    return `<div class="acc-sub">
+      <div class="acc-sub-header" onclick="toggleAccSub(this)">
+        <span class="acc-sub-title">Grupo ${g}</span>
+        <span style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;color:${ptsColor}">${icon} ${groupPts} pts</span>
+          <span class="acc-sub-arrow">▼</span>
+        </span>
+      </div>
+      <div class="acc-sub-body">${rowsHTML}</div>
+    </div>`;
+  }).filter(Boolean).join('');
+
+  const summaryBar = `<div style="display:flex;justify-content:space-between;align-items:center;
+    background:rgba(0,230,118,.05);border:1px solid rgba(0,230,118,.2);
+    border-radius:8px;padding:10px 14px;margin-bottom:10px;">
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--dim)">
+      ${totalLocked} posición${totalLocked!==1?'es':''} confirmada${totalLocked!==1?'s':''}
+    </span>
+    <span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--green)">
+      ${grandTotal} pts de grupos
+    </span>
+  </div>`;
+
+  return summaryBar + (subsHTML || `<div style="padding:14px;font-size:13px;color:var(--muted);text-align:center">Sin predicciones registradas.</div>`);
+}
 // ══════════════════════════════════════════════════════
 //  MODAL FICHA JUGADOR
 // ══════════════════════════════════════════════════════
@@ -3198,6 +3327,7 @@ function openPlayerCard(rawName, pts, rank, gPts, pPts) {
         <div class="acc-body">${matchPointsHTML}</div>
       </div>`;
       // ── SECCIÓN: Puntos por Grupo ──
+// ── Puntos por Grupo ──
     const groupPointsHTML = buildGroupPointsHTML(picks);
     html += `
       <div class="acc-section">
@@ -4204,11 +4334,12 @@ function updateHeader(){
 async function run(){
   const sDot=document.getElementById('sDot'),sStatus=document.getElementById('sStatus');
   if(sDot)sDot.classList.remove('live');if(sStatus)sStatus.textContent='Actualizando…';
-  await Promise.allSettled([
+await Promise.allSettled([
     fetchLeaderboard(),
     fetchPartidosFromSheets(),
     fetchDatosFormulario(),
-    fetchGamesLeaderboard()
+    fetchGamesLeaderboard(),
+    fetchResultadosReales()
   ]);
   if(sStatus)sStatus.textContent='Sincronizado';if(sDot)sDot.classList.add('live');
 }
