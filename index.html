@@ -934,6 +934,89 @@ html.modo-mexico .papel-picado-bar{display:flex}
   background:rgba(79,195,247,0.06);
 }
 .admin-update-btn:active{transform:scale(0.97)}
+
+/* ── MODAL ADMIN: 16AVOS ── */
+.admin16-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);
+  z-index:2500;display:flex;align-items:center;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .25s ease;padding:16px;
+}
+.admin16-overlay.active{opacity:1;pointer-events:auto}
+.admin16-modal{
+  width:100%;max-width:680px;max-height:88vh;background:var(--card);
+  border:1px solid var(--blue);border-radius:16px;overflow:hidden;
+  display:flex;flex-direction:column;box-shadow:0 12px 50px rgba(0,0,0,0.6);
+  transform:scale(0.95);transition:transform .25s ease;
+}
+.admin16-overlay.active .admin16-modal{transform:scale(1)}
+.admin16-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 20px;border-bottom:1px solid var(--border);
+  background:rgba(79,195,247,0.06);
+}
+.admin16-title{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:800;color:var(--blue)}
+.admin16-close{font-size:26px;color:var(--muted);cursor:pointer;background:none;border:none;line-height:1}
+.admin16-close:hover{color:#fff}
+.admin16-body{overflow-y:auto;padding:14px 18px;flex:1}
+.admin16-body::-webkit-scrollbar{width:5px}
+.admin16-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.admin16-row{
+  background:rgba(255,255,255,0.025);border:1px solid var(--border);border-radius:10px;
+  padding:12px 14px;margin-bottom:10px;
+}
+.admin16-row-head{
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;
+}
+.admin16-slot{
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;
+  color:var(--dim);letter-spacing:1px;
+}
+.admin16-estado-tag{
+  font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:1px;
+  text-transform:uppercase;border-radius:5px;padding:2px 8px;
+}
+.admin16-estado-tag.sched{background:rgba(84,110,122,.15);color:var(--muted)}
+.admin16-estado-tag.live{background:rgba(255,23,68,.15);color:var(--live-red)}
+.admin16-estado-tag.fin{background:rgba(0,230,118,.15);color:var(--green)}
+.admin16-grid{
+  display:grid;grid-template-columns:1fr 50px auto 50px 1fr;align-items:center;gap:6px;margin-bottom:8px;
+}
+.admin16-team-input{
+  background:var(--surface);border:1px solid var(--border);border-radius:6px;
+  color:var(--text);font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;
+  padding:7px 8px;outline:none;width:100%;text-align:center;
+}
+.admin16-team-input:focus{border-color:var(--blue)}
+.admin16-gol-input{
+  background:var(--surface);border:1px solid var(--border);border-radius:6px;
+  color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;
+  padding:7px 4px;outline:none;width:100%;text-align:center;
+}
+.admin16-gol-input:focus{border-color:var(--gold)}
+.admin16-sep{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:var(--muted);text-align:center}
+.admin16-extra-row{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center}
+.admin16-select{
+  background:var(--surface);border:1px solid var(--border);border-radius:6px;
+  color:var(--text);font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:600;
+  padding:6px 8px;outline:none;width:100%;
+}
+.admin16-fecha-input{
+  background:var(--surface);border:1px solid var(--border);border-radius:6px;
+  color:var(--text);font-family:'Barlow',sans-serif;font-size:12px;
+  padding:6px 8px;outline:none;width:100%;
+}
+.admin16-save-btn{
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;
+  letter-spacing:.5px;text-transform:uppercase;padding:8px 16px;border-radius:8px;
+  border:none;cursor:pointer;background:var(--green);color:#000;transition:all .15s;white-space:nowrap;
+}
+.admin16-save-btn:hover{background:#00ff88}
+.admin16-save-btn:disabled{opacity:.5;cursor:not-allowed}
+.admin16-row-status{font-size:11px;margin-top:6px;text-align:right;min-height:14px}
+.admin16-row-status.ok{color:var(--green)}
+.admin16-row-status.err{color:var(--accent)}
+.admin16-loading{padding:30px;text-align:center;color:var(--muted);font-size:13px}
+    
   </style>
 </head>
 <body>
@@ -1284,6 +1367,19 @@ html.modo-mexico .papel-picado-bar{display:flex}
   </div>
 </div>
 
+<div class="admin16-overlay" id="admin16Overlay" onclick="if(event.target===this)closeAdmin16Modal()">
+  <div class="admin16-modal">
+    <div class="admin16-head">
+      <span class="admin16-title">🔐 Actualizar Resultados — 16avos</span>
+      <button class="admin16-close" onclick="closeAdmin16Modal()">×</button>
+    </div>
+    <div class="admin16-body" id="admin16Body">
+      <div class="admin16-loading">⏳ Cargando cruces desde Google Sheets…</div>
+    </div>
+  </div>
+</div>
+
+  
 <script>
 // ══════════════════════════════════════════════════════
 //  CONFIGURACIÓN
@@ -4243,17 +4339,170 @@ function renderPosibleLB() {
   // ══════════════════════════════════════════════════════
 //  ADMIN: ACTUALIZAR RESULTADOS 16AVOS (protegido por clave)
 // ══════════════════════════════════════════════════════
-const ADMIN_PASSWORD = 'CAMBIA_ESTA_CLAVE'; // 👈 pon aquí la clave que quieras
+// ══════════════════════════════════════════════════════
+//  ADMIN: ACTUALIZAR RESULTADOS 16AVOS (protegido por clave)
+// ══════════════════════════════════════════════════════
+const ADMIN_PASSWORD   = 'HalaMadridChingao'; // 👈 misma clave que en el Apps Script
+const GID_16AVOS        = '493132322';
+const ADMIN16_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3o4EOidOa9LFlDvX7Rd1IMZbMaaEdpjU3MdEFcUSXTQX6KyImzQriUS0X9_eMkMD5_w/exec'; // 👈 URL del despliegue nuevo
+
+let admin16Cache = []; // [{slot, equipoA, equipoB, golA, golB, estado, fecha}]
 
 function adminPromptUpdateResults() {
   const pass = prompt('🔐 Ingresa la contraseña de administrador:');
   if (pass === null) return; // cancelado
-  if (pass !== HalaMadridChingao) {
+  if (pass !== ADMIN_PASSWORD) {
     alert('❌ Contraseña incorrecta.');
     return;
   }
-  // ✅ Acceso concedido — aquí conectaremos el formulario de 16avos
-  alert('✅ Acceso concedido. (Próximo paso: aquí abrirá el formulario para capturar resultados de 16avos)');
+  openAdmin16Modal();
+}
+
+async function openAdmin16Modal() {
+  document.getElementById('admin16Overlay').classList.add('active');
+  await fetchAdmin16Data();
+  renderAdmin16Modal();
+}
+
+function closeAdmin16Modal() {
+  document.getElementById('admin16Overlay').classList.remove('active');
+}
+
+async function fetchAdmin16Data() {
+  const body = document.getElementById('admin16Body');
+  try {
+    const r = await fetch(csvUrl(SID, GID_16AVOS));
+    if (!r.ok) throw new Error('No se pudo leer la hoja 16avos');
+    const rows = parseCSV(await r.text());
+
+    // Buscar la fila de encabezados reales (Slot, EquipoA, EquipoB...)
+    let hdrIdx = -1;
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i][0] && rows[i][0].trim().toLowerCase() === 'slot') { hdrIdx = i; break; }
+    }
+    if (hdrIdx === -1) throw new Error('No encontré la fila de encabezados ("Slot") en la hoja 16avos.');
+
+    const hdr = rows[hdrIdx].map(h => (h || '').trim().toLowerCase());
+    const iSlot = hdr.indexOf('slot');
+    const iEqA  = hdr.indexOf('equipoa');
+    const iEqB  = hdr.indexOf('equipob');
+    const iGolA = hdr.indexOf('gola');
+    const iGolB = hdr.indexOf('golb');
+    const iEst  = hdr.indexOf('estado');
+    const iFec  = hdr.indexOf('fecha');
+
+    const list = [];
+    for (let i = hdrIdx + 1; i < rows.length; i++) {
+      const row = rows[i];
+      const slot = (row[iSlot] || '').trim();
+      if (!/^M\d{1,2}$/i.test(slot)) continue;
+      list.push({
+        slot: slot.toUpperCase(),
+        equipoA: (row[iEqA] || '').trim(),
+        equipoB: (row[iEqB] || '').trim(),
+        golA: (row[iGolA] || '').trim(),
+        golB: (row[iGolB] || '').trim(),
+        estado: (row[iEst] || 'SCHED').trim().toUpperCase(),
+        fecha: (row[iFec] || '').trim(),
+      });
+    }
+    // Ordenar M1..M16 numéricamente
+    list.sort((a, b) => parseInt(a.slot.slice(1)) - parseInt(b.slot.slice(1)));
+    admin16Cache = list;
+  } catch (e) {
+    console.error('Error cargando 16avos:', e);
+    body.innerHTML = `<div class="admin16-loading" style="color:var(--accent)">❌ ${e.message || 'Error al cargar los cruces.'}</div>`;
+    admin16Cache = [];
+  }
+}
+
+function renderAdmin16Modal() {
+  const body = document.getElementById('admin16Body');
+  if (!admin16Cache.length) {
+    body.innerHTML = `<div class="admin16-loading">No hay cruces capturados todavía en la hoja "16avos".</div>`;
+    return;
+  }
+
+  body.innerHTML = admin16Cache.map((m, idx) => {
+    const estClass = m.estado === 'LIVE' ? 'live' : m.estado === 'FIN' ? 'fin' : 'sched';
+    return `<div class="admin16-row" id="admin16row-${idx}">
+      <div class="admin16-row-head">
+        <span class="admin16-slot">${m.slot}</span>
+        <span class="admin16-estado-tag ${estClass}" id="admin16tag-${idx}">${m.estado}</span>
+      </div>
+      <div class="admin16-grid">
+        <input class="admin16-team-input" id="admin16-eqA-${idx}" value="${m.equipoA}" placeholder="Equipo A">
+        <input class="admin16-gol-input" id="admin16-golA-${idx}" value="${m.golA}" placeholder="-" inputmode="numeric">
+        <span class="admin16-sep">VS</span>
+        <input class="admin16-gol-input" id="admin16-golB-${idx}" value="${m.golB}" placeholder="-" inputmode="numeric">
+        <input class="admin16-team-input" id="admin16-eqB-${idx}" value="${m.equipoB}" placeholder="Equipo B">
+      </div>
+      <div class="admin16-extra-row">
+        <select class="admin16-select" id="admin16-estado-${idx}">
+          <option value="SCHED"${m.estado==='SCHED'?' selected':''}>SCHED — Sin jugar</option>
+          <option value="LIVE"${m.estado==='LIVE'?' selected':''}>LIVE — En vivo</option>
+          <option value="FIN"${m.estado==='FIN'?' selected':''}>FIN — Finalizado</option>
+        </select>
+        <input class="admin16-fecha-input" id="admin16-fecha-${idx}" value="${m.fecha}" placeholder="Ej: 12 - 3:00pm">
+        <button class="admin16-save-btn" onclick="saveAdmin16Row(${idx})">💾 Guardar</button>
+      </div>
+      <div class="admin16-row-status" id="admin16-status-${idx}"></div>
+    </div>`;
+  }).join('');
+}
+
+async function saveAdmin16Row(idx) {
+  const m = admin16Cache[idx];
+  const statusEl = document.getElementById(`admin16-status-${idx}`);
+  const btn = document.querySelector(`#admin16row-${idx} .admin16-save-btn`);
+
+  const payload = {
+    clave: ADMIN_PASSWORD,
+    slot: m.slot,
+    equipoA: document.getElementById(`admin16-eqA-${idx}`).value.trim(),
+    equipoB: document.getElementById(`admin16-eqB-${idx}`).value.trim(),
+    golA: document.getElementById(`admin16-golA-${idx}`).value.trim(),
+    golB: document.getElementById(`admin16-golB-${idx}`).value.trim(),
+    estado: document.getElementById(`admin16-estado-${idx}`).value,
+    fecha: document.getElementById(`admin16-fecha-${idx}`).value.trim(),
+  };
+
+  if (ADMIN16_SCRIPT_URL.includes('PEGA_AQUI')) {
+    statusEl.textContent = '⚠️ Falta configurar ADMIN16_SCRIPT_URL en el código.';
+    statusEl.className = 'admin16-row-status err';
+    return;
+  }
+
+  btn.disabled = true;
+  statusEl.textContent = 'Guardando...';
+  statusEl.className = 'admin16-row-status';
+
+  try {
+    const r = await fetch(ADMIN16_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+    });
+    const data = await r.json();
+    if (data.ok) {
+      statusEl.textContent = `✅ ${m.slot} guardado correctamente.`;
+      statusEl.className = 'admin16-row-status ok';
+      const tag = document.getElementById(`admin16tag-${idx}`);
+      tag.textContent = payload.estado;
+      tag.className = 'admin16-estado-tag ' + (payload.estado === 'LIVE' ? 'live' : payload.estado === 'FIN' ? 'fin' : 'sched');
+      // Actualizar caché local
+      admin16Cache[idx] = { ...m, ...payload };
+    } else {
+      statusEl.textContent = `❌ ${data.error || 'Error al guardar.'}`;
+      statusEl.className = 'admin16-row-status err';
+    }
+  } catch (e) {
+    console.error('Error guardando cruce 16avos:', e);
+    statusEl.textContent = '❌ No se pudo conectar con el servidor.';
+    statusEl.className = 'admin16-row-status err';
+  } finally {
+    btn.disabled = false;
+  }
 }
   
 // ══════════════════════════════════════════════════════
