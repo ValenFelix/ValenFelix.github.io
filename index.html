@@ -919,6 +919,21 @@ html.modo-mexico .papel-picado-bar{display:flex}
 }
 @keyframes cr7-pop{from{opacity:0;transform:scale(.5) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
 
+    /* ── BOTÓN ADMIN: ACTUALIZAR RESULTADOS 16AVOS ── */
+.admin-update-btn{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;margin-top:10px;
+  padding:11px 16px;border:1px dashed var(--border);border-radius:10px;
+  background:rgba(255,255,255,0.03);color:var(--dim);
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:.5px;text-transform:uppercase;cursor:pointer;
+  transition:all .2s;
+}
+.admin-update-btn:hover{
+  border-color:var(--blue);color:var(--blue);
+  background:rgba(79,195,247,0.06);
+}
+.admin-update-btn:active{transform:scale(0.97)}
   </style>
 </head>
 <body>
@@ -2574,12 +2589,14 @@ function getLivePrediction(playerName) {
       const lbC = body.closest('.card') || body;
       if (lbC && lbC.parentNode) lbC.parentNode.insertBefore(prizeBox, lbC);
     }
-    prizeBox.innerHTML = `
+   prizeBox.innerHTML = `
       <div style="grid-column:span 3;font-weight:bold;color:#ffd700;font-size:15px;border-bottom:1px solid rgba(255,255,255,0.1);padding-bottom:8px;margin-bottom:4px;">💰 Bolsa Total: $${totalPool.toLocaleString('es-MX')} MXN</div>
       <div><div style="font-size:16px;">🥇</div><span style="font-size:11px;color:#aaa">1º (50%)</span><br><strong style="color:#fff;font-size:14px;">$${p1.toLocaleString('es-MX')}</strong></div>
       <div><div style="font-size:16px;">🥈</div><span style="font-size:11px;color:#aaa">2º (30%)</span><br><strong style="color:#fff;font-size:14px;">$${p2.toLocaleString('es-MX')}</strong></div>
-      <div><div style="font-size:16px;">🥉</div><span style="font-size:11px;color:#aaa">3º (20%)</span><br><strong style="color:#fff;font-size:14px;">$${p3.toLocaleString('es-MX')}</strong></div>`;
-
+      <div><div style="font-size:16px;">🥉</div><span style="font-size:11px;color:#aaa">3º (20%)</span><br><strong style="color:#fff;font-size:14px;">$${p3.toLocaleString('es-MX')}</strong></div>
+      <div style="grid-column:span 3">
+        <button type="button" class="admin-update-btn" onclick="adminPromptUpdateResults()">🔐 Actualizar Resultados (16avos)</button>
+      </div>`;
     if (!players.length) { body.innerHTML = '<div class="err">No hay participantes.</div>'; return; }
     // ── Calcular rangos reales (empates comparten el mismo lugar) ──
 // ── Calcular rangos reales (empates comparten el mismo lugar) ──
@@ -4222,6 +4239,21 @@ function renderPosibleLB() {
       </div>
     </div>
   `;
+}
+  // ══════════════════════════════════════════════════════
+//  ADMIN: ACTUALIZAR RESULTADOS 16AVOS (protegido por clave)
+// ══════════════════════════════════════════════════════
+const ADMIN_PASSWORD = 'CAMBIA_ESTA_CLAVE'; // 👈 pon aquí la clave que quieras
+
+function adminPromptUpdateResults() {
+  const pass = prompt('🔐 Ingresa la contraseña de administrador:');
+  if (pass === null) return; // cancelado
+  if (pass !== HalaMadridChingao) {
+    alert('❌ Contraseña incorrecta.');
+    return;
+  }
+  // ✅ Acceso concedido — aquí conectaremos el formulario de 16avos
+  alert('✅ Acceso concedido. (Próximo paso: aquí abrirá el formulario para capturar resultados de 16avos)');
 }
   
 // ══════════════════════════════════════════════════════
