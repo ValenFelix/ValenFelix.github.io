@@ -1057,6 +1057,10 @@ html.modo-mexico .papel-picado-bar{display:flex}
         <span class="omi-emoji">📊</span>
         <span class="omi-text"><b>Estadísticas</b><small>Posibilidad de remontada y datos curiosos</small></span>
       </button>
+      <button class="otras-menu-item" id="omiPred16" onclick="selectOtraOpcion('pred16')">
+        <span class="omi-emoji">📝</span>
+        <span class="omi-text"><b>Predicciones 16avos</b><small>Envía tu marcador para cada cruce</small></span>
+      </button>
     </div>
   </div>
 </nav>
@@ -1457,7 +1461,7 @@ let cr7GolEvaluado = false;
 // ══════════════════════════════════════════════════════
 //  UTILIDADES
 // ══════════════════════════════════════════════════════
-const OTRAS_OPCIONES = ['bracket', 'stats'];
+const OTRAS_OPCIONES = ['bracket', 'stats', 'pred16'];
 function switchSection(name) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('on'));
@@ -1467,14 +1471,16 @@ function switchSection(name) {
   if (navEl) navEl.classList.add('on');
   document.querySelectorAll('.otras-menu-item').forEach(it => it.classList.remove('active'));
   if (OTRAS_OPCIONES.includes(name)) {
-    const item = document.getElementById(
-      name === 'bracket' ? 'omiBracket' :
-      name === 'stats'   ? 'omiStats'   : 'omiPosibleLB'
-    );
+      const item = document.getElementById(
+    name === 'bracket' ? 'omiBracket' :
+    name === 'stats'   ? 'omiStats'   :
+    name === 'pred16'  ? 'omiPred16'  : 'omiPosibleLB'
+  );
     if (item) item.classList.add('active');
   }
   if (name === 'stats')     renderStats();
   if (name === 'posiblelb') renderPosibleLB();
+  if (name === 'pred16')    initPred16Form();
 }
 
 function toggleOtrasMenu(e) {
@@ -4538,6 +4544,177 @@ function init(){
 }
 
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
+
+  // ══════════════════════════════════════════════════════
+//  FORMULARIO PÚBLICO: PREDICCIONES 16AVOS
+// ══════════════════════════════════════════════════════
+const PRED16_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwW9_PhLtbdgQuO3Oke_msicyXAW3q_d0__bxhZ985aLCJZxC_wDAkeZyZf6l_2vpN5YQ/exec'; // 
+
+let pred16Cruces = [];      // [{slot, equipoA, equipoB, estado}]
+let pred16Loaded  = false;
+let pred16Sending = false;
+
+async function initPred16Form() {
+  if (pred16Loaded) return; // ya cargado, no repetir fetch cada vez que entras a la pestaña
+  await fetchPred16Cruces();
+  renderPred16Form();
+  pred16Loaded = true;
+}
+
+async function fetchPred16Cruces() {
+  const listEl = document.getElementById('pred16CrucesList');
+  try {
+    const r = await fetch(PRED16_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ accion: 'consultarCruces' }),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+    });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error || 'No se pudieron cargar los cruces.');
+    pred16Cruces = data.cruces || [];
+  } catch (e) {
+    console.error('Error cargando cruces 16avos:', e);
+    listEl.innerHTML = `<div class="pred16-empty-msg" style="color:var(--accent)">❌ ${e.message || 'No se pudieron cargar los cruces.'}</div>`;
+    pred16Cruces = [];
+  }
+}
+
+function renderPred16Form() {
+  const listEl = document.getElementById('pred16CrucesList');
+  if (!pred16Cruces.length) {
+    listEl.innerHTML = `<div class="pred16-empty-msg">Aún no hay cruces de 16avos capturados. Vuelve más tarde.</div>`;
+    document.getElementById('pred16SubmitBtn').style.display = 'none';
+    return;
+  }
+
+  const sinEquipos = pred16Cruces.every(c => !c.equipoA || !c.equipoB);
+  if (sinEquipos) {
+    listEl.innerHTML = `<div class="pred16-empty-msg">⏳ Los cruces de 16avos todavía no están definidos. Vuelve cuando termine la fase de grupos.</div>`;
+    document.getElementById('pred16SubmitBtn').style.display = 'none';
+    return;
+  }
+
+  listEl.innerHTML = pred16Cruces.map(c => {
+    const locked = c.estado === 'LIVE' || c.estado === 'FIN';
+    const tagClass = c.estado === 'LIVE' ? 'live' : c.estado === 'FIN' ? 'fin' : '';
+    const tagLabel = c.estado === 'LIVE' ? 'EN VIVO' : c.estado === 'FIN' ? 'FINALIZADO' : 'ABIERTO';
+    const flagA = fl(c.equipoA), flagB = fl(c.equipoB);
+
+    if (!c.equipoA || !c.equipoB) {
+      return `<div class="pred16-cruce-card locked">
+        <div class="pred16-cruce-head">
+          <span class="pred16-slot-tag">${c.slot}</span>
+          <span class="pred16-lock-tag">POR DEFINIR</span>
+        </div>
+        <div class="pred16-team-name" style="color:var(--muted);font-style:italic">Equipos aún no confirmados</div>
+      </div>`;
+    }
+
+    return `<div class="pred16-cruce-card${locked ? ' locked' : ''}">
+      <div class="pred16-cruce-head">
+        <span class="pred16-slot-tag">${c.slot}</span>
+        <span class="pred16-lock-tag ${tagClass}">${tagLabel}</span>
+      </div>
+      <div class="pred16-teams-row">
+        <span class="pred16-team-name">${flagA} ${c.equipoA}</span>
+        <input class="pred16-gol-input" id="p16-golA-${c.slot}" type="number" min="0" max="20" ${locked ? 'disabled' : ''} placeholder="-">
+        <span class="pred16-vs">VS</span>
+        <input class="pred16-gol-input" id="p16-golB-${c.slot}" type="number" min="0" max="20" ${locked ? 'disabled' : ''} placeholder="-">
+        <span class="pred16-team-name">${c.equipoB} ${flagB}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('pred16SubmitBtn').style.display = '';
+}
+
+async function enviarPred16() {
+  if (pred16Sending) return;
+  const statusEl = document.getElementById('pred16Status');
+  const btn = document.getElementById('pred16SubmitBtn');
+
+  const nombre   = document.getElementById('p16Nombre').value.trim();
+  const telefono = document.getElementById('p16Telefono').value.trim();
+
+  if (!nombre || !telefono) {
+    statusEl.textContent = '⚠️ Escribe tu nombre y teléfono.';
+    statusEl.className = 'pred16-status err';
+    return;
+  }
+
+  // Recolectar picks solo de cruces abiertos (SCHED) y con ambos equipos definidos
+  const picks = {};
+  let huboError = false;
+  pred16Cruces.forEach(c => {
+    if (c.estado !== 'SCHED' || !c.equipoA || !c.equipoB) return;
+    const golAEl = document.getElementById(`p16-golA-${c.slot}`);
+    const golBEl = document.getElementById(`p16-golB-${c.slot}`);
+    if (!golAEl || !golBEl) return;
+    const golA = golAEl.value.trim();
+    const golB = golBEl.value.trim();
+    if (golA === '' && golB === '') return; // no contestó ese cruce, se omite
+    if (golA === '' || golB === '' || isNaN(golA) || isNaN(golB)) {
+      huboError = true;
+      return;
+    }
+    picks[c.slot] = `${parseInt(golA)}-${parseInt(golB)}`;
+  });
+
+  if (huboError) {
+    statusEl.textContent = '⚠️ Hay marcadores incompletos. Completa ambos goles o deja el cruce vacío.';
+    statusEl.className = 'pred16-status err';
+    return;
+  }
+
+  if (!Object.keys(picks).length) {
+    statusEl.textContent = '⚠️ No escribiste ninguna predicción.';
+    statusEl.className = 'pred16-status err';
+    return;
+  }
+
+  if (PRED16_SCRIPT_URL.includes('PEGA_AQUI')) {
+    statusEl.textContent = '⚠️ Falta configurar PRED16_SCRIPT_URL en el código.';
+    statusEl.className = 'pred16-status err';
+    return;
+  }
+
+  pred16Sending = true;
+  btn.disabled = true;
+  statusEl.textContent = 'Enviando tus predicciones...';
+  statusEl.className = 'pred16-status';
+
+  try {
+    const r = await fetch(PRED16_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ nombre, telefono, picks }),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+    });
+    const data = await r.json();
+    if (data.ok) {
+      statusEl.textContent = `✅ ¡Listo, ${data.nombre}! Se guardaron ${data.guardados} predicciones.`;
+      statusEl.className = 'pred16-status ok';
+      btn.style.display = 'none';
+      // Deshabilitar todos los inputs para evitar reenvío visual
+      pred16Cruces.forEach(c => {
+        const a = document.getElementById(`p16-golA-${c.slot}`);
+        const b = document.getElementById(`p16-golB-${c.slot}`);
+        if (a) a.disabled = true;
+        if (b) b.disabled = true;
+      });
+    } else {
+      statusEl.textContent = `❌ ${data.error || 'No se pudo guardar tu predicción.'}`;
+      statusEl.className = 'pred16-status err';
+      btn.disabled = false;
+    }
+  } catch (e) {
+    console.error('Error enviando picks 16avos:', e);
+    statusEl.textContent = '❌ No se pudo conectar con el servidor. Intenta de nuevo.';
+    statusEl.className = 'pred16-status err';
+    btn.disabled = false;
+  } finally {
+    pred16Sending = false;
+  }
+}
 </script>
 </body>
 </html>
