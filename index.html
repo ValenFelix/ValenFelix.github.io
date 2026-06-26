@@ -77,6 +77,59 @@
     .dot.live{background:var(--accent);animation:pulse 1.5s infinite}
     @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
+
+/* ── AVISO PREDICCIONES 16AVOS ── */
+.pred16-notice-wrap{
+  max-width:1100px;margin:0 auto;padding:0 16px 20px;
+}
+.pred16-notice-banner{
+  background:linear-gradient(135deg,rgba(245,200,66,0.11) 0%,rgba(79,195,247,0.07) 100%);
+  border:1px solid rgba(245,200,66,0.55);border-radius:14px;
+  padding:16px 20px;
+  display:flex;align-items:center;gap:16px;
+  cursor:pointer;transition:all .2s ease;
+  box-shadow:0 4px 20px rgba(245,200,66,0.08);
+  animation:pred16-notice-glow 2.8s ease-in-out infinite;
+}
+.pred16-notice-banner:hover{
+  border-color:rgba(245,200,66,0.85);
+  transform:translateY(-2px);
+  box-shadow:0 8px 32px rgba(245,200,66,0.18);
+}
+.pred16-notice-icon{
+  font-size:34px;flex-shrink:0;
+  animation:flag-bounce 2s ease-in-out infinite;
+}
+.pred16-notice-body{flex:1;min-width:0}
+.pred16-notice-title{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(18px,3vw,23px);font-weight:900;
+  color:var(--gold);line-height:1.1;letter-spacing:-.2px;
+}
+.pred16-notice-sub{
+  font-size:13px;color:var(--dim);margin-top:4px;line-height:1.4;
+}
+.pred16-notice-cta{
+  flex-shrink:0;margin-left:auto;
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;
+  letter-spacing:.5px;text-transform:uppercase;
+  background:var(--gold);color:#000;border:none;
+  padding:9px 20px;border-radius:8px;cursor:pointer;
+  box-shadow:0 4px 14px rgba(245,200,66,0.3);
+  transition:all .15s ease;white-space:nowrap;
+}
+.pred16-notice-cta:hover{background:#ffe066;box-shadow:0 6px 20px rgba(245,200,66,0.45);}
+@keyframes pred16-notice-glow{
+  0%,100%{box-shadow:0 4px 20px rgba(245,200,66,0.08);}
+  50%    {box-shadow:0 6px 28px rgba(245,200,66,0.2),0 0 16px 2px rgba(245,200,66,0.07);}
+}
+@media(max-width:600px){
+  .pred16-notice-cta{width:100%;margin-left:0;margin-top:10px;}
+  .pred16-notice-banner{flex-wrap:wrap;}
+}
+
+
+    
     /* ── LIVE BADGE ── */
     .live-badge{
       display:inline-flex;align-items:center;gap:6px;
@@ -1084,6 +1137,21 @@ html.modo-mexico .papel-picado-bar{display:flex}
 </nav>
 
 <div class="section active" id="secQuiniela">
+  <!-- ══ AVISO 16AVOS ══ -->
+<div class="pred16-notice-wrap" id="pred16NoticeWrap">
+  <div class="pred16-notice-banner"
+       role="button" tabindex="0"
+       onclick="selectOtraOpcion('pred16')"
+       onkeydown="if(event.key==='Enter'||event.key===' ')selectOtraOpcion('pred16')"
+       title="Ir a Predicciones 16avos">
+    <span class="pred16-notice-icon">📝</span>
+    <div class="pred16-notice-body">
+      <div class="pred16-notice-title">¡Ya están abiertos los Dieciseisavos de Final!</div>
+      <div class="pred16-notice-sub">Registra tu marcador para los cruces de eliminación directa antes de que cierren. ¡No te quedes fuera!</div>
+    </div>
+    <button class="pred16-notice-cta" type="button">Ir a predicciones →</button>
+  </div>
+</div>
   <div class="wrap">
     <div style="display:flex;flex-direction:column;gap:24px">
 
