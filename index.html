@@ -1016,6 +1016,24 @@ html.modo-mexico .papel-picado-bar{display:flex}
 .admin16-row-status.ok{color:var(--green)}
 .admin16-row-status.err{color:var(--accent)}
 .admin16-loading{padding:30px;text-align:center;color:var(--muted);font-size:13px}
+
+.pred16-empty-msg{padding:18px;text-align:center;color:var(--muted);font-size:13px}
+.pred16-status{margin-top:8px;font-size:12px;text-align:center;color:var(--dim);min-height:16px}
+.pred16-status.ok{color:var(--green)}
+.pred16-status.err{color:var(--accent)}
+.pred16-cruce-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:10px}
+.pred16-cruce-card.locked{opacity:.55}
+.pred16-cruce-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.pred16-slot-tag{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;color:var(--dim);background:var(--card);border:1px solid var(--border);border-radius:5px;padding:2px 9px}
+.pred16-lock-tag{font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:1px;text-transform:uppercase;background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.35);border-radius:5px;padding:2px 8px}
+.pred16-lock-tag.live{background:rgba(255,23,68,.12);color:var(--live-red);border-color:rgba(255,23,68,.35)}
+.pred16-lock-tag.fin{background:rgba(84,110,122,.14);color:var(--muted);border-color:rgba(84,110,122,.3)}
+.pred16-teams-row{display:grid;grid-template-columns:1fr 50px auto 50px 1fr;align-items:center;gap:8px}
+.pred16-team-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--text)}
+.pred16-vs{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--muted);text-align:center}
+.pred16-gol-input{background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;padding:7px 4px;outline:none;width:100%;text-align:center}
+.pred16-gol-input:focus{border-color:var(--gold)}
+.pred16-gol-input:disabled{opacity:.4}
     
   </style>
 </head>
@@ -1298,6 +1316,28 @@ html.modo-mexico .papel-picado-bar{display:flex}
   <div class="bracket-wrap">
     <div class="eyebrow-sm">🔮 Posible Leaderboard — Simulación con Grupos Actuales</div>
     <div id="posibleLBContent"><div class="err">⏳ Cargando datos…</div></div>
+  </div>
+</div>
+  <div class="section" id="secPred16">
+  <div class="bracket-wrap">
+    <div class="eyebrow-sm">📝 Predicciones de dieciseisavos de Final</div>
+    <div class="card" style="padding:20px">
+      <div class="cb-head-sub" style="margin-bottom:16px">
+        Escribe tu nombre y el teléfono con el que te registraste en la quiniela, y manda tu marcador para cada cruce que esté abierto. Solo puedes enviarlas una vez.
+      </div>
+
+      <div class="fb-label">Tu nombre</div>
+      <input class="fb-input" id="p16Nombre" type="text" placeholder="Nombre completo" maxlength="60" autocomplete="off">
+
+      <div class="fb-label" style="margin-top:12px">Tu teléfono registrado</div>
+      <input class="fb-input" id="p16Telefono" type="tel" placeholder="10 dígitos" maxlength="20" autocomplete="off">
+
+      <div class="fb-label" style="margin-top:20px">Cruces de dieciseisavos</div>
+      <div id="pred16CrucesList"><div class="pred16-empty-msg">⏳ Cargando cruces…</div></div>
+
+      <button class="fb-submit" id="pred16SubmitBtn" onclick="enviarPred16()" style="margin-top:14px">Enviar Predicciones 🚀</button>
+      <div class="pred16-status" id="pred16Status"></div>
+    </div>
   </div>
 </div>
 
@@ -4349,7 +4389,7 @@ function renderPosibleLB() {
 //  ADMIN: ACTUALIZAR RESULTADOS 16AVOS (protegido por clave)
 // ══════════════════════════════════════════════════════
 const ADMIN_PASSWORD   = 'HalaMadridChingao'; // 👈 misma clave que en el Apps Script
-const GID_16AVOS        = '493132322';
+const GID_16AVOS        = '681477915';
 const ADMIN16_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx3o4EOidOa9LFlDvX7Rd1IMZbMaaEdpjU3MdEFcUSXTQX6KyImzQriUS0X9_eMkMD5_w/exec'; // 👈 URL del despliegue nuevo
 
 let admin16Cache = []; // [{slot, equipoA, equipoB, golA, golB, estado, fecha}]
