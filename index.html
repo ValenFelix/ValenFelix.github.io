@@ -1279,7 +1279,7 @@ html.modo-mexico .papel-picado-bar{display:flex}
 <nav class="main-nav">
   <button class="main-tab on" id="navQuiniela" onclick="switchSection('quiniela')">🏆 Quiniela</button>
   <button class="main-tab games-tab" id="navGames" onclick="switchSection('games')">🎮 Mini Juegos</button>
-  <button class="main-tab" id="navDuel" onclick="switchSection('duel')">⚔️ 1v1</button>
+  <button class="main-tab" id="navLeyendas" onclick="switchSection('leyendas')">👑 Leyendas</button>
   <div class="nav-more-wrap" id="navMoreWrap">
     <button class="main-tab" id="navOtras" onclick="toggleOtrasMenu(event)">🗂️ Otras Opciones</button>
     <div class="otras-menu" id="otrasMenu">
@@ -1295,9 +1295,9 @@ html.modo-mexico .papel-picado-bar{display:flex}
         <span class="omi-emoji">📝</span>
         <span class="omi-text"><b>Predicciones 16avos</b><small>Envía tu marcador para cada cruce</small></span>
       </button>
-      <button class="otras-menu-item" id="omiLeyendas" onclick="selectOtraOpcion('leyendas')">
-        <span class="omi-emoji">👑</span>
-        <span class="omi-text"><b>Leyendas</b><small>Encuestas y homenaje a los grandes</small></span>
+      <button class="otras-menu-item" id="omiDuel" onclick="selectOtraOpcion('duel')">
+        <span class="omi-emoji">⚔️</span>
+        <span class="omi-text"><b>1v1</b><small>Compara predicciones cara a cara</small></span>
       </button>
     </div>
   </div>
@@ -2038,7 +2038,7 @@ let cr7GolEvaluado = false;
 // ══════════════════════════════════════════════════════
 //  UTILIDADES
 // ══════════════════════════════════════════════════════
-const OTRAS_OPCIONES = ['bracket', 'stats', 'pred16', 'leyendas'];
+const OTRAS_OPCIONES = ['bracket', 'stats', 'pred16', 'duel'];
 function switchSection(name) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('on'));
@@ -2048,12 +2048,12 @@ function switchSection(name) {
   if (navEl) navEl.classList.add('on');
   document.querySelectorAll('.otras-menu-item').forEach(it => it.classList.remove('active'));
   if (OTRAS_OPCIONES.includes(name)) {
-      const item = document.getElementById(
-    name === 'bracket'  ? 'omiBracket'  :
-    name === 'stats'    ? 'omiStats'    :
-    name === 'pred16'   ? 'omiPred16'   :
-    name === 'leyendas' ? 'omiLeyendas' : 'omiPosibleLB'
-  );
+    const item = document.getElementById(
+      name === 'bracket' ? 'omiBracket' :
+      name === 'stats'   ? 'omiStats'   :
+      name === 'pred16'  ? 'omiPred16'  :
+      name === 'duel'    ? 'omiDuel'    : 'omiPosibleLB'
+    );
     if (item) item.classList.add('active');
   }
   if (name === 'stats')     renderStats();
