@@ -2059,6 +2059,7 @@ function switchSection(name) {
   if (name === 'stats')     renderStats();
   if (name === 'posiblelb') renderPosibleLB();
   if (name === 'pred16')    initPred16Form();
+  if (name === 'leyendas')  fetchGlobalPollCounts().then(() => initPolls());
 }
 
 function toggleOtrasMenu(e) {
@@ -5418,64 +5419,43 @@ if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded'
 // ══════════════════════════════════════════════════════
 const POLL_COLORS = ['var(--green)','var(--gold)','var(--blue)','var(--accent)','var(--silver)'];
 
-// Conteos globales leídos desde Google Sheets (ENCUESTAS_GID)
-// Estructura: { qid: { optIdx: count } }
-let globalPollCounts = {};
+// Conteos globales leídos desde el Sheets (se reemplazan en cada fetch)
+let globalPollData = {}; // { [qid]: { [opcionText]: count, _otros: string[] } }
 
-/* ── Lee los votos guardados en Sheets y construye globalPollCounts ── */
-async function fetchPollStats() {
+async function fetchGlobalPollCounts() {
   try {
     const r = await fetch(csvUrl(GAMES_SID, ENCUESTAS_GID));
     if (!r.ok) return;
     const rows = parseCSV(await r.text());
     if (rows.length < 2) return;
-
-    const hdr = rows[0].map(h => (h || '').toLowerCase().trim());
-    const iEnc = hdr.findIndex(h => h === 'encuesta');
-    const iOpc = hdr.findIndex(h => h === 'opcion' || h === 'opción');
-    if (iEnc < 0 || iOpc < 0) return;
-
-    // Agrupar votos por encuesta y opción (texto)
-    const sheetCounts = {}; // { qid: { optionText: count } }
+    // Detectar columnas por nombre de header (flexiblе)
+    const header = rows[0].map(h => h.toLowerCase().trim());
+    const iQid     = header.findIndex(h => h.includes('encuesta'));
+    const iOpcion  = header.findIndex(h => h.includes('opcion'));
+    const iEsOtro  = header.findIndex(h => h.includes('esotr'));
+    const iOtroTxt = header.findIndex(h => h.includes('textootro') || (h.includes('texto') && h.includes('otro')));
+    if (iQid === -1 || iOpcion === -1) {
+      console.warn('Encuestas CSV: no se encontraron columnas encuesta/opcion', header);
+      return;
+    }
+    const data = {};
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
-      const qid   = (row[iEnc] || '').trim();
-      const opcion = (row[iOpc] || '').trim();
+      if (row.length < 2) continue;
+      const qid    = (row[iQid]    || '').trim();
+      const opcion = (row[iOpcion] || '').trim();
       if (!qid || !opcion) continue;
-      if (!sheetCounts[qid]) sheetCounts[qid] = {};
-      sheetCounts[qid][opcion] = (sheetCounts[qid][opcion] || 0) + 1;
+      if (!data[qid]) data[qid] = { _otros: [] };
+      data[qid][opcion] = (data[qid][opcion] || 0) + 1;
+      const esOtro  = iEsOtro  !== -1 ? (row[iEsOtro]  || '').trim().toLowerCase() : '';
+      const otroTxt = iOtroTxt !== -1 ? (row[iOtroTxt] || '').trim() : '';
+      if ((esOtro === 'true' || opcion === '✏️ Otro') && otroTxt) {
+        data[qid]._otros.push(otroTxt);
+      }
     }
-
-    // Convertir de texto-de-botón → índice usando el DOM
-    const newGlobal = {};
-    document.querySelectorAll('.enc-card').forEach(card => {
-      const qid    = card.dataset.qid;
-      const qCnts  = sheetCounts[qid] || {};
-      const opts   = card.querySelectorAll('.enc-option');
-      const idxCnts = {};
-      opts.forEach((opt, i) => {
-        const btnText = (opt.querySelector('.enc-vote-btn')?.textContent || '').trim();
-        // Coincidencia exacta primero, luego parcial
-        if (qCnts[btnText] !== undefined) {
-          idxCnts[i] = qCnts[btnText];
-        } else {
-          const matchKey = Object.keys(qCnts).find(k =>
-            k.startsWith(btnText) || btnText.startsWith(k)
-          );
-          idxCnts[i] = matchKey ? qCnts[matchKey] : 0;
-        }
-      });
-      newGlobal[qid] = idxCnts;
-    });
-    globalPollCounts = newGlobal;
-
-    // Re-renderizar las tarjetas donde el usuario ya votó
-    document.querySelectorAll('.enc-card').forEach(card => {
-      const savedVote = localStorage.getItem('poll_v2_' + card.dataset.qid);
-      if (savedVote !== null) showPollResults(card, savedVote);
-    });
+    globalPollData = data;
   } catch(e) {
-    console.error('Error cargando estadísticas de encuestas desde Sheets:', e);
+    console.warn('No se pudieron cargar encuestas globales:', e);
   }
 }
 
@@ -5521,6 +5501,13 @@ function votePoll(qid, optIdx, otroTexto) {
        || chosenOpt?.querySelector('.enc-opt-name')?.textContent.trim()
        || '');
 
+  // Actualización optimista: sumar este voto a globalPollData para que
+  // el porcentaje sea correcto sin esperar otro fetch al Sheets
+  const keyGlobal = esOtro ? '✏️ Otro' : opcionTxt;
+  if (!globalPollData[qid]) globalPollData[qid] = { _otros: [] };
+  globalPollData[qid][keyGlobal] = (globalPollData[qid][keyGlobal] || 0) + 1;
+  if (esOtro && otroTexto) globalPollData[qid]._otros.push(otroTexto);
+
   showPollResults(card, optIdx);
   sendPollVoteToSheet(qid, pregunta, opcionTxt, esOtro, otroTexto || '');
 }
@@ -5545,12 +5532,39 @@ function sendPollVoteToSheet(qid, pregunta, opcion, esOtro, textoOtro) {
 
 function showPollResults(card, chosenIdx) {
   const qid = card.dataset.qid;
-  const key = 'poll_c_' + qid;
-  const counts = JSON.parse(localStorage.getItem(key) || '{}');
   const opts = card.querySelectorAll('.enc-option');
+
+  // Construir mapa opcionText → índice usando el DOM
+  const nameToIdx = {};
+  opts.forEach((opt, i) => {
+    if (opt.classList.contains('enc-option-otro')) {
+      nameToIdx['✏️ Otro'] = i;
+    } else {
+      const btnTxt = opt.querySelector('.enc-vote-btn')?.textContent.trim();
+      if (btnTxt) nameToIdx[btnTxt] = i;
+    }
+  });
+
+  // Usar datos globales del Sheets si están disponibles; si no, localStorage
+  let counts;
+  const gData = globalPollData[qid];
+  if (gData) {
+    counts = {};
+    for (const [name, val] of Object.entries(gData)) {
+      if (name === '_otros') continue;
+      const idx = nameToIdx[name];
+      if (idx !== undefined) counts[idx] = (counts[idx] || 0) + val;
+    }
+  } else {
+    counts = JSON.parse(localStorage.getItem('poll_c_' + qid) || '{}');
+  }
+
   const rawTotal = Array.from(opts).reduce((s, _, i) => s + (counts[i] || 0), 0);
   const divisor = rawTotal || 1;
-  const otroTexts = JSON.parse(localStorage.getItem('poll_otro_txt_' + qid) || '[]');
+  // Textos de "Otro": preferir los globales, sino localStorage
+  const otroTexts = (gData && gData._otros && gData._otros.length)
+    ? gData._otros
+    : JSON.parse(localStorage.getItem('poll_otro_txt_' + qid) || '[]');
 
   opts.forEach((opt, i) => {
     const btn       = opt.querySelector('.enc-vote-btn');
@@ -5575,7 +5589,7 @@ function showPollResults(card, chosenIdx) {
   });
 
   const totalEl = card.querySelector('.enc-total');
-  if (totalEl) totalEl.textContent = rawTotal + (rawTotal === 1 ? ' voto' : ' votos');
+  if (totalEl) totalEl.textContent = rawTotal + (rawTotal === 1 ? ' voto' : ' votos') + (gData ? ' · global 🌐' : '');
   const revote = card.querySelector('.enc-revote-btn');
   if (revote) revote.style.display = 'inline';
 }
@@ -5610,7 +5624,9 @@ function resetPoll(qid) {
   if (totalEl) totalEl.textContent = 'Sin votos aún';
 }
 
-function initPolls() {
+async function initPolls() {
+  // Si aún no hay datos globales, intenta cargarlos primero
+  if (!Object.keys(globalPollData).length) await fetchGlobalPollCounts();
   document.querySelectorAll('.enc-card').forEach(card => {
     const qid = card.dataset.qid;
     const savedVote = localStorage.getItem('poll_v2_' + qid);
