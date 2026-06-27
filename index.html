@@ -1183,6 +1183,73 @@ html.modo-mexico .papel-picado-bar{display:flex}
   .gs-progress-sub{flex-direction:column;gap:4px}
 }
 
+/* ══ LEYENDAS: ENCUESTAS ══ */
+.enc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:32px}
+.enc-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:12px;position:relative;overflow:hidden}
+.enc-badge{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);background:rgba(245,200,66,0.1);border:1px solid rgba(245,200,66,0.3);border-radius:100px;padding:3px 10px;width:fit-content}
+.enc-question{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:900;color:var(--text);line-height:1.2}
+.enc-options{display:flex;flex-direction:column;gap:8px}
+.enc-vote-btn{width:100%;font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:800;padding:11px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;text-align:left;transition:all .2s ease}
+.enc-vote-btn:hover{border-color:var(--gold);background:rgba(245,200,66,0.06);transform:translateY(-1px)}
+.enc-result{display:none;padding:4px 0}
+.enc-result-label{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.enc-opt-name{font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--text)}
+.enc-pct{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;color:var(--text)}
+.enc-bar-bg{height:7px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden}
+.enc-bar-fill{height:100%;border-radius:100px;width:0%;transition:width .9s cubic-bezier(.4,0,.2,1)}
+.enc-option.my-vote .enc-opt-name::after{content:' ✓';color:var(--green);font-size:12px}
+.enc-footer{display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid var(--border);margin-top:4px}
+.enc-total{font-size:11px;color:var(--muted);font-weight:600;font-family:'Barlow Condensed',sans-serif;letter-spacing:.5px}
+.enc-revote-btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;background:none;border:none;color:var(--dim);cursor:pointer;padding:0;transition:color .15s;display:none}
+.enc-revote-btn:hover{color:var(--text)}
+.enc-otro-input-row{display:flex;gap:8px;align-items:center}
+.enc-otro-input{flex:1;min-width:0;font-family:'Barlow',sans-serif;font-size:14px;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--text)}
+.enc-otro-input:focus{outline:none;border-color:var(--gold)}
+.enc-otro-send{flex-shrink:0;font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;letter-spacing:.3px;padding:10px 16px;border-radius:10px;border:none;background:var(--gold);color:#000;cursor:pointer;white-space:nowrap;transition:all .15s ease}
+.enc-otro-send:hover{background:#ffe066}
+.enc-otro-texts{font-size:11px;color:var(--dim);margin-top:6px;line-height:1.5;font-style:italic;word-break:break-word}
+
+/* ══ LEYENDAS: TRIBUTO ══ */
+.ley-divider{height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:8px 0 30px}
+.ley-tribute-eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:var(--gold);text-align:center;margin-bottom:8px;opacity:.9}
+.ley-tribute-title{font-family:'Barlow Condensed',sans-serif;font-size:clamp(22px,5vw,34px);font-weight:900;color:var(--text);text-align:center;line-height:1.15;margin-bottom:6px}
+.ley-tribute-sub{font-size:14px;color:var(--dim);text-align:center;max-width:560px;margin:0 auto 28px;line-height:1.6}
+.ley-main-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px}
+@media(max-width:650px){.ley-main-grid{grid-template-columns:1fr;gap:46px}.enc-grid{grid-template-columns:1fr}}
+.legend-main-card{position:relative;overflow:hidden;border-radius:18px;padding:26px 22px;display:flex;flex-direction:column;gap:14px;transition:transform .25s ease}
+.legend-main-card:hover{transform:translateY(-4px)}
+.legend-main-card.messi{background:linear-gradient(145deg,#0a1a3e 0%,#0d2b5e 50%,#0e2a0a 100%);border:1px solid rgba(108,188,86,0.5);animation:lglow-messi 3s ease-in-out infinite}
+.legend-main-card.cr7{background:linear-gradient(145deg,#200808 0%,#3d0e0e 50%,#0a0e20 100%);border:1px solid rgba(245,200,66,0.5);animation:lglow-cr7 3s ease-in-out infinite}
+@keyframes lglow-messi{0%,100%{box-shadow:0 8px 40px rgba(108,188,86,0.15)}50%{box-shadow:0 12px 56px rgba(108,188,86,0.32),0 0 20px rgba(108,188,86,0.1)}}
+@keyframes lglow-cr7{0%,100%{box-shadow:0 8px 40px rgba(245,200,66,0.12)}50%{box-shadow:0 12px 56px rgba(245,200,66,0.28),0 0 20px rgba(245,200,66,0.1)}}
+.legend-card-bg-num{position:absolute;top:-10px;right:-8px;font-family:'Barlow Condensed',sans-serif;font-size:160px;font-weight:900;opacity:0.05;line-height:1;pointer-events:none;color:#fff}
+.legend-shine{position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.04),transparent);animation:lshine 5.5s ease-in-out infinite;pointer-events:none}
+@keyframes lshine{0%,100%{left:-60%;opacity:0}38%{left:120%;opacity:1}39%{opacity:0}}
+.legend-flag{font-size:34px;line-height:1}
+.legend-name-row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.legend-name{font-family:'Barlow Condensed',sans-serif;font-size:clamp(24px,4vw,34px);font-weight:900;color:#fff;line-height:1;letter-spacing:-0.5px}
+.legend-nickname{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:rgba(255,255,255,0.45);letter-spacing:.5px;text-transform:uppercase}
+.legend-country{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:rgba(255,255,255,0.6);letter-spacing:1px;text-transform:uppercase;margin-top:-6px}
+.legend-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(80px,1fr));gap:8px;margin-top:4px}
+.legend-stat{background:rgba(0,0,0,0.28);border-radius:10px;padding:9px 10px;border:1px solid rgba(255,255,255,0.07)}
+.legend-stat-val{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--gold);line-height:1}
+.legend-stat-lbl{font-size:10px;color:rgba(255,255,255,0.45);font-weight:600;letter-spacing:.3px;text-transform:uppercase;margin-top:2px;line-height:1.2}
+.legend-quote{font-size:13px;color:rgba(255,255,255,0.65);font-style:italic;line-height:1.55;border-left:2px solid rgba(255,255,255,0.2);padding-left:10px;margin-top:2px}
+/* secondary legends */
+.ley-secondary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-top:4px}
+.legend-small-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;transition:transform .2s ease,border-color .2s ease;position:relative;overflow:hidden}
+.legend-small-card:hover{transform:translateY(-3px);border-color:var(--dim)}
+.legend-small-header{display:flex;align-items:center;gap:10px}
+.legend-small-flag{font-size:26px;flex-shrink:0}
+.legend-small-name{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;color:var(--text);line-height:1}
+.legend-small-role{font-size:10px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.legend-small-desc{font-size:12px;color:var(--dim);line-height:1.5}
+.legend-small-tag{display:inline-block;font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:3px 9px;border-radius:100px;width:fit-content}
+.ley-closing{margin-top:30px;text-align:center;padding:28px 24px;background:linear-gradient(135deg,rgba(245,200,66,0.07) 0%,rgba(0,230,118,0.05) 100%);border:1px solid rgba(245,200,66,0.2);border-radius:16px}
+.ley-closing-emoji{font-size:32px;margin-bottom:8px}
+.ley-closing-text{font-family:'Barlow Condensed',sans-serif;font-size:clamp(18px,3.5vw,24px);font-weight:900;color:var(--text);line-height:1.3}
+.ley-closing-sub{font-size:13px;color:var(--dim);margin-top:8px;line-height:1.6;max-width:520px;margin-left:auto;margin-right:auto}
+
 </style>
 </head>
 <body>
@@ -1227,6 +1294,10 @@ html.modo-mexico .papel-picado-bar{display:flex}
       <button class="otras-menu-item" id="omiPred16" onclick="selectOtraOpcion('pred16')">
         <span class="omi-emoji">📝</span>
         <span class="omi-text"><b>Predicciones 16avos</b><small>Envía tu marcador para cada cruce</small></span>
+      </button>
+      <button class="otras-menu-item" id="omiLeyendas" onclick="selectOtraOpcion('leyendas')">
+        <span class="omi-emoji">👑</span>
+        <span class="omi-text"><b>Leyendas</b><small>Encuestas y homenaje a los grandes</small></span>
       </button>
     </div>
   </div>
@@ -1505,6 +1576,306 @@ html.modo-mexico .papel-picado-bar{display:flex}
   </div>
 </div>
 
+<div class="section" id="secLeyendas">
+  <div class="bracket-wrap">
+
+    <div class="eyebrow-sm" style="margin-top:0">🗳️ Encuestas del Mundial</div>
+    <p style="font-size:13px;color:var(--dim);margin:-6px 0 16px;line-height:1.5">Vota anónimamente desde tu dispositivo. Los resultados aparecen al instante después de votar.</p>
+
+    <div class="enc-grid">
+
+      <div class="enc-card" data-qid="goat">
+        <div class="enc-badge">DEBATE ETERNO</div>
+        <div class="enc-question">¿Quién fue el mejor futbolista de esta generación?</div>
+        <div class="enc-options">
+          <div class="enc-option" data-idx="0">
+            <button class="enc-vote-btn" onclick="votePoll('goat',0)">🐐 Lionel Messi</button>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">🐐 Messi</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div></div>
+          </div>
+          <div class="enc-option" data-idx="1">
+            <button class="enc-vote-btn" onclick="votePoll('goat',1)">👑 Cristiano Ronaldo</button>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">👑 Cristiano</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div></div>
+          </div>
+          <div class="enc-option enc-option-otro" data-idx="2">
+            <button class="enc-vote-btn" id="otroBtn-goat" onclick="toggleOtroInput('goat')">✏️ Otro (escribe el tuyo)</button>
+            <div class="enc-otro-input-row" id="otroInputRow-goat" style="display:none">
+              <input type="text" class="enc-otro-input" id="otroInput-goat" placeholder="Escribe tu respuesta…" maxlength="60" onkeydown="if(event.key==='Enter')submitOtroVote('goat',2)">
+              <button class="enc-otro-send" onclick="submitOtroVote('goat',2)">Enviar</button>
+            </div>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">✏️ Otro</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div><div class="enc-otro-texts" id="otroTexts-goat"></div></div>
+          </div>
+        </div>
+        <div class="enc-footer">
+          <span class="enc-total">Sin votos aún</span>
+          <button class="enc-revote-btn" onclick="resetPoll('goat')">↩ Cambiar voto</button>
+        </div>
+      </div>
+
+      <div class="enc-card" data-qid="extraniar">
+        <div class="enc-badge">DESPEDIDA</div>
+        <div class="enc-question">¿A quién extrañarás más en los próximos mundiales?</div>
+        <div class="enc-options">
+          <div class="enc-option" data-idx="0">
+            <button class="enc-vote-btn" onclick="votePoll('extraniar',0)">🐐 Lionel Messi</button>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">🐐 Messi</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div></div>
+          </div>
+          <div class="enc-option" data-idx="1">
+            <button class="enc-vote-btn" onclick="votePoll('extraniar',1)">👑 Cristiano Ronaldo</button>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">👑 Cristiano</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div></div>
+          </div>
+          <div class="enc-option" data-idx="2">
+            <button class="enc-vote-btn" onclick="votePoll('extraniar',2)">🎩 Luka Modric</button>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">🎩 Modric</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div></div>
+          </div>
+          <div class="enc-option" data-idx="3">
+            <button class="enc-vote-btn" onclick="votePoll('extraniar',3)">✨ Neymar Jr.</button>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">✨ Neymar</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div></div>
+          </div>
+          <div class="enc-option enc-option-otro" data-idx="4">
+            <button class="enc-vote-btn" id="otroBtn-extraniar" onclick="toggleOtroInput('extraniar')">✏️ Otro (escribe el tuyo)</button>
+            <div class="enc-otro-input-row" id="otroInputRow-extraniar" style="display:none">
+              <input type="text" class="enc-otro-input" id="otroInput-extraniar" placeholder="Escribe tu respuesta…" maxlength="60" onkeydown="if(event.key==='Enter')submitOtroVote('extraniar',4)">
+              <button class="enc-otro-send" onclick="submitOtroVote('extraniar',4)">Enviar</button>
+            </div>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">✏️ Otro</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div><div class="enc-otro-texts" id="otroTexts-extraniar"></div></div>
+          </div>
+        </div>
+        <div class="enc-footer">
+          <span class="enc-total">Sin votos aún</span>
+          <button class="enc-revote-btn" onclick="resetPoll('extraniar')">↩ Cambiar voto</button>
+        </div>
+      </div>
+
+      <div class="enc-card" data-qid="memorable">
+        <div class="enc-badge">HISTORIA</div>
+        <div class="enc-question">¿Cuál fue el partido más memorable de los últimos mundiales?</div>
+        <div class="enc-options">
+          <div class="enc-option" data-idx="0">
+            <button class="enc-vote-btn" onclick="votePoll('memorable',0)">🇩🇪 Alemania 7-1 Brasil (2014)</button>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">🇩🇪 7-1 Brasil</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div></div>
+          </div>
+          <div class="enc-option" data-idx="1">
+            <button class="enc-vote-btn" onclick="votePoll('memorable',1)">🏆 Final 2022 — Argentina 3-3 Francia</button>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">🏆 Final Qatar 2022</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div></div>
+          </div>
+          <div class="enc-option" data-idx="2">
+            <button class="enc-vote-btn" onclick="votePoll('memorable',2)">🇲🇽 México vs Alemania (Rusia 2018)</button>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">🇲🇽 México-Alemania 2018</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div></div>
+          </div>
+          <div class="enc-option enc-option-otro" data-idx="3">
+            <button class="enc-vote-btn" id="otroBtn-memorable" onclick="toggleOtroInput('memorable')">✏️ Otro (escribe el tuyo)</button>
+            <div class="enc-otro-input-row" id="otroInputRow-memorable" style="display:none">
+              <input type="text" class="enc-otro-input" id="otroInput-memorable" placeholder="Escribe tu respuesta…" maxlength="60" onkeydown="if(event.key==='Enter')submitOtroVote('memorable',3)">
+              <button class="enc-otro-send" onclick="submitOtroVote('memorable',3)">Enviar</button>
+            </div>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">✏️ Otro</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div><div class="enc-otro-texts" id="otroTexts-memorable"></div></div>
+          </div>
+        </div>
+        <div class="enc-footer">
+          <span class="enc-total">Sin votos aún</span>
+          <button class="enc-revote-btn" onclick="resetPoll('memorable')">↩ Cambiar voto</button>
+        </div>
+      </div>
+
+      <div class="enc-card" data-qid="mundial">
+        <div class="enc-badge">FAVORITO</div>
+        <div class="enc-question">¿Cuál fue el mejor mundial que has vivido en esta era?</div>
+        <div class="enc-options">
+          <div class="enc-option" data-idx="0">
+            <button class="enc-vote-btn" onclick="votePoll('mundial',0)">🇧🇷 Brasil 2014</button>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">🇧🇷 Brasil 2014</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div></div>
+          </div>
+          <div class="enc-option" data-idx="1">
+            <button class="enc-vote-btn" onclick="votePoll('mundial',1)">🇷🇺 Rusia 2018</button>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">🇷🇺 Rusia 2018</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div></div>
+          </div>
+          <div class="enc-option" data-idx="2">
+            <button class="enc-vote-btn" onclick="votePoll('mundial',2)">🇶🇦 Qatar 2022</button>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">🇶🇦 Qatar 2022</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div></div>
+          </div>
+          <div class="enc-option" data-idx="3">
+            <button class="enc-vote-btn" onclick="votePoll('mundial',3)">🏆 ¡Este! México-USA-CAN 2026</button>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">🏆 México 2026</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div></div>
+          </div>
+          <div class="enc-option enc-option-otro" data-idx="4">
+            <button class="enc-vote-btn" id="otroBtn-mundial" onclick="toggleOtroInput('mundial')">✏️ Otro (escribe el tuyo)</button>
+            <div class="enc-otro-input-row" id="otroInputRow-mundial" style="display:none">
+              <input type="text" class="enc-otro-input" id="otroInput-mundial" placeholder="Escribe tu respuesta…" maxlength="60" onkeydown="if(event.key==='Enter')submitOtroVote('mundial',4)">
+              <button class="enc-otro-send" onclick="submitOtroVote('mundial',4)">Enviar</button>
+            </div>
+            <div class="enc-result"><div class="enc-result-label"><span class="enc-opt-name">✏️ Otro</span><span class="enc-pct">0%</span></div><div class="enc-bar-bg"><div class="enc-bar-fill"></div></div><div class="enc-otro-texts" id="otroTexts-mundial"></div></div>
+          </div>
+        </div>
+        <div class="enc-footer">
+          <span class="enc-total">Sin votos aún</span>
+          <button class="enc-revote-btn" onclick="resetPoll('mundial')">↩ Cambiar voto</button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="ley-divider"></div>
+    <div class="ley-tribute-eyebrow">✦ Adiós a una era ✦</div>
+    <div class="ley-tribute-title">Disfrutemos a las leyendas<br>que se van después de este mundial</div>
+    <div class="ley-tribute-sub">Algunos de los más grandes de todos los tiempos juegan aquí su último mundial. Honremos su legado y celebremos lo que nos dieron al fútbol.</div>
+
+    <div class="ley-main-grid">
+
+      <div class="legend-main-card cr7">
+        <div class="legend-card-bg-num">7</div>
+        <div class="legend-shine"></div>
+        <div class="legend-flag">🇵🇹</div>
+        <div>
+          <div class="legend-name-row">
+            <span class="legend-name">Cristiano Ronaldo</span>
+            <span class="legend-nickname">CR7 · El Bicho</span>
+          </div>
+          <div class="legend-country">Portugal · Delantero</div>
+        </div>
+        <div class="legend-stats">
+          <div class="legend-stat"><div class="legend-stat-val">5</div><div class="legend-stat-lbl">Balones de Oro</div></div>
+          <div class="legend-stat"><div class="legend-stat-val">5</div><div class="legend-stat-lbl">Champions League</div></div>
+          <div class="legend-stat"><div class="legend-stat-val">900+</div><div class="legend-stat-lbl">Goles de carrera</div></div>
+          <div class="legend-stat"><div class="legend-stat-val">#1</div><div class="legend-stat-lbl">Goleador histórico</div></div>
+        </div>
+        <div class="legend-quote">"El talento sin trabajo no sirve de nada. Por eso llegué hasta aquí, y así me voy: con todo dado."</div>
+      </div>
+
+      <div class="legend-main-card messi">
+        <div class="legend-card-bg-num">10</div>
+        <div class="legend-shine"></div>
+        <div class="legend-flag">🇦🇷</div>
+        <div>
+          <div class="legend-name-row">
+            <span class="legend-name">Lionel Messi</span>
+            <span class="legend-nickname">La Pulga · GOAT</span>
+          </div>
+          <div class="legend-country">Argentina · Delantero</div>
+        </div>
+        <div class="legend-stats">
+          <div class="legend-stat"><div class="legend-stat-val">🏆</div><div class="legend-stat-lbl">Campeón Mundial 2022</div></div>
+          <div class="legend-stat"><div class="legend-stat-val">8</div><div class="legend-stat-lbl">Balones de Oro</div></div>
+          <div class="legend-stat"><div class="legend-stat-val">5</div><div class="legend-stat-lbl">Champions League</div></div>
+          <div class="legend-stat"><div class="legend-stat-val">800+</div><div class="legend-stat-lbl">Goles de carrera</div></div>
+        </div>
+        <div class="legend-quote">"Siempre soñé con levantar esa copa. Este fue mi momento, el más hermoso de mi vida futbolística."</div>
+      </div>
+
+    </div>
+
+    <div class="eyebrow-sm">Y también se van otras leyendas…</div>
+    <div class="ley-secondary-grid">
+
+      <div class="legend-small-card">
+        <div class="legend-small-header">
+          <span class="legend-small-flag">🇧🇷</span>
+          <div><div class="legend-small-name">Neymar Jr.</div><div class="legend-small-role">Delantero · Brasil</div></div>
+        </div>
+        <div class="legend-small-tag" style="background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.3)">✨ El Mago</div>
+        <div class="legend-small-desc">Malabarista, provocador, brillante. El jugador más caro de la historia en su momento. Le faltó la Copa, pero nos regaló magia pura durante dos décadas.</div>
+      </div>
+
+      <div class="legend-small-card">
+        <div class="legend-small-header">
+          <span class="legend-small-flag">🇩🇪</span>
+          <div><div class="legend-small-name">Manuel Neuer</div><div class="legend-small-role">Portero · Alemania</div></div>
+        </div>
+        <div class="legend-small-tag" style="background:rgba(79,195,247,0.1);color:var(--blue);border:1px solid rgba(79,195,247,0.3)">🧤 Sweeper-Keeper</div>
+        <div class="legend-small-desc">Redefinió lo que significa ser portero. Con el balón en los pies como un 10 y reflejos de otro mundo. Campeón del Mundo 2014 con la Mannschaft.</div>
+      </div>
+
+      <div class="legend-small-card">
+        <div class="legend-small-header">
+          <span class="legend-small-flag">🇭🇷</span>
+          <div><div class="legend-small-name">Luka Modric</div><div class="legend-small-role">Mediocampista · Croacia</div></div>
+        </div>
+        <div class="legend-small-tag" style="background:rgba(245,200,66,0.1);color:var(--gold);border:1px solid rgba(245,200,66,0.3)">🎩 El Maestro</div>
+        <div class="legend-small-desc">El pequeño que venció a Messi y CR7 en el Balón de Oro 2018. Finalista del Mundo con Croacia. Pulpo de mediocampo que nunca pierde el balón.</div>
+      </div>
+
+      <div class="legend-small-card">
+        <div class="legend-small-header">
+          <span class="legend-small-flag">🇧🇪</span>
+          <div><div class="legend-small-name">Kevin De Bruyne</div><div class="legend-small-role">Mediocampista · Bélgica</div></div>
+        </div>
+        <div class="legend-small-tag" style="background:rgba(255,87,34,0.1);color:var(--accent);border:1px solid rgba(255,87,34,0.3)">🎯 El General</div>
+        <div class="legend-small-desc">Capitán y cerebro de la "generación dorada" belga. Visión de juego y pase milimétrico, lidera a los Diablos Rojos en lo que se perfila como su última gran cita mundialista.</div>
+      </div>
+
+      <div class="legend-small-card">
+        <div class="legend-small-header">
+          <span class="legend-small-flag">🇪🇬</span>
+          <div><div class="legend-small-name">Mohamed Salah</div><div class="legend-small-role">Delantero · Egipto</div></div>
+        </div>
+        <div class="legend-small-tag" style="background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.3)">⚡ El Faraón</div>
+        <div class="legend-small-desc">Capitán y máximo ídolo del fútbol egipcio. Goleador histórico de los Faraones, llega a lo que muchos consideran su última gran misión con la selección.</div>
+      </div>
+
+      <div class="legend-small-card">
+        <div class="legend-small-header">
+          <span class="legend-small-flag">🇸🇳</span>
+          <div><div class="legend-small-name">Sadio Mané</div><div class="legend-small-role">Delantero · Senegal</div></div>
+        </div>
+        <div class="legend-small-tag" style="background:rgba(245,200,66,0.1);color:var(--gold);border:1px solid rgba(245,200,66,0.3)">🦁 El León</div>
+        <div class="legend-small-desc">Capitán y máximo goleador histórico de los Leones de Teranga. Campeón de África, llega a este Mundial como el gran referente de su generación.</div>
+      </div>
+
+      <div class="legend-small-card">
+        <div class="legend-small-header">
+          <span class="legend-small-flag">🇨🇴</span>
+          <div><div class="legend-small-name">James Rodríguez</div><div class="legend-small-role">Mediocampista · Colombia</div></div>
+        </div>
+        <div class="legend-small-tag" style="background:rgba(79,195,247,0.1);color:var(--blue);border:1px solid rgba(79,195,247,0.3)">🎩 El 10</div>
+        <div class="legend-small-desc">Capitán y referente absoluto de la Tricolor. Goleador en Brasil 2014, vuelve a vestir la cinta en lo que podría ser su última Copa del Mundo.</div>
+      </div>
+
+      <div class="legend-small-card">
+        <div class="legend-small-header">
+          <span class="legend-small-flag">🇭🇷</span>
+          <div><div class="legend-small-name">Ivan Perisic</div><div class="legend-small-role">Delantero · Croacia</div></div>
+        </div>
+        <div class="legend-small-tag" style="background:rgba(176,190,197,0.1);color:var(--silver);border:1px solid rgba(176,190,197,0.3)">🔥 El Veterano</div>
+        <div class="legend-small-desc">A los 37 años disputa su cuarta Copa del Mundo. Pieza clave en las dos mejores actuaciones mundialistas de Croacia: el subcampeonato de 2018 y el tercer lugar de 2022.</div>
+      </div>
+
+      <div class="legend-small-card">
+        <div class="legend-small-header">
+          <span class="legend-small-flag">🇰🇷</span>
+          <div><div class="legend-small-name">Son Heung-min</div><div class="legend-small-role">Delantero · Corea del Sur</div></div>
+        </div>
+        <div class="legend-small-tag" style="background:rgba(0,230,118,0.1);color:var(--green);border:1px solid rgba(0,230,118,0.3)">⚡ Sonny</div>
+        <div class="legend-small-desc">Capitán y máxima figura del fútbol asiático. Juega su cuarto Mundial buscando, por fin, dejar huella en la fase final del torneo.</div>
+      </div>
+
+      <div class="legend-small-card">
+        <div class="legend-small-header">
+          <span class="legend-small-flag">🇳🇱</span>
+          <div><div class="legend-small-name">Virgil van Dijk</div><div class="legend-small-role">Defensa · Países Bajos</div></div>
+        </div>
+        <div class="legend-small-tag" style="background:rgba(79,195,247,0.1);color:var(--blue);border:1px solid rgba(79,195,247,0.3)">🧱 El Muro</div>
+        <div class="legend-small-desc">Capitán histórico de la Oranje, con más partidos con el brazalete que cualquier otro neerlandés. Busca en lo que podría ser su último Mundial el título que a su país siempre se le ha escapado.</div>
+      </div>
+
+      <div class="legend-small-card">
+        <div class="legend-small-header">
+          <span class="legend-small-flag">🇲🇽</span>
+          <div><div class="legend-small-name">Guillermo Ochoa</div><div class="legend-small-role">Portero · México</div></div>
+        </div>
+        <div class="legend-small-tag" style="background:rgba(245,200,66,0.1);color:var(--gold);border:1px solid rgba(245,200,66,0.3)">🐐 Memo</div>
+        <div class="legend-small-desc">A los 40 años se convirtió, junto a Messi y Cristiano, en uno de los primeros futbolistas en disputar seis Copas del Mundo. Una leyenda de la portería mexicana en su última gran cita.</div>
+      </div>
+
+    </div>
+
+    <div class="ley-closing">
+      <div class="ley-closing-emoji">🙏⚽🙏</div>
+      <div class="ley-closing-text">Gracias por todo, leyendas.<br>Este mundial es suyo.</div>
+      <div class="ley-closing-sub">Porque no habrá otro Messi. No habrá otro Cristiano. Esta generación fue única en la historia del fútbol, y tuvimos el privilegio de vivirla. Que lo disfruten, que lo gocen — merecen irse con aplausos de pie del mundo entero.</div>
+    </div>
+
+  </div>
+</div>
+
 <div class="modal-overlay" id="playerModal" onclick="if(event.target===this)closePlayerCard()">
   <div class="fifa-card" id="fcContent"></div>
 </div>
@@ -1602,6 +1973,7 @@ const GID_LOCKS = '1684909330';
 const GAMES_SID        = '1pDcY7q9SMP1mLGL12jKY3GKeD4RywOZtA_V7QjAYfDQ';
 const GAMES_GID        = '0';
 const GAMES_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz8uGFJAWqC7UiKSNFer6BlNk5bsm63bbUn_y9Yd-Tb6HEvXqmDeB5vRhoy4L1b4vSv/exec';
+const ENCUESTAS_GID    = '1506641563'; // hoja de la spreadsheet de GAMES_SID donde se guardan los votos de las encuestas
 
 // ── Sugerencias / Feedback ──
 const FEEDBACK_GID         = '1488569557';
@@ -1666,7 +2038,7 @@ let cr7GolEvaluado = false;
 // ══════════════════════════════════════════════════════
 //  UTILIDADES
 // ══════════════════════════════════════════════════════
-const OTRAS_OPCIONES = ['bracket', 'stats', 'pred16'];
+const OTRAS_OPCIONES = ['bracket', 'stats', 'pred16', 'leyendas'];
 function switchSection(name) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('on'));
@@ -1677,9 +2049,10 @@ function switchSection(name) {
   document.querySelectorAll('.otras-menu-item').forEach(it => it.classList.remove('active'));
   if (OTRAS_OPCIONES.includes(name)) {
       const item = document.getElementById(
-    name === 'bracket' ? 'omiBracket' :
-    name === 'stats'   ? 'omiStats'   :
-    name === 'pred16'  ? 'omiPred16'  : 'omiPosibleLB'
+    name === 'bracket'  ? 'omiBracket'  :
+    name === 'stats'    ? 'omiStats'    :
+    name === 'pred16'   ? 'omiPred16'   :
+    name === 'leyendas' ? 'omiLeyendas' : 'omiPosibleLB'
   );
     if (item) item.classList.add('active');
   }
@@ -5035,9 +5408,154 @@ function init(){
   selectGame('cabezazo');
   setTimeout(showMascotBubble, 4000);
   scheduleMascotBubble();
+  initPolls();
 }
 
 if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
+
+// ══════════════════════════════════════════════════════
+//  ENCUESTAS — LEYENDAS
+// ══════════════════════════════════════════════════════
+const POLL_COLORS = ['var(--green)','var(--gold)','var(--blue)','var(--accent)','var(--silver)'];
+
+function toggleOtroInput(qid) {
+  const btn = document.getElementById(`otroBtn-${qid}`);
+  const row = document.getElementById(`otroInputRow-${qid}`);
+  if (!row) return;
+  row.style.display = 'flex';
+  if (btn) btn.style.display = 'none';
+  document.getElementById(`otroInput-${qid}`)?.focus();
+}
+
+function submitOtroVote(qid, optIdx) {
+  if (localStorage.getItem('poll_v2_' + qid) !== null) return; // ya votó
+  const input = document.getElementById(`otroInput-${qid}`);
+  const text = (input?.value || '').trim();
+  if (!text) { input?.focus(); return; }
+  const txtKey = 'poll_otro_txt_' + qid;
+  const texts = JSON.parse(localStorage.getItem(txtKey) || '[]');
+  texts.push(text);
+  localStorage.setItem(txtKey, JSON.stringify(texts));
+  votePoll(qid, optIdx, text);
+}
+
+function votePoll(qid, optIdx, otroTexto) {
+  const card = document.querySelector(`.enc-card[data-qid="${qid}"]`);
+  if (!card) return;
+  if (localStorage.getItem('poll_v2_' + qid) !== null) return; // ya votó
+  localStorage.setItem('poll_v2_' + qid, String(optIdx));
+  const key = 'poll_c_' + qid;
+  const counts = JSON.parse(localStorage.getItem(key) || '{}');
+  counts[optIdx] = (counts[optIdx] || 0) + 1;
+  localStorage.setItem(key, JSON.stringify(counts));
+
+  // Capturamos el texto de la pregunta y de la opción elegida antes de que se oculten los botones
+  const esOtro    = typeof otroTexto === 'string' && otroTexto.trim().length > 0;
+  const pregunta  = card.querySelector('.enc-question')?.textContent.trim() || qid;
+  const opts      = card.querySelectorAll('.enc-option');
+  const chosenOpt = opts[optIdx];
+  const opcionTxt = esOtro
+    ? '✏️ Otro'
+    : (chosenOpt?.querySelector('.enc-vote-btn')?.textContent.trim()
+       || chosenOpt?.querySelector('.enc-opt-name')?.textContent.trim()
+       || '');
+
+  showPollResults(card, optIdx);
+  sendPollVoteToSheet(qid, pregunta, opcionTxt, esOtro, otroTexto || '');
+}
+
+/* ── envía el voto al spreadsheet de GAMES_SCRIPT_URL para estadísticas globales ── */
+function sendPollVoteToSheet(qid, pregunta, opcion, esOtro, textoOtro) {
+  const payload = {
+    tipo: 'encuesta',
+    fecha: new Date().toLocaleString('es-MX'),
+    encuesta: qid,
+    pregunta,
+    opcion,
+    esOtro,
+    textoOtro
+  };
+  fetch(GAMES_SCRIPT_URL, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+  }).catch(e => console.error('Error guardando voto de encuesta:', e));
+}
+
+function showPollResults(card, chosenIdx) {
+  const qid = card.dataset.qid;
+  const key = 'poll_c_' + qid;
+  const counts = JSON.parse(localStorage.getItem(key) || '{}');
+  const opts = card.querySelectorAll('.enc-option');
+  const rawTotal = Array.from(opts).reduce((s, _, i) => s + (counts[i] || 0), 0);
+  const divisor = rawTotal || 1;
+  const otroTexts = JSON.parse(localStorage.getItem('poll_otro_txt_' + qid) || '[]');
+
+  opts.forEach((opt, i) => {
+    const btn       = opt.querySelector('.enc-vote-btn');
+    const inputRow  = opt.querySelector('.enc-otro-input-row');
+    const result    = opt.querySelector('.enc-result');
+    const pctEl     = opt.querySelector('.enc-pct');
+    const barEl     = opt.querySelector('.enc-bar-fill');
+    const textsEl   = opt.querySelector('.enc-otro-texts');
+    const pct       = Math.round(((counts[i] || 0) / divisor) * 100);
+    if (btn)      btn.style.display = 'none';
+    if (inputRow) inputRow.style.display = 'none';
+    if (result)   result.style.display = 'block';
+    if (pctEl)    pctEl.textContent = pct + '%';
+    if (barEl) {
+      barEl.style.background = POLL_COLORS[i % POLL_COLORS.length];
+      // slight delay so CSS transition fires visually
+      requestAnimationFrame(() => requestAnimationFrame(() => { barEl.style.width = pct + '%'; }));
+    }
+    if (textsEl) textsEl.textContent = otroTexts.length ? '📝 ' + otroTexts.join(' · ') : '';
+    opt.classList.remove('my-vote');
+    if (String(i) === String(chosenIdx)) opt.classList.add('my-vote');
+  });
+
+  const totalEl = card.querySelector('.enc-total');
+  if (totalEl) totalEl.textContent = rawTotal + (rawTotal === 1 ? ' voto' : ' votos');
+  const revote = card.querySelector('.enc-revote-btn');
+  if (revote) revote.style.display = 'inline';
+}
+
+function resetPoll(qid) {
+  const card = document.querySelector(`.enc-card[data-qid="${qid}"]`);
+  if (!card) return;
+  const prevVote = localStorage.getItem('poll_v2_' + qid);
+  if (prevVote !== null) {
+    const key = 'poll_c_' + qid;
+    const counts = JSON.parse(localStorage.getItem(key) || '{}');
+    if ((counts[prevVote] || 0) > 0) counts[prevVote]--;
+    localStorage.setItem(key, JSON.stringify(counts));
+    localStorage.removeItem('poll_v2_' + qid);
+  }
+  card.querySelectorAll('.enc-option').forEach(opt => {
+    opt.classList.remove('my-vote');
+    const btn      = opt.querySelector('.enc-vote-btn');
+    const inputRow = opt.querySelector('.enc-otro-input-row');
+    const input    = opt.querySelector('.enc-otro-input');
+    const result   = opt.querySelector('.enc-result');
+    const barEl    = opt.querySelector('.enc-bar-fill');
+    if (btn)      btn.style.display = '';
+    if (inputRow) inputRow.style.display = 'none';
+    if (input)    input.value = '';
+    if (result)   result.style.display = 'none';
+    if (barEl)    barEl.style.width = '0%';
+  });
+  const revote = card.querySelector('.enc-revote-btn');
+  if (revote) revote.style.display = 'none';
+  const totalEl = card.querySelector('.enc-total');
+  if (totalEl) totalEl.textContent = 'Sin votos aún';
+}
+
+function initPolls() {
+  document.querySelectorAll('.enc-card').forEach(card => {
+    const qid = card.dataset.qid;
+    const savedVote = localStorage.getItem('poll_v2_' + qid);
+    if (savedVote !== null) showPollResults(card, savedVote);
+  });
+}
 
 // ══════════════════════════════════════════════════════
 //  FORMULARIO PÚBLICO: PREDICCIONES 16AVOS (POR PARTIDO)
