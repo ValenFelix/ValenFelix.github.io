@@ -1360,11 +1360,11 @@ html.modo-mexico .papel-picado-bar{display:flex}
       <div class="cb-head">
         <div>
           <div class="cb-head-title">🔄 Posibilidad de Remontada</div>
-          <div class="cb-head-sub">¿Quién todavía puede alcanzar al líder? Calculado con los partidos que cada jugador aún tiene pendientes de evaluar (máx. 4 pts c/u).</div>
+          <div class="cb-head-sub">¿Quién todavía puede alcanzar al líder? Incluye partidos de grupos pendientes (máx. 4 pts c/u) <b>y</b> el techo de puntos que aún se pueden ganar en 16avos, Cuartos, Semis, Finalista, Campeón y Goleador.</div>
         </div>
         <span class="bracket-status-pill" id="statsTime">Calculando…</span>
       </div>
-      <div class="bracket-notice" style="margin:14px 18px">⚠️ <b>Estimado.</b> Solo considera los partidos con marcador pendiente de cada jugador, y descarta los que tienen el <b>mismo marcador exacto que el líder</b> (ese resultado les daría los mismos puntos a ambos, así que no cierra la brecha). No incluye bonos finales (campeón, goleador, sorpresa, etc.) que también pueden sumar puntos al cierre del torneo.</div>
+      <div class="bracket-notice" style="margin:14px 18px">⚠️ <b>Estimado.</b> Para partidos de grupos, solo considera los que aún tienen marcador pendiente, y descarta los que tienen el <b>mismo marcador exacto que el líder</b> (ese resultado les daría los mismos puntos a ambos, así que no cierra la brecha). Para eliminación directa (16avos, Cuartos, Semis, Finalista, Campeón) se cuenta el equipo elegido por el jugador como "con posibilidad" mientras no haya sido eliminado matemáticamente en la fase de grupos; no se verifica el resultado real de esas rondas porque este sitio aún no las registra. El bono de Goleador siempre se cuenta como posible, ya que no se rastrea si ese jugador sigue activo en el torneo.</div>
       <div id="comebackBody"></div>
     </div>
 
@@ -2284,6 +2284,49 @@ function allGroupsFinished(qualifiers) {
   });
 }
 
+// ── ¿Un equipo sigue "vivo" para fines de eliminación directa? ──
+// Reglas (siempre dando el beneficio de la duda al jugador):
+//  · Si no encontramos el equipo en ningún grupo → lo tratamos como vivo (no podemos afirmar lo contrario).
+//  · Si el grupo de ese equipo AÚN NO termina → vivo (todavía puede clasificar).
+//  · Si el grupo YA terminó → vivo solo si quedó 1º o 2º de su grupo, o entre los 8 mejores terceros.
+//    Si quedó 3º pero no entra en el top-8 de terceros, o quedó 4º → eliminado.
+// Esto NO seis a nada más allá de la fase de grupos: una vez que un equipo clasifica a dieciseisavos,
+// lo seguimos considerando "vivo" para cuartos/semis/final/campeón aunque pierda su partido de
+// eliminación directa, porque este sitio no registra resultados de esa fase todavía.
+function findTeamGroup(team) {
+  if (!team) return null;
+  const tNorm = team.trim().toLowerCase();
+  for (const g of Object.keys(GROUPS)) {
+    if (GROUPS[g].some(t => t.toLowerCase() === tNorm)) return g;
+  }
+  return null;
+}
+
+function isTeamAliveForElimination(team, qualifiersCache, bestThirdsCache) {
+  if (!team) return false;
+  const g = findTeamGroup(team);
+  if (!g) return true; // no lo encontramos en ningún grupo conocido: no afirmamos que está eliminado
+
+  const qualifiers = qualifiersCache || getGroupQualifiers();
+  const q = qualifiers[g];
+  if (!q) return true;
+
+  const groupDone = q.finished.total > 0 && q.finished.played === q.finished.total;
+  if (!groupDone) return true; // el grupo no ha terminado: todavía puede clasificar
+
+  const tNorm = team.trim().toLowerCase();
+  const isFirst  = q.first  && q.first.team.toLowerCase()  === tNorm;
+  const isSecond = q.second && q.second.team.toLowerCase() === tNorm;
+  if (isFirst || isSecond) return true;
+
+  const isThird = q.third && q.third.team.toLowerCase() === tNorm;
+  if (!isThird) return false; // quedó 4º de su grupo (ya cerrado): eliminado
+
+  const bestThirds = bestThirdsCache || getBestThirds(qualifiers);
+  const top8 = bestThirds.slice(0, 8).map(t => t.team.toLowerCase());
+  return top8.includes(tNorm); // 3º que sí entra al top-8 de terceros: vivo; si no, eliminado
+}
+
 // Asigna cada uno de los 8 mejores terceros a UN solo pool del bracket, respetando
 // el orden real de la FIFA: se recorren los 8 mejores terceros en orden de ranking
 // y cada uno se coloca en el primer pool (en el orden en que aparece en el bracket)
@@ -2437,6 +2480,78 @@ function statsFindMatch(teamH, teamA) {
   }) || null;
 }
 
+// ══════════════════════════════════════════════════════
+//  TECHO POTENCIAL DE ELIMINACIÓN DIRECTA Y BONOS FINALES
+//  (16avos, Cuartos, Semis, Finalista, Campeón, Goleador)
+// ══════════════════════════════════════════════════════
+// Puntos por categoría, según la tabla mostrada en el panel de "¿Te ayudo?":
+const ELIM_CATS = [
+  { key: 'd16',     pts: 6,  count: 16, matchers: [/dieciseisavos/i, /16\s*avos/i] },
+  { key: 'cuartos',  pts: 8,  count: 8,  matchers: [/cuartos/i] },
+  { key: 'semis',    pts: 11, count: 4,  matchers: [/semifinal/i, /\bsemis?\b/i] },
+  { key: 'finalista',pts: 15, count: 2,  matchers: [/finalista/i] },
+  { key: 'campeon',  pts: 20, count: 1,  matchers: [/campe[oó]n/i] },
+  { key: 'goleador', pts: 18, count: 1,  matchers: [/goleador/i] },
+];
+
+// Clasifica una pregunta de eliminación directa en su categoría, evitando que
+// "Final" / "Finalista" choquen con "Cuartos de Final" o con preguntas de grupo.
+function elimCategoryFor(question) {
+  const q = (question || '').toLowerCase();
+  if (q.includes('goleador'))    return 'goleador';
+  if (q.includes('campeón') || q.includes('campeon')) return 'campeon';
+  if (q.includes('finalista'))   return 'finalista';
+  if (/semifinal|\bsemis?\b/.test(q)) return 'semis';
+  if (q.includes('cuartos'))     return 'cuartos';
+  if (/dieciseisavos|16\s*avos/.test(q)) return 'd16';
+  return null;
+}
+
+// Picks de eliminación directa de un jugador: { categoria: [equipo1, equipo2, ...] }
+function getEliminationPicks(nameLower) {
+  const picks = formPicks[nameLower] || [];
+  const out = { d16: [], cuartos: [], semis: [], finalista: [], campeon: [], goleador: [] };
+  picks.forEach(p => {
+    const cat = elimCategoryFor(p.q);
+    if (!cat) return;
+    const answer = (p.a || '').trim();
+    if (!answer) return;
+    out[cat].push(answer);
+  });
+  return out;
+}
+
+// Techo de puntos que un jugador todavía puede ganar en eliminación directa y bonos finales.
+// Para cada equipo elegido en cada categoría (excepto Goleador), solo se cuenta si ese equipo
+// sigue "vivo" según isTeamAliveForElimination (criterio optimista: vivo salvo eliminación
+// matemática confirmada en fase de grupos). El Goleador siempre se cuenta como posible, porque
+// este sitio no rastrea si el jugador elegido sigue activo en el torneo.
+function getEliminationCeiling(nameLower) {
+  const picks = getEliminationPicks(nameLower);
+  const qualifiers = getGroupQualifiers();
+  const bestThirds = getBestThirds(qualifiers);
+
+  let ceiling = 0;
+  const detail = []; // { cat, label, team, pts, alive }
+
+  ELIM_CATS.forEach(cat => {
+    const teams = picks[cat.key] || [];
+    if (!teams.length) return;
+    teams.forEach(team => {
+      if (cat.key === 'goleador') {
+        ceiling += cat.pts;
+        detail.push({ cat: cat.key, team, pts: cat.pts, alive: true });
+        return;
+      }
+      const alive = isTeamAliveForElimination(team, qualifiers, bestThirds);
+      if (alive) ceiling += cat.pts;
+      detail.push({ cat: cat.key, team, pts: cat.pts, alive });
+    });
+  });
+
+  return { ceiling, detail };
+}
+
 // Para un jugador: partidos ya evaluados (con pts) y cuántos le quedan pendientes (LIVE/SCHED)
 // Para un jugador: partidos ya evaluados (con pts), cuántos le quedan pendientes (LIVE/SCHED)
 // y cuántos de esos pendientes realmente pueden achicar la brecha con el líder.
@@ -2506,7 +2621,8 @@ function renderComebackTable() {
     const rank = i + 1;
     const nameLower = p.name.trim().toLowerCase();
     const { pending, pendingUseful } = getPlayerStatsData(nameLower, leaderNameLower);
-    const maxAdicional = pending * 4;
+    const { ceiling: elimCeiling } = getEliminationCeiling(nameLower);
+    const maxAdicional = pending * 4 + elimCeiling;
     const maxFinal = p.total + maxAdicional;
     const gap = leaderTotal - p.total;
     const sharedCount = pending - pendingUseful;
@@ -2519,7 +2635,7 @@ function renderComebackTable() {
       statusHTML = `<span class="cb-badge cb-tied">🤝 Empatado arriba</span>`;
       barPct = 100; pctLabel = '';
     } else {
-      const usefulMax = pendingUseful * 4;
+      const usefulMax = pendingUseful * 4 + elimCeiling;
       if (usefulMax <= 0) {
         statusHTML = `<span class="cb-badge cb-dead">❌ Eliminado</span>`;
         barPct = 0; pctLabel = '';
@@ -2536,6 +2652,9 @@ function renderComebackTable() {
     const sharedNote = (rank !== 1 && sharedCount > 0)
       ? ` · <span style="color:var(--muted)">${sharedCount} igual${sharedCount!==1?'es':''} al líder (no suma a la remontada)</span>`
       : '';
+    const elimNote = elimCeiling > 0
+      ? ` · <span style="color:var(--blue)">+${elimCeiling} pts posibles de eliminación directa/bonos</span>`
+      : '';
 
     return `<div class="cb-row${rank===1?' is-leader':''}">
       <div class="cb-rank">${rank}</div>
@@ -2544,7 +2663,7 @@ function renderComebackTable() {
           <span class="cb-name-txt">${p.name}</span>
           <span class="cb-gap-txt">${gapTxt}</span>
         </div>
-        <div class="cb-meta">${p.total} pts actuales · ${pending} partido${pending!==1?'s':''} pendiente${pending!==1?'s':''} · tope máx. ${maxFinal} pts${sharedNote}</div>
+        <div class="cb-meta">${p.total} pts actuales · ${pending} partido${pending!==1?'s':''} de grupos pendiente${pending!==1?'s':''} · tope máx. ${maxFinal} pts${sharedNote}${elimNote}</div>
         <div class="cb-bar-bg"><div class="cb-bar-fill" style="width:${barPct}%"></div></div>
       </div>
       <div class="cb-status-col">
