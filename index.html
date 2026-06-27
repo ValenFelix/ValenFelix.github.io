@@ -1087,8 +1087,103 @@ html.modo-mexico .papel-picado-bar{display:flex}
 .pred16-gol-input{background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--gold);font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:16px;padding:7px 4px;outline:none;width:100%;text-align:center}
 .pred16-gol-input:focus{border-color:var(--gold)}
 .pred16-gol-input:disabled{opacity:.4}
-    
-  </style>
+
+/* ══ TRANSICIÓN FASE DE GRUPOS → 16AVOS ══ */
+#groupStageWrap{max-width:1100px;margin:0 auto;padding:0 16px;display:flex;flex-direction:column;gap:0}
+.gs-progress-card{
+  background:linear-gradient(135deg,rgba(0,230,118,0.08) 0%,rgba(79,195,247,0.05) 100%);
+  border:1px solid rgba(0,230,118,0.3);border-radius:14px;
+  padding:16px 20px;margin-bottom:18px;
+  box-shadow:0 4px 20px rgba(0,230,118,0.06);
+}
+.gs-progress-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
+.gs-progress-title{
+  font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:800;
+  color:var(--text);display:flex;align-items:center;gap:8px;
+}
+.gs-progress-pct{
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;
+  color:var(--green);letter-spacing:.5px;
+}
+.gs-progress-bar-bg{height:8px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden;margin-bottom:10px}
+.gs-progress-bar-fill{
+  height:100%;border-radius:100px;
+  background:linear-gradient(90deg,var(--blue),var(--green));
+  transition:width 1s cubic-bezier(.4,0,.2,1);
+}
+.gs-progress-sub{font-size:12px;color:var(--dim);line-height:1.5;display:flex;flex-wrap:wrap;gap:14px}
+.gs-progress-sub b{color:var(--text)}
+.gs-progress-leader{display:flex;align-items:center;gap:6px}
+
+.gs-close-banner{
+  position:relative;overflow:hidden;border-radius:18px;margin-bottom:20px;
+  background:linear-gradient(135deg,#0d2818 0%,#0a3d22 35%,#1a1410 70%,#3a2a05 100%);
+  border:1px solid rgba(245,200,66,0.5);
+  box-shadow:0 10px 40px rgba(245,200,66,0.15),0 0 0 0 rgba(0,230,118,0);
+  animation:gs-close-glow 3s ease-in-out infinite;
+}
+@keyframes gs-close-glow{
+  0%,100%{box-shadow:0 10px 40px rgba(245,200,66,0.12);}
+  50%{box-shadow:0 14px 56px rgba(245,200,66,0.28),0 0 24px 4px rgba(0,230,118,0.12);}
+}
+.gs-close-inner{position:relative;z-index:1;padding:28px 26px;text-align:center}
+.gs-close-eyebrow{
+  font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;
+  letter-spacing:3px;text-transform:uppercase;color:var(--green);margin-bottom:10px;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.gs-close-eyebrow .gs-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 1.5s infinite}
+.gs-close-title{
+  font-family:'Barlow Condensed',sans-serif;font-weight:900;line-height:1;
+  font-size:clamp(28px,6vw,46px);color:#fff;letter-spacing:-0.5px;
+  text-shadow:0 4px 20px rgba(0,0,0,0.4);margin-bottom:6px;
+}
+.gs-close-title span{color:var(--gold)}
+.gs-close-sub{font-size:14px;color:rgba(255,255,255,0.75);max-width:520px;margin:0 auto 18px;line-height:1.5}
+.gs-close-stats{
+  display:flex;justify-content:center;gap:14px;flex-wrap:wrap;margin-bottom:20px;
+}
+.gs-close-stat{
+  background:rgba(0,0,0,0.28);border:1px solid rgba(255,255,255,0.1);border-radius:12px;
+  padding:10px 18px;min-width:120px;
+}
+.gs-close-stat .gcs-val{font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;color:var(--gold)}
+.gs-close-stat .gcs-lbl{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:rgba(255,255,255,0.55);margin-top:2px}
+.gs-close-cd{
+  display:inline-flex;align-items:center;gap:10px;background:rgba(0,0,0,0.35);
+  border:1px solid rgba(79,195,247,0.4);border-radius:100px;padding:9px 22px;margin-bottom:18px;
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:var(--blue);
+}
+.gs-close-cd b{font-size:17px;font-weight:900;color:#fff;letter-spacing:.5px}
+.gs-close-cta{
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:.5px;
+  text-transform:uppercase;background:var(--gold);color:#000;border:none;
+  padding:11px 28px;border-radius:10px;cursor:pointer;
+  box-shadow:0 6px 18px rgba(245,200,66,0.35);transition:all .15s ease;
+}
+.gs-close-cta:hover{background:#ffe066;box-shadow:0 8px 26px rgba(245,200,66,0.5);transform:translateY(-1px)}
+.gs-close-cta:active{transform:scale(.96)}
+.gs-close-dismiss{
+  position:absolute;top:14px;right:16px;background:none;border:none;color:rgba(255,255,255,0.4);
+  font-size:22px;cursor:pointer;line-height:1;z-index:2;transition:color .15s;
+}
+.gs-close-dismiss:hover{color:#fff}
+.gs-confetti-wrap{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.gs-confetti-piece{
+  position:absolute;top:-12px;width:7px;height:12px;border-radius:2px;opacity:.9;
+  animation-name:gs-confetti-fall;animation-timing-function:linear;animation-fill-mode:forwards;
+}
+@keyframes gs-confetti-fall{
+  0%{transform:translateY(-10px) rotate(0deg);opacity:1}
+  100%{transform:translateY(340px) rotate(480deg);opacity:.1}
+}
+@media(max-width:600px){
+  .gs-close-stats{gap:8px}
+  .gs-close-stat{min-width:96px;padding:8px 12px}
+  .gs-progress-sub{flex-direction:column;gap:4px}
+}
+
+</style>
 </head>
 <body>
 
@@ -1110,6 +1205,7 @@ html.modo-mexico .papel-picado-bar{display:flex}
   </div>
 </header>
 <div class="papel-picado-bar" id="papelPicadoBar"></div>
+<div id="groupStageWrap"></div>
 <div id="specialBannersWrap"></div>
 <div id="dailyMessage"></div>
 
@@ -1731,6 +1827,7 @@ async function fetchPartidosFromSheets() {
   renderDailyMessage();
   renderStd();
   renderBracket();
+  renderGroupStageStatus();
   startCountdown();
 }
 
@@ -2282,6 +2379,173 @@ function allGroupsFinished(qualifiers) {
     const f = qualifiers[g].finished;
     return f.total > 0 && f.played === f.total;
   });
+}
+
+// ══════════════════════════════════════════════════════
+//  TRANSICIÓN FASE DE GRUPOS → 16AVOS
+// ══════════════════════════════════════════════════════
+let _gsCloseShown   = false; // ya se mostró/disparó el banner de cierre en esta sesión
+let _gsCloseDismissed = false; // el usuario lo cerró manualmente
+let _gsNextElimDate = null; // Date del próximo partido de 16avos (si se pudo leer)
+let _gsNextElimSlot  = null;
+let _gsCountdownInt  = null;
+
+async function fetchNextElimDate() {
+  // Lectura pública (sin contraseña) de la hoja "16avos" solo para sacar
+  // el slot con fecha más próxima que aún no se ha jugado.
+  try {
+    const r = await fetch(csvUrl(SID, GID_16AVOS));
+    if (!r.ok) return;
+    const rows = parseCSV(await r.text());
+    let hdrIdx = -1;
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i][0] && rows[i][0].trim().toLowerCase() === 'slot') { hdrIdx = i; break; }
+    }
+    if (hdrIdx === -1) return;
+    const hdr = rows[hdrIdx].map(h => (h || '').trim().toLowerCase());
+    const iSlot = hdr.indexOf('slot');
+    const iEst  = hdr.indexOf('estado');
+    const iFec  = hdr.indexOf('fecha');
+
+    let best = null;
+    for (let i = hdrIdx + 1; i < rows.length; i++) {
+      const row = rows[i];
+      const slot = (row[iSlot] || '').trim();
+      if (!/^M\d{1,2}$/i.test(slot)) continue;
+      const estado = (row[iEst] || 'SCHED').trim().toUpperCase();
+      const fechaStr = (row[iFec] || '').trim();
+      if (estado !== 'SCHED' || !fechaStr) continue;
+      const d = parseFecha(fechaStr);
+      if (!best || d < best.date) best = { date: d, slot: slot.toUpperCase() };
+    }
+    if (best) { _gsNextElimDate = best.date; _gsNextElimSlot = best.slot; }
+  } catch (e) {
+    console.error('Error leyendo fecha de 16avos:', e);
+  }
+}
+
+function spawnConfettiGS(container) {
+  const colors = ['#f5c842', '#00e676', '#4fc3f7', '#ffffff'];
+  const wrap = document.createElement('div');
+  wrap.className = 'gs-confetti-wrap';
+  for (let i = 0; i < 60; i++) {
+    const p = document.createElement('span');
+    p.className = 'gs-confetti-piece';
+    p.style.left = Math.random() * 100 + '%';
+    p.style.background = colors[i % colors.length];
+    p.style.animationDelay = (Math.random() * 1.2) + 's';
+    p.style.animationDuration = (2.4 + Math.random() * 1.8) + 's';
+    p.style.transform = `rotate(${Math.random() * 360}deg)`;
+    wrap.appendChild(p);
+  }
+  container.appendChild(wrap);
+  setTimeout(() => wrap.remove(), 4500);
+}
+
+function dismissGSClose() {
+  _gsCloseDismissed = true;
+  if (_gsCountdownInt) { clearInterval(_gsCountdownInt); _gsCountdownInt = null; }
+  const wrap = document.getElementById('groupStageWrap');
+  if (wrap) wrap.innerHTML = '';
+}
+
+function renderGroupStageStatus() {
+  const wrap = document.getElementById('groupStageWrap');
+  if (!wrap || _gsCloseDismissed) return;
+  if (!matches.length) { wrap.innerHTML = ''; return; }
+
+  const qualifiers = getGroupQualifiers();
+  const allDone = allGroupsFinished(qualifiers);
+
+  const groupMatches = matches.filter(m => GROUPS[m.g]); // partidos de fase de grupos
+  const totalPartidos = groupMatches.length;
+  const jugados = groupMatches.filter(m => m.st === 'FIN').length;
+  const pct = totalPartidos > 0 ? Math.round((jugados / totalPartidos) * 100) : 0;
+
+  if (jugados === 0) { wrap.innerHTML = ''; return; } // aún ni empieza el torneo, no mostrar nada
+
+  if (!allDone) {
+    // ── Barra de progreso "Camino a 16avos" ──
+    if (_gsCountdownInt) { clearInterval(_gsCountdownInt); _gsCountdownInt = null; }
+    const equiposClasificados = Object.keys(GROUPS).reduce((acc, g) => {
+      const f = qualifiers[g].finished;
+      const done = f.total > 0 && f.played === f.total;
+      return acc + (done ? 2 : 0); // 1ro y 2do confirmados cuando el grupo cierra
+    }, 0);
+    const liderActual = lbPlayers[0] ? lbPlayers[0].name : null;
+
+    wrap.innerHTML = `
+      <div class="gs-progress-card">
+        <div class="gs-progress-top">
+          <span class="gs-progress-title">🏟️ Camino a Dieciseisavos</span>
+          <span class="gs-progress-pct">${pct}% completado</span>
+        </div>
+        <div class="gs-progress-bar-bg"><div class="gs-progress-bar-fill" style="width:${pct}%"></div></div>
+        <div class="gs-progress-sub">
+          <span>⚽ <b>${jugados}/${totalPartidos}</b> partidos de grupos jugados</span>
+          <span>✅ <b>${equiposClasificados}</b> equipos ya confirmados</span>
+          ${liderActual ? `<span class="gs-progress-leader">🥇 Líder de la quiniela: <b>${liderActual}</b></span>` : ''}
+        </div>
+      </div>`;
+    return;
+  }
+
+  // ── Fase de grupos 100% terminada: banner especial de cierre ──
+  const champion = lbPlayers[0] || null;
+  const totalJugadores = lbPlayers.length;
+  const equiposClasificadosTotal = Object.keys(GROUPS).length * 2; // 1ro y 2do de cada grupo
+  const mejoresTerceros = 8;
+
+  let cdHTML = '';
+  if (_gsNextElimDate) {
+    cdHTML = `<div class="gs-close-cd" id="gsCloseCd">⏳ Arranca <b id="gsCloseCdVal">--:--:--</b></div>`;
+  }
+
+  const firstTimeShowingClose = !_gsCloseShown;
+  _gsCloseShown = true;
+
+  wrap.innerHTML = `
+    <div class="gs-close-banner" id="gsCloseBanner">
+      <button class="gs-close-dismiss" onclick="dismissGSClose()" title="Cerrar">×</button>
+      <div class="gs-close-inner">
+        <div class="gs-close-eyebrow"><span class="gs-dot"></span>Fase de Grupos Completa<span class="gs-dot"></span></div>
+        <div class="gs-close-title">¡SE ACABARON LOS GRUPOS!<br><span>RUMBO A DIECISEISAVOS 🏆</span></div>
+        <div class="gs-close-sub">Los 32 equipos que avanzan ya están definidos. Ahora todo se juega a una sola carta — revisa el bracket, manda tus predicciones de eliminación directa y prepárate para la fiesta.</div>
+        <div class="gs-close-stats">
+          <div class="gs-close-stat"><div class="gcs-val">${totalPartidos}</div><div class="gcs-lbl">Partidos jugados</div></div>
+          <div class="gs-close-stat"><div class="gcs-val">${equiposClasificadosTotal}+${mejoresTerceros}</div><div class="gcs-lbl">Equipos a 16avos</div></div>
+          <div class="gs-close-stat"><div class="gcs-val">${totalJugadores}</div><div class="gcs-lbl">Participantes</div></div>
+          ${champion ? `<div class="gs-close-stat"><div class="gcs-val">🥇</div><div class="gcs-lbl">${champion.name}</div></div>` : ''}
+        </div>
+        ${cdHTML}
+        <div>
+          <button class="gs-close-cta" onclick="selectOtraOpcion('bracket')">Ver el Bracket →</button>
+        </div>
+      </div>
+    </div>`;
+
+  if (firstTimeShowingClose) {
+    const banner = document.getElementById('gsCloseBanner');
+    if (banner) spawnConfettiGS(banner);
+  }
+
+  if (_gsNextElimDate) {
+    if (_gsCountdownInt) clearInterval(_gsCountdownInt);
+    const tick = () => {
+      const el = document.getElementById('gsCloseCdVal');
+      if (!el) { clearInterval(_gsCountdownInt); _gsCountdownInt = null; return; }
+      const diff = _gsNextElimDate - Date.now();
+      if (diff <= 0) { el.textContent = '¡Ya empezó!'; clearInterval(_gsCountdownInt); _gsCountdownInt = null; return; }
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      const s = Math.floor((diff % 60000) / 1000);
+      const hh = String(h).padStart(2,'0'), mm = String(m).padStart(2,'0'), ss = String(s).padStart(2,'0');
+      el.textContent = d > 0 ? `${d}d ${hh}:${mm}:${ss}` : `${hh}:${mm}:${ss}`;
+    };
+    tick();
+    _gsCountdownInt = setInterval(tick, 1000);
+  }
 }
 
 // ── ¿Un equipo sigue "vivo" para fines de eliminación directa? ──
@@ -4755,8 +5019,10 @@ await Promise.allSettled([
     fetchPartidosFromSheets(),
     fetchDatosFormulario(),
     fetchGamesLeaderboard(),
-    fetchResultadosReales()
+    fetchResultadosReales(),
+    fetchNextElimDate()
   ]);
+  renderGroupStageStatus(); // refresca con la fecha de 16avos ya cargada (si aplica)
   if(sStatus)sStatus.textContent='Sincronizado';if(sDot)sDot.classList.add('live');
 }
 
