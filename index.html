@@ -3470,8 +3470,13 @@ async function fetchLeaderboard() {
 
 
 function missingM1(playerName) {
-  const normName = playerName.trim().toLowerCase();
-  if (!(normName in m1Status)) return false; // sin datos del formulario aún, no marcar
+  const normName = playerName.trim().toLowerCase().replace(/\s+/g, ' ');
+  if (!(normName in m1Status)) {
+    if (Object.keys(m1Status).length > 0) {
+      console.warn('[M1 check] nombre del leaderboard no encontrado en Datos_Formulario:', JSON.stringify(playerName));
+    }
+    return false; // sin datos del formulario aún (o nombre no encontrado), no marcar
+  }
   return m1Status[normName] === false;
 }
 
@@ -3630,9 +3635,10 @@ async function fetchDatosFormulario() {
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       if (!row[nameIdx]) continue;
-      const pName = row[nameIdx].trim().toLowerCase();
+      const pName = row[nameIdx].trim().toLowerCase().replace(/\s+/g, ' ');
       if (m1Idx !== -1) {
-        m1Status[pName] = !!(row[m1Idx] && row[m1Idx].trim() !== '');
+        const hasM1 = !!(row[m1Idx] && row[m1Idx].trim() !== '');
+        m1Status[pName] = m1Status[pName] || hasM1;
       }
       let picks = [];
       for (let j = 0; j < headers.length; j++) {
