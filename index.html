@@ -2014,6 +2014,7 @@ Chart.defaults.font.family = "'Barlow Condensed', sans-serif";
 // ══════════════════════════════════════════════════════
 let matches        = [];
 let lockedGroupPositions = {}; // { 'G-A-1': 'México', 'G-D-4': 'Turquía', ... }
+let slot16TeamsMap = {};
 let formPicks      = {};
 let m1Status       = {}; // nombre(lowercase) -> true/false, si la columna M1 (EA) tiene contenido
 let lbPlayers       = [];
@@ -3447,6 +3448,30 @@ function renderFunStats() {
 
   grid.innerHTML = cards.length ? cards.join('') : '<div class="err">Aún no hay suficientes partidos evaluados.</div>';
 }
+  async function fetchSlot16TeamsMap() {
+  try {
+    const r = await fetch(csvUrl(SID, GID_16AVOS));
+    if (!r.ok) return;
+    const rows = parseCSV(await r.text());
+    let hdrIdx = -1;
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i][0] && rows[i][0].trim().toLowerCase() === 'slot') { hdrIdx = i; break; }
+    }
+    if (hdrIdx === -1) return;
+    const map = {};
+    for (let i = hdrIdx + 1; i < rows.length; i++) {
+      const row = rows[i];
+      const slot = (row[0] || '').trim().toUpperCase();
+      if (!/^M\d{1,2}$/.test(slot)) continue;
+      const eqA = (row[1] || '').trim();
+      const eqB = (row[2] || '').trim();
+      if (eqA && eqB) map[slot] = { a: eqA, b: eqB };
+    }
+    slot16TeamsMap = map;
+  } catch(e) {
+    console.error('Error cargando mapa de equipos 16avos:', e);
+  }
+}
 async function fetchResultadosReales() {
   try {
     const r = await fetch(csvUrl(SID, GID_LOCKS));
@@ -3725,10 +3750,24 @@ function buildSpotlightHTML(picks) {
   if (!spotlightMatches.length) return '';
 
   // Buscar predicción del jugador para un partido dado
- function findPick(match) {
+function findPick(match) {
   if (!picks || !picks.length) return null;
   const homeNorm = match.h.toLowerCase();
   const awayNorm = match.a.toLowerCase();
+
+  // Prioridad 0: picks de eliminación directa (M1...M16) → resolver por el mapa de slots
+  for (const p of picks) {
+    const slotKey = p.q.trim().toUpperCase();
+    if (/^M\d{1,2}$/.test(slotKey) && slot16TeamsMap[slotKey]) {
+      const { a, b } = slot16TeamsMap[slotKey];
+      const aNorm = a.toLowerCase(), bNorm = b.toLowerCase();
+      const sameMatch =
+        (aNorm === homeNorm && bNorm === awayNorm) ||
+        (aNorm === awayNorm && bNorm === homeNorm);
+      if (sameMatch) return p.a;
+    }
+  }
+
   // Prioridad 1: la pregunta menciona AMBOS equipos
   for (const p of picks) {
     const qLow = p.q.toLowerCase();
@@ -5416,8 +5455,9 @@ await Promise.allSettled([
     fetchDatosFormulario(),
     fetchGamesLeaderboard(),
     fetchResultadosReales(),
-    fetchNextElimDate()
-  ]);
+    fetchNextElimDate(),
+    fetchSlot16TeamsMap()   // 👈 nueva
+]);
   renderGroupStageStatus(); // refresca con la fecha de 16avos ya cargada (si aplica)
   if(sStatus)sStatus.textContent='Sincronizado';if(sDot)sDot.classList.add('live');
 }
