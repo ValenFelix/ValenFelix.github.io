@@ -2072,30 +2072,43 @@ function csvUrl(sid, gid) {
 }
 
 function parseCSV(txt) {
+  // Parser RFC4180 carácter por carácter: maneja correctamente campos entre comillas
+  // que contengan comas, comillas escapadas ("") o SALTOS DE LÍNEA internos.
+  // (El parser anterior cortaba por líneas primero, lo que desalineaba columnas
+  // cuando alguien escribía una respuesta de texto libre con Enter dentro.)
   const rows = [];
-  const lines = txt.split(/\r?\n/);
-  for (const line of lines) {
-    const trimmed = line.trim();
-    if (!trimmed || /^,+$/.test(trimmed)) continue;
-    if (!trimmed.includes('"')) { rows.push(trimmed.split(',').map(v => v.trim())); continue; }
-    const row = []; let c = 0;
-    while (c < trimmed.length) {
-      if (trimmed[c] === '"') {
-        let end = trimmed.indexOf('"', c+1);
-        while (end !== -1 && trimmed[end+1] === '"') end = trimmed.indexOf('"', end+2);
-        if (end === -1) end = trimmed.length;
-        row.push(trimmed.substring(c+1, end).replace(/""/g, '"').trim());
-        c = end + 2;
-      } else {
-        let nx = trimmed.indexOf(',', c);
-        if (nx === -1) nx = trimmed.length;
-        row.push(trimmed.substring(c, nx).trim());
-        c = nx + 1;
+  let row = [];
+  let field = '';
+  let inQuotes = false;
+  let i = 0;
+  const len = txt.length;
+  while (i < len) {
+    const c = txt[i];
+    if (inQuotes) {
+      if (c === '"') {
+        if (txt[i+1] === '"') { field += '"'; i += 2; continue; }
+        inQuotes = false; i++; continue;
       }
+      field += c; i++; continue;
+    } else {
+      if (c === '"') { inQuotes = true; i++; continue; }
+      if (c === ',') { row.push(field.trim()); field = ''; i++; continue; }
+      if (c === '\r') { i++; continue; }
+      if (c === '\n') {
+        row.push(field.trim()); field = '';
+        if (!(row.length === 1 && row[0] === '')) rows.push(row);
+        row = []; i++; continue;
+      }
+      field += c; i++; continue;
     }
-    rows.push(row);
   }
-  return rows;
+  // Última fila/campo si el texto no termina en salto de línea
+  if (field !== '' || row.length) {
+    row.push(field.trim());
+    if (!(row.length === 1 && row[0] === '')) rows.push(row);
+  }
+  // Descartar filas completamente vacías (igual que el comportamiento anterior)
+  return rows.filter(r => r.some(cell => cell !== ''));
 }
 
 // ══════════════════════════════════════════════════════
