@@ -2068,7 +2068,7 @@ document.addEventListener('click', (e) => {
 });
 
 function csvUrl(sid, gid) {
-  return `https://docs.google.com/spreadsheets/d/${sid}/gviz/tq?tqx=out:csv&gid=${gid}`;
+  return `https://docs.google.com/spreadsheets/d/${sid}/gviz/tq?tqx=out:csv&gid=${gid}&_=${Date.now()}`;
 }
 
 function parseCSV(txt) {
