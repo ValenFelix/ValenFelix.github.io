@@ -2015,6 +2015,7 @@ Chart.defaults.font.family = "'Barlow Condensed', sans-serif";
 let matches        = [];
 let lockedGroupPositions = {}; // { 'G-A-1': 'México', 'G-D-4': 'Turquía', ... }
 let formPicks      = {};
+let m1Status       = {}; // nombre(lowercase) -> true/false, si la columna M1 (EA) tiene contenido
 let lbPlayers       = [];
 let chartInstances = {};
 let curTab         = 'r';
@@ -3470,9 +3471,8 @@ async function fetchLeaderboard() {
 
 function missingM1(playerName) {
   const normName = playerName.trim().toLowerCase();
-  const playerPicks = formPicks[normName];
-  if (!playerPicks) return false; // sin datos del formulario aún, no marcar
-  return !playerPicks.some(pk => pk.q && pk.q.trim() === 'M1');
+  if (!(normName in m1Status)) return false; // sin datos del formulario aún, no marcar
+  return m1Status[normName] === false;
 }
 
 function getLivePrediction(playerName) {
@@ -3619,12 +3619,21 @@ async function fetchDatosFormulario() {
     for (let i = 0; i < headers.length; i++) {
       if (headers[i].toLowerCase().includes('nombre') || headers[i].toLowerCase().includes('participante')) nameIdx = i;
     }
+    // Localizar la columna exacta cuyo header es "M1" (columna EA en el Sheet)
+    let m1Idx = -1;
+    for (let i = 0; i < headers.length; i++) {
+      if (headers[i].trim() === 'M1') { m1Idx = i; break; }
+    }
     formPicks = {};
+    m1Status = {};
     const globalStats = {};
     for (let i = 1; i < rows.length; i++) {
       const row = rows[i];
       if (!row[nameIdx]) continue;
       const pName = row[nameIdx].trim().toLowerCase();
+      if (m1Idx !== -1) {
+        m1Status[pName] = !!(row[m1Idx] && row[m1Idx].trim() !== '');
+      }
       let picks = [];
       for (let j = 0; j < headers.length; j++) {
         const h = headers[j].toLowerCase();
