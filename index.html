@@ -3644,10 +3644,9 @@ async function fetchDatosFormulario() {
     renderCharts(globalStats);
     duelInjectPicks();
     if (document.getElementById('secStats')?.classList.contains('active')) renderStats();
-// Re-renderizar leaderboard para mostrar predicciones live actualizadas
+// Re-renderizar leaderboard para reflejar picks recién cargados (predicciones live + indicador M1 faltante)
     const lbRows = document.querySelectorAll('.lb-row');
-    if (lbRows.length && matches.some(m => m.st === 'LIVE')) {
-      // Hay live y ya tenemos picks — re-fetch leaderboard para pintar predicciones
+    if (lbRows.length) {
       fetchLeaderboard();
     }
     
