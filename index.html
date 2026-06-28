@@ -2148,8 +2148,8 @@ async function fetchPartidosFromSheets() {
 
       const grupoRaw  = (row[g] || '').replace(/grupo\s*/i, '').trim().toUpperCase();
       const fechaStr  = (row[f] || '').trim();
-      const local     = (row[l] || '').trim();
-      const visitante = (row[v] || '').trim();
+      const local     = (row[l] || '').replace(/\u00A0/g, ' ').trim().replace(/\s+/g, ' ');
+      const visitante = (row[v] || '').replace(/\u00A0/g, ' ').trim().replace(/\s+/g, ' ');
       const golL      = row[gl] !== '' && row[gl] !== undefined && row[gl] !== null ? parseFloat(row[gl]) : null;
       const golV      = row[gv] !== '' && row[gv] !== undefined && row[gv] !== null ? parseFloat(row[gv]) : null;
       const estadoRaw = (row[est] || '').trim().toLowerCase();
@@ -3463,11 +3463,12 @@ function renderFunStats() {
       const row = rows[i];
       const slot = (row[0] || '').trim().toUpperCase();
       if (!/^M\d{1,2}$/.test(slot)) continue;
-      const eqA = (row[1] || '').trim();
-      const eqB = (row[2] || '').trim();
+      const eqA = (row[1] || '').replace(/\u00A0/g, ' ').trim().replace(/\s+/g, ' ');
+      const eqB = (row[2] || '').replace(/\u00A0/g, ' ').trim().replace(/\s+/g, ' ');
       if (eqA && eqB) map[slot] = { a: eqA, b: eqB };
     }
     slot16TeamsMap = map;
+    refreshOpenPlayerCardIfAny(); // 👈 si la tarjeta de un jugador ya estaba abierta, la repintamos con el mapa recién llegado
   } catch(e) {
     console.error('Error cargando mapa de equipos 16avos:', e);
   }
@@ -3765,6 +3766,24 @@ function findPick(match) {
         (aNorm === homeNorm && bNorm === awayNorm) ||
         (aNorm === awayNorm && bNorm === homeNorm);
       if (sameMatch) return p.a;
+    }
+  }
+
+  // Prioridad 0b (fallback): si slot16TeamsMap todavía no cargó (o no trae ese slot),
+  // pero el partido ya es de fase eliminatoria (grupo "16AVOS"), resolvemos el slot M#
+  // por orden cronológico directo entre los partidos de 16avos en `matches`.
+  if (/16avos|16\s*avos/i.test(match.g || '')) {
+    const elimMatches = matches
+      .filter(mm => /16avos|16\s*avos/i.test(mm.g || ''))
+      .sort((a, b) => a.date - b.date);
+    const idx = elimMatches.findIndex(mm =>
+      mm.h.toLowerCase() === homeNorm && mm.a.toLowerCase() === awayNorm
+    );
+    if (idx !== -1) {
+      const expectedSlot = `M${idx + 1}`;
+      for (const p of picks) {
+        if (p.q.trim().toUpperCase() === expectedSlot) return p.a;
+      }
     }
   }
 
@@ -4156,7 +4175,10 @@ function buildGroupPointsHTML(picks) {
 // ══════════════════════════════════════════════════════
 //  MODAL FICHA JUGADOR
 // ══════════════════════════════════════════════════════
+let _openPlayerCardArgs = null; // 👈 recuerda qué tarjeta está abierta, para poder refrescarla cuando lleguen datos async (p.ej. slot16TeamsMap)
+
 function openPlayerCard(rawName, pts, rank, gPts, pPts) {
+  _openPlayerCardArgs = { rawName, pts, rank, gPts, pPts };
   const modal   = document.getElementById('playerModal');
   const content = document.getElementById('fcContent');
   const normName= rawName.trim().toLowerCase();
@@ -4300,7 +4322,18 @@ function openPlayerCard(rawName, pts, rank, gPts, pPts) {
   content.innerHTML = html;
   modal.classList.add('active');
 }
-function closePlayerCard() { document.getElementById('playerModal').classList.remove('active'); }
+function closePlayerCard() { document.getElementById('playerModal').classList.remove('active'); _openPlayerCardArgs = null; }
+
+// Si la tarjeta de un jugador ya está abierta cuando llegan datos async (p.ej. el mapa
+// de equipos de 16avos), la volvemos a pintar para que el Spotlight muestre la predicción
+// correcta sin que el usuario tenga que cerrar y volver a abrir.
+function refreshOpenPlayerCardIfAny() {
+  if (!_openPlayerCardArgs) return;
+  const modal = document.getElementById('playerModal');
+  if (!modal || !modal.classList.contains('active')) return;
+  const { rawName, pts, rank, gPts, pPts } = _openPlayerCardArgs;
+  openPlayerCard(rawName, pts, rank, gPts, pPts);
+}
   function toggleAcc(header) {
   const arrow = header.querySelector('.acc-arrow');
   const body  = header.nextElementSibling;
