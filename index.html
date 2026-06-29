@@ -2737,6 +2737,36 @@ const BRACKET_FIXTURES_OFFICIAL = [
   { id:'M16', a:{type:'pos', g:'K', pos:1}, b:{type:'third', pool:'DEIJL'} },
 ];
 
+// ── EQUIPOS REALES DE 16AVOS (fijo, a mano) ──
+// Una vez que los cruces de 16avos quedaron definidos, se ponen aquí literal
+// para no depender de que la hoja "Partidos" y la hoja "16avos" del Sheet
+// coincidan texto por texto (espacios, tildes, mayúsculas, etc. pueden
+// desincronizarlas). Esta tabla SIEMPRE tiene prioridad sobre slot16TeamsMap.
+const SLOT16_FIXED_TEAMS = {
+  'M1':  { a:'Sudáfrica',        b:'Canadá' },
+  'M2':  { a:'Países Bajos',     b:'Marruecos' },
+  'M3':  { a:'Estados Unidos',   b:'Bosnia y H.' },
+  'M4':  { a:'Brasil',           b:'Japón' },
+  'M5':  { a:'Costa de Marfil',  b:'Noruega' },
+  'M6':  { a:'Australia',        b:'Egipto' },
+  'M7':  { a:'Alemania',         b:'Paraguay' },
+  'M8':  { a:'Francia',          b:'Suecia' },
+  'M9':  { a:'Argentina',        b:'Cabo Verde' },
+  'M10': { a:'Portugal',         b:'Croacia' },
+  'M11': { a:'España',           b:'Austria' },
+  'M12': { a:'Bélgica',          b:'Senegal' },
+  'M13': { a:'México',           b:'Ecuador' },
+  'M14': { a:'Inglaterra',       b:'RD Congo' },
+  'M15': { a:'Suiza',            b:'Argelia' },
+  'M16': { a:'Colombia',         b:'Ghana' },
+};
+// Devuelve {a,b} para un slot 'M#', priorizando la tabla fija de arriba
+// y cayendo a slot16TeamsMap (lo leído en vivo del Sheet) si el slot no
+// estuviera todavía en la tabla fija.
+function getSlot16Teams(slotKey) {
+  return SLOT16_FIXED_TEAMS[slotKey] || slot16TeamsMap[slotKey] || null;
+}
+
 function getGroupQualifiers() {
   // Devuelve { A: {first, second, third}, ... } a partir de computeGroupTable
   const out = {};
@@ -3808,36 +3838,23 @@ function buildSpotlightHTML(picks) {
   // Buscar predicción del jugador para un partido dado
 function findPick(match) {
   if (!picks || !picks.length) return null;
-  const homeNorm = match.h.toLowerCase();
-  const awayNorm = match.a.toLowerCase();
+  const homeNorm = match.h.trim().toLowerCase();
+  const awayNorm = match.a.trim().toLowerCase();
 
-  // Prioridad 0: picks de eliminación directa (M1...M16) → resolver por el mapa de slots
-  for (const p of picks) {
-    const slotKey = p.q.trim().toUpperCase();
-    if (/^M\d{1,2}$/.test(slotKey) && slot16TeamsMap[slotKey]) {
-      const { a, b } = slot16TeamsMap[slotKey];
-      const aNorm = a.toLowerCase(), bNorm = b.toLowerCase();
+  // Prioridad 0: si el partido es de 16avos, resolver directo por la tabla fija
+  // de cruces reales (SLOT16_FIXED_TEAMS), sin depender de que matches[] / la
+  // hoja "Partidos" tenga el nombre de equipo escrito exactamente igual.
+  if (/16avos|16\s*avos/i.test(match.g || '')) {
+    for (const slotKey of Object.keys(SLOT16_FIXED_TEAMS)) {
+      const teams = getSlot16Teams(slotKey);
+      if (!teams) continue;
+      const aNorm = teams.a.toLowerCase(), bNorm = teams.b.toLowerCase();
       const sameMatch =
         (aNorm === homeNorm && bNorm === awayNorm) ||
         (aNorm === awayNorm && bNorm === homeNorm);
-      if (sameMatch) return p.a;
-    }
-  }
-
-  // Prioridad 0b (fallback): si slot16TeamsMap todavía no cargó (o no trae ese slot),
-  // pero el partido ya es de fase eliminatoria (grupo "16AVOS"), resolvemos el slot M#
-  // por orden cronológico directo entre los partidos de 16avos en `matches`.
-  if (/16avos|16\s*avos/i.test(match.g || '')) {
-    const elimMatches = matches
-      .filter(mm => /16avos|16\s*avos/i.test(mm.g || ''))
-      .sort((a, b) => a.date - b.date);
-    const idx = elimMatches.findIndex(mm =>
-      mm.h.toLowerCase() === homeNorm && mm.a.toLowerCase() === awayNorm
-    );
-    if (idx !== -1) {
-      const expectedSlot = `M${idx + 1}`;
-      for (const p of picks) {
-        if (p.q.trim().toUpperCase() === expectedSlot) return p.a;
+      if (sameMatch) {
+        const pick = picks.find(p => p.q.trim().toUpperCase() === slotKey);
+        if (pick) return pick.a;
       }
     }
   }
@@ -4113,8 +4130,8 @@ function buildElim16HTML(picks) {
     const slot = p.q.trim().toUpperCase();
     const predScore = parseScore(p.a);
 
-    // Equipos (del mapa ya cargado)
-    const teamInfo = slot16TeamsMap[slot];
+    // Equipos (tabla fija primero, slot16TeamsMap del Sheet como respaldo)
+    const teamInfo = getSlot16Teams(slot);
     const teamA = teamInfo ? teamInfo.a : null;
     const teamB = teamInfo ? teamInfo.b : null;
     const fA = teamA ? fl(teamA) : '🏳️';
