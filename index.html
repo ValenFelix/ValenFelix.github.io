@@ -2017,6 +2017,7 @@ let lockedGroupPositions = {}; // { 'G-A-1': 'México', 'G-D-4': 'Turquía', ...
 let slot16TeamsMap = {};
 let formPicks      = {};
 let m1Status       = {}; // nombre(lowercase) -> true/false, si la columna M1 (EA) tiene contenido
+let admin16Cache   = []; // [{slot, equipoA, equipoB, golA, golB, estado, fecha}]
 let lbPlayers       = [];
 let chartInstances = {};
 let curTab         = 'r';
@@ -3458,17 +3459,42 @@ function renderFunStats() {
       if (rows[i][0] && rows[i][0].trim().toLowerCase() === 'slot') { hdrIdx = i; break; }
     }
     if (hdrIdx === -1) return;
-    const map = {};
+
+    // Leer headers para encontrar columnas por nombre
+    const hdr = rows[hdrIdx].map(h => (h || '').trim().toLowerCase());
+    const iSlot = hdr.findIndex(h => h === 'slot');
+    const iEqA  = hdr.findIndex(h => h === 'equipoa');
+    const iEqB  = hdr.findIndex(h => h === 'equipob');
+    const iGolA = hdr.findIndex(h => h === 'gola');
+    const iGolB = hdr.findIndex(h => h === 'golb');
+    const iEst  = hdr.findIndex(h => h === 'estado');
+    const iFec  = hdr.findIndex(h => h === 'fecha');
+
+    const map  = {};
+    const cache = [];
     for (let i = hdrIdx + 1; i < rows.length; i++) {
-      const row = rows[i];
-      const slot = (row[0] || '').trim().toUpperCase();
+      const row  = rows[i];
+      const slot = (row[iSlot >= 0 ? iSlot : 0] || '').trim().toUpperCase();
       if (!/^M\d{1,2}$/.test(slot)) continue;
-      const eqA = (row[1] || '').replace(/\u00A0/g, ' ').trim().replace(/\s+/g, ' ');
-      const eqB = (row[2] || '').replace(/\u00A0/g, ' ').trim().replace(/\s+/g, ' ');
+      const eqA = (row[iEqA >= 0 ? iEqA : 1] || '').replace(/\u00A0/g, ' ').trim().replace(/\s+/g, ' ');
+      const eqB = (row[iEqB >= 0 ? iEqB : 2] || '').replace(/\u00A0/g, ' ').trim().replace(/\s+/g, ' ');
       if (eqA && eqB) map[slot] = { a: eqA, b: eqB };
+
+      // También llenar admin16Cache para que la ficha de jugador pueda calcular puntos
+      cache.push({
+        slot,
+        equipoA: eqA,
+        equipoB: eqB,
+        golA:    iGolA >= 0 ? (row[iGolA] || '').trim() : '',
+        golB:    iGolB >= 0 ? (row[iGolB] || '').trim() : '',
+        estado:  iEst  >= 0 ? (row[iEst]  || 'SCHED').trim().toUpperCase() : 'SCHED',
+        fecha:   iFec  >= 0 ? (row[iFec]  || '').trim() : '',
+      });
     }
+    cache.sort((a, b) => parseInt(a.slot.slice(1)) - parseInt(b.slot.slice(1)));
     slot16TeamsMap = map;
-    refreshOpenPlayerCardIfAny(); // 👈 si la tarjeta de un jugador ya estaba abierta, la repintamos con el mapa recién llegado
+    admin16Cache   = cache;   // disponible para buildElim16HTML sin necesitar el admin
+    refreshOpenPlayerCardIfAny();
   } catch(e) {
     console.error('Error cargando mapa de equipos 16avos:', e);
   }
@@ -5427,8 +5453,6 @@ function renderPosibleLB() {
 const ADMIN_PASSWORD   = 'HalaMadridChingao'; // 👈 misma clave que en el Apps Script
 const GID_16AVOS        = '681477915';
 const ADMIN16_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxbyoDf0NupVYw09f9Rto69iwhnfAeG250skh4DypyITrV5A-uf9iWJnXX8xOTr7NfU/exec'; // 👈 URL del despliegue nuevo
-
-let admin16Cache = []; // [{slot, equipoA, equipoB, golA, golB, estado, fecha}]
 
 function adminPromptUpdateResults() {
   const pass = prompt('🔐 Ingresa la contraseña de administrador:');
