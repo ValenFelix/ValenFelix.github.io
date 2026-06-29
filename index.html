@@ -2027,7 +2027,20 @@ let admin16Cache   = []; // [{slot, equipoA, equipoB, golA, golB, estado, fecha}
 // Formato: 'M1': { golA: 0, golB: 1, estado: 'FIN' }
 const MANUAL_16AVOS_RESULTS = {
   'M1': { golA: 0, golB: 1, estado: 'FIN' }, // Sudáfrica 0 - 1 Canadá
+  'M4': { golA: 2, golB: 1, estado: 'FIN' }, // Brasil 2 - 1 Japón
 };
+// Devuelve {golA, golB, estado} para un slot 'M#', priorizando SIEMPRE
+// MANUAL_16AVOS_RESULTS (resultado confirmado a mano) sobre admin16Cache
+// (lo leído en vivo del Sheet). Así, aunque el fetch en vivo falle o la
+// hoja "16avos" no responda a tiempo, los resultados ya confirmados
+// igual se calculan y muestran sus puntos.
+function getSlot16Result(slot) {
+  const manual = MANUAL_16AVOS_RESULTS[slot];
+  if (manual) return manual;
+  const cached = admin16Cache.find(c => c.slot === slot);
+  if (cached) return { golA: cached.golA, golB: cached.golB, estado: cached.estado };
+  return null;
+}
 let lbPlayers       = [];
 let chartInstances = {};
 let curTab         = 'r';
@@ -4138,13 +4151,15 @@ function buildElim16HTML(picks) {
     const fB = teamB ? fl(teamB) : '🏳️';
     const matchLabel = teamA && teamB ? `${fA} ${teamA} vs ${teamB} ${fB}` : slot;
 
-    // Resultado real (de admin16Cache)
+    // Resultado real: prioriza MANUAL_16AVOS_RESULTS (resultado confirmado a
+    // mano, siempre disponible) y cae a admin16Cache (lo leído en vivo del
+    // Sheet) si el slot no estuviera todavía forzado a mano.
     // Nota: si el marcador es 0, Google Sheets puede exportar la celda como
     // string vacío cuando la columna tiene un formato numérico que oculta los
     // ceros (formato tipo "0;-0;;@"). Por eso NO usamos "!== ''" como condición
     // de "hay resultado": basta con que el Estado sea FIN, y tratamos golA/golB
     // vacíos como 0 en ese caso.
-    const realMatch = admin16Cache.find(c => c.slot === slot);
+    const realMatch = getSlot16Result(slot);
     const hasResult = !!(realMatch && realMatch.estado === 'FIN');
     const realA = hasResult ? (parseInt(realMatch.golA) || 0) : null;
     const realB = hasResult ? (parseInt(realMatch.golB) || 0) : null;
