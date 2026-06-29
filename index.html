@@ -4093,11 +4093,15 @@ function buildElim16HTML(picks) {
     const matchLabel = teamA && teamB ? `${fA} ${teamA} vs ${teamB} ${fB}` : slot;
 
     // Resultado real (de admin16Cache)
+    // Nota: si el marcador es 0, Google Sheets puede exportar la celda como
+    // string vacío cuando la columna tiene un formato numérico que oculta los
+    // ceros (formato tipo "0;-0;;@"). Por eso NO usamos "!== ''" como condición
+    // de "hay resultado": basta con que el Estado sea FIN, y tratamos golA/golB
+    // vacíos como 0 en ese caso.
     const realMatch = admin16Cache.find(c => c.slot === slot);
-    const hasResult = realMatch && realMatch.estado === 'FIN' &&
-                      realMatch.golA !== '' && realMatch.golB !== '';
-    const realA = hasResult ? parseInt(realMatch.golA) : null;
-    const realB = hasResult ? parseInt(realMatch.golB) : null;
+    const hasResult = !!(realMatch && realMatch.estado === 'FIN');
+    const realA = hasResult ? (parseInt(realMatch.golA) || 0) : null;
+    const realB = hasResult ? (parseInt(realMatch.golB) || 0) : null;
 
     const predStr = predScore ? `${predScore[0]}–${predScore[1]}` : p.a;
     const realStr = hasResult ? `${realA}–${realB}` : null;
@@ -5531,6 +5535,11 @@ function renderAdmin16Modal() {
 
   body.innerHTML = admin16Cache.map((m, idx) => {
     const estClass = m.estado === 'LIVE' ? 'live' : m.estado === 'FIN' ? 'fin' : 'sched';
+    // Si el partido ya está FIN pero golA/golB llegan vacíos (Sheets puede exportar
+    // una celda con valor 0 como vacía si la columna tiene formato que oculta ceros),
+    // mostramos "0" explícito en el input para que el admin no piense que falta capturar.
+    const golAView = (m.estado === 'FIN' && m.golA === '') ? '0' : m.golA;
+    const golBView = (m.estado === 'FIN' && m.golB === '') ? '0' : m.golB;
     return `<div class="admin16-row" id="admin16row-${idx}">
       <div class="admin16-row-head">
         <span class="admin16-slot">${m.slot}</span>
@@ -5538,9 +5547,9 @@ function renderAdmin16Modal() {
       </div>
       <div class="admin16-grid">
         <input class="admin16-team-input" id="admin16-eqA-${idx}" value="${m.equipoA}" placeholder="Equipo A">
-        <input class="admin16-gol-input" id="admin16-golA-${idx}" value="${m.golA}" placeholder="-" inputmode="numeric">
+        <input class="admin16-gol-input" id="admin16-golA-${idx}" value="${golAView}" placeholder="-" inputmode="numeric">
         <span class="admin16-sep">VS</span>
-        <input class="admin16-gol-input" id="admin16-golB-${idx}" value="${m.golB}" placeholder="-" inputmode="numeric">
+        <input class="admin16-gol-input" id="admin16-golB-${idx}" value="${golBView}" placeholder="-" inputmode="numeric">
         <input class="admin16-team-input" id="admin16-eqB-${idx}" value="${m.equipoB}" placeholder="Equipo B">
       </div>
       <div class="admin16-extra-row">
