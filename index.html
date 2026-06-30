@@ -2675,7 +2675,7 @@ function renderDailyMessage() {
           <div class="sbn-content">
 
             <div class="sbn-eyebrow">
-              🔥 OCTAVOS DE FINAL · ELIMINACIÓN DIRECTA
+              🔥 DIECISÉISAVOS DE FINAL · ELIMINACIÓN DIRECTA
               ${mxLive ? '<span class="sbn-live-chip">EN VIVO</span>' : ''}
             </div>
 
@@ -2758,14 +2758,14 @@ function showMexicoOctavosOverlay(m, isLive) {
   overlay.className = 'mex-octavos-overlay';
   overlay.innerHTML = `
     <div class="mex-octavos-card" title="Toca para cerrar">
-      <div class="mex-oct-eyebrow">${isLive ? '⚡ PARTIDO EN VIVO ⚡' : '⚡ OCTAVOS DE FINAL · 2026 ⚡'}</div>
+      <div class="mex-oct-eyebrow">${isLive ? '⚡ PARTIDO EN VIVO ⚡' : '⚡ DIECISEISAVOS DE FINAL · 2026 ⚡'}</div>
       <div class="mex-oct-title">HOY SE<br>JUEGA<br>TODO</div>
       <div class="mex-oct-vs">
         <span class="mex-team">${flagMx} México</span>
         <span class="mex-vsword">VS</span>
         <span class="mex-team">${rival} ${flagRiv}</span>
       </div>
-      <div class="mex-oct-stakes">🏆 Ganamos → Cuartos de Final</div>
+      <div class="mex-oct-stakes">🏆 Ganamos → Octavos de Final</div>
       <div class="mex-oct-sub">Eliminación directa. No hay mañana.<br>¡La Familia López Félix está lista! 🦅</div>
       <button class="mex-oct-close" onclick="this.closest('.mex-octavos-overlay').classList.remove('show')">
         ¡VAMOS MÉXICO! 🇲🇽
