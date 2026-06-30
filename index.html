@@ -2853,11 +2853,11 @@ function showParaguayVictoria() {
       <div class="par-tap-hint">Toca para cerrar</div>
     </div>
   `;
-  document.body.appendChild(overlay);
+document.body.appendChild(overlay);
   requestAnimationFrame(() => overlay.classList.add('show'));
-  spawnConfettiParaguay();
 
   const dismiss = () => {
+    spawnConfettiParaguay();
     overlay.classList.remove('show');
     setTimeout(() => overlay.remove(), 500);
   };
