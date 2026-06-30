@@ -404,42 +404,11 @@
     .duel-cell.right .duel-a{justify-content:flex-end}
     .duel-icon{font-size:16px;text-align:center}
     .duel-empty-msg{text-align:center;padding:20px;color:var(--muted);font-size:13px;background:var(--card);border:1px solid var(--border);border-radius:10px}
-    /* ── BRACKET dieciseisavos ── */
+    /* clases de layout compartidas (bracket removido, estas siguen en stats/pred16) */
     .bracket-wrap{max-width:1100px;margin:0 auto;padding:30px 16px 60px;display:flex;flex-direction:column;gap:18px}
-    .bracket-top-bar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-    .bracket-status-pill{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:5px 14px;color:var(--dim)}
     .bracket-notice{background:rgba(79,195,247,0.08);border:1px solid rgba(79,195,247,0.3);border-radius:10px;padding:12px 16px;font-size:13px;color:var(--text);line-height:1.5}
     .bracket-notice b{color:var(--blue)}
-    .bracket-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-    @media(max-width:700px){.bracket-grid{grid-template-columns:1fr}}
-    .bracket-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}
-    .bracket-card.is-proj{border-color:rgba(79,195,247,0.35)}
-    .bracket-card-head{display:flex;justify-content:space-between;align-items:center;padding:9px 14px;background:rgba(255,255,255,0.02);border-bottom:1px solid var(--border)}
-    .bracket-match-id{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;letter-spacing:1px;color:var(--muted)}
-    .bracket-tag{font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:800;letter-spacing:1px;text-transform:uppercase;border-radius:5px;padding:2px 7px}
-    .bracket-tag.real{background:rgba(0,230,118,0.12);color:var(--green);border:1px solid rgba(0,230,118,0.3)}
-    .bracket-tag.proj{background:rgba(79,195,247,0.12);color:var(--blue);border:1px solid rgba(79,195,247,0.3)}
-    .bracket-team-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--border)}
-    .bracket-team-row:last-child{border-bottom:none}
-    .bracket-slot-code{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:800;color:var(--muted);background:var(--surface);border:1px solid var(--border);border-radius:5px;width:30px;text-align:center;padding:3px 0;flex-shrink:0}
-    .bracket-team-flag{font-size:18px;flex-shrink:0}
-    .bracket-team-name{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .bracket-team-name.tbd{color:var(--muted);font-weight:600;font-style:italic}
-    .bracket-team-name.is-proj-team{color:var(--blue)}
-    .bracket-third-pool{font-size:10px;color:var(--muted);margin-left:auto;padding-left:8px;flex-shrink:0;white-space:nowrap}
-    .bracket-thirds-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:6px}
-    .bracket-thirds-row{display:grid;grid-template-columns:30px 1fr 60px 60px;align-items:center;padding:9px 16px;border-bottom:1px solid var(--border);font-family:'Barlow Condensed',sans-serif}
-    .bracket-thirds-row:last-child{border-bottom:none}
-    .bracket-thirds-row.qualified{background:rgba(0,230,118,0.04)}
-    .bracket-thirds-row .bt-rank{font-size:13px;font-weight:900;color:var(--muted)}
-    .bracket-thirds-row.qualified .bt-rank{color:var(--green)}
-    .bracket-thirds-row .bt-team{font-size:14px;font-weight:700;display:flex;align-items:center;gap:6px}
-    .bracket-thirds-row .bt-pts{font-size:13px;font-weight:800;text-align:right;color:var(--dim)}
-    .bracket-thirds-row.qualified .bt-pts{color:var(--text)}
-    .bracket-thirds-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.01)}
-    .bracket-legend{display:flex;gap:18px;font-size:12px;color:var(--muted);padding:4px 2px}
-    .bl-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
-    .bl-real{background:var(--green)}.bl-proj{background:var(--blue)}
+    .bracket-status-pill{font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:5px 14px;color:var(--dim)}
     /* ── ACCORDION EN FICHA JUGADOR ── */
 .acc-section{margin-bottom:10px;border-radius:10px;overflow:hidden;border:1px solid var(--border)}
 .acc-header{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(255,255,255,0.04);cursor:pointer;user-select:none;transition:background .2s}
@@ -832,6 +801,96 @@ html.modo-mexico .papel-picado-bar{display:flex}
 .pp-flag:nth-child(3n+1){background:#00c853}
 .pp-flag:nth-child(3n+2){background:#f6f6f0}
 .pp-flag:nth-child(3n+3){background:#ef3e45}
+
+/* ── OVERLAY ÉPICO MODO MÉXICO (octavos) ── */
+.mex-octavos-overlay{
+  position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.88);backdrop-filter:blur(6px);
+  opacity:0;transition:opacity .45s ease;pointer-events:none;
+}
+.mex-octavos-overlay.show{opacity:1;pointer-events:auto}
+.mex-octavos-card{
+  position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#0a2e14 0%,#0b0e0a 50%,#2c0a0c 100%);
+  border:1px solid rgba(0,200,83,0.45);
+  border-radius:22px;padding:44px 36px 36px;
+  max-width:420px;width:92%;text-align:center;
+  box-shadow:0 0 60px rgba(0,200,83,0.25),0 0 120px rgba(239,62,69,0.15);
+  animation:mex-card-breathe 3s ease-in-out infinite;
+}
+@keyframes mex-card-breathe{
+  0%,100%{box-shadow:0 0 60px rgba(0,200,83,0.25),0 0 120px rgba(239,62,69,0.15)}
+  50%    {box-shadow:0 0 80px rgba(0,200,83,0.45),0 0 140px rgba(239,62,69,0.3),0 0 200px rgba(0,200,83,0.1)}
+}
+.mex-octavos-card::before{
+  content:'🦅';position:absolute;top:12px;left:50%;transform:translateX(-50%);
+  font-size:80px;opacity:0.06;pointer-events:none;
+}
+.mex-oct-eyebrow{
+  font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;
+  letter-spacing:3px;text-transform:uppercase;color:#00c853;margin-bottom:10px;
+  animation:mex-eyebrow-pulse 1.8s ease-in-out infinite;
+}
+@keyframes mex-eyebrow-pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.mex-oct-title{
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:clamp(40px,10vw,62px);font-weight:900;line-height:1;
+  color:#f4f7f2;letter-spacing:-1px;margin-bottom:6px;
+  text-shadow:0 0 40px rgba(0,200,83,0.5);
+}
+.mex-oct-vs{
+  font-family:'Barlow Condensed',sans-serif;font-size:22px;font-weight:700;
+  color:#a4c7b0;margin:12px 0;display:flex;align-items:center;justify-content:center;gap:14px;
+}
+.mex-oct-vs .mex-team{font-size:26px;font-weight:900;color:#f4f7f2}
+.mex-oct-vs .mex-vsword{font-size:15px;font-weight:800;color:#5f8a72;letter-spacing:2px}
+.mex-oct-stakes{
+  font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;
+  color:#ef3e45;letter-spacing:.5px;margin:14px 0 6px;
+  text-transform:uppercase;
+}
+.mex-oct-sub{font-size:13px;color:#a4c7b0;line-height:1.5;margin-bottom:22px}
+.mex-oct-close{
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;
+  letter-spacing:1px;text-transform:uppercase;
+  background:linear-gradient(135deg,#00c853,#00a040);color:#000;border:none;
+  padding:12px 32px;border-radius:10px;cursor:pointer;
+  box-shadow:0 6px 20px rgba(0,200,83,0.4);transition:all .15s ease;
+}
+.mex-oct-close:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,200,83,0.55)}
+.mex-oct-tap{font-size:11px;color:#5f8a72;margin-top:12px}
+
+/* ── OVERLAY ¡MÉXICO VA GANANDO! (más épico) ── */
+.mex-winning-overlay{
+  position:fixed;inset:0;z-index:2900;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.82);backdrop-filter:blur(5px);
+  opacity:0;transition:opacity .4s ease;pointer-events:none;
+}
+.mex-winning-overlay.show{opacity:1;pointer-events:auto}
+.mex-winning-card{
+  position:relative;overflow:hidden;
+  background:linear-gradient(160deg,#082015 0%,#050d07 50%,#1a0608 100%);
+  border:2px solid rgba(0,200,83,0.6);border-radius:20px;
+  padding:36px 30px 28px;max-width:380px;width:90%;text-align:center;
+  box-shadow:0 0 80px rgba(0,200,83,0.4);
+  animation:mex-win-glow 1s ease-in-out infinite;
+}
+@keyframes mex-win-glow{
+  0%,100%{box-shadow:0 0 60px rgba(0,200,83,0.3)}
+  50%    {box-shadow:0 0 100px rgba(0,200,83,0.6),0 0 40px rgba(239,62,69,0.2)}
+}
+.mex-win-emoji{font-size:50px;margin-bottom:8px}
+.mex-win-title{
+  font-family:'Barlow Condensed',sans-serif;font-size:clamp(30px,8vw,48px);
+  font-weight:900;color:#00c853;line-height:1;
+  text-shadow:0 0 30px rgba(0,200,83,0.8);margin-bottom:6px;
+}
+.mex-win-score{
+  font-family:'Barlow Condensed',sans-serif;font-size:28px;font-weight:800;
+  color:#f4f7f2;margin:10px 0;
+}
+.mex-win-sub{font-size:13px;color:#a4c7b0;margin-bottom:18px}
+.mex-win-tap{font-size:11px;color:#5f8a72;margin-top:10px}
 
     /* ══════════════════════════════════════════════════════
    MODO PARAGUAY — rojo/blanco/azul
@@ -1421,10 +1480,6 @@ html.modo-paraguay .rayas-paraguay-bar{display:flex}
   <div class="nav-more-wrap" id="navMoreWrap">
     <button class="main-tab" id="navOtras" onclick="toggleOtrasMenu(event)">🗂️ Otras Opciones</button>
     <div class="otras-menu" id="otrasMenu">
-      <button class="otras-menu-item" id="omiBracket" onclick="selectOtraOpcion('bracket')">
-        <span class="omi-emoji">🏟️</span>
-        <span class="omi-text"><b>Bracket</b><small>Cruces de eliminación directa</small></span>
-      </button>
       <button class="otras-menu-item" id="omiStats" onclick="selectOtraOpcion('stats')">
         <span class="omi-emoji">📊</span>
         <span class="omi-text"><b>Estadísticas</b><small>Posibilidad de remontada y datos curiosos</small></span>
@@ -1624,20 +1679,6 @@ html.modo-paraguay .rayas-paraguay-bar{display:flex}
   </div>
 </div>
 
-<div class="section" id="secBracket">
-  <div class="bracket-wrap">
-    <div class="bracket-top-bar">
-      <div class="eyebrow-sm" style="margin-bottom:0">dieciseisavos de Final — Proyección Automática</div>
-      <span class="bracket-status-pill" id="bracketStatusPill">Calculando…</span>
-    </div>
-    <div id="bracketNotice" class="bracket-notice" style="display:none"></div>
-    <div id="bracketGrid" class="bracket-grid"></div>
-    <div class="bracket-legend">
-      <span><span class="bl-dot bl-real"></span>Confirmado por partidos jugados</span>
-      <span><span class="bl-dot bl-proj"></span>Proyección con datos actuales</span>
-    </div>
-  </div>
-</div>
 
 <div class="section" id="secStats">
   <div class="bracket-wrap">
@@ -2152,8 +2193,8 @@ let matches        = [];
 let lockedGroupPositions = {}; // { 'G-A-1': 'México', 'G-D-4': 'Turquía', ... }
 let slot16TeamsMap = {};
 let formPicks      = {};
-let m1Status       = {}; // nombre(lowercase) -> true/false, si el jugador completó TODOS los slots vigilados (M1, M2, M4, M5, M7, M8, M13)
-const WATCHED_ELIM_SLOTS = ['M1', 'M2', 'M4', 'M5', 'M7', 'M8', 'M13']; // slots de 16avos que ya se jugaron/están por jugarse: se marca al jugador si le falta cualquiera de estos
+let m1Status       = {}; // nombre(lowercase) -> true/false, si el jugador completó TODOS los slots vigilados (M1, M2, M4, M7)
+const WATCHED_ELIM_SLOTS = ['M1', 'M2', 'M4', 'M7']; // slots de 16avos que ya se jugaron/están por jugarse: se marca al jugador si le falta cualquiera de estos
 let admin16Cache   = []; // [{slot, equipoA, equipoB, golA, golB, estado, fecha}]
 
 // ── RESULTADOS MANUALES DE 16AVOS ──
@@ -2191,7 +2232,7 @@ let paraguayCelebEvaluada = false;
 // ══════════════════════════════════════════════════════
 //  UTILIDADES
 // ══════════════════════════════════════════════════════
-const OTRAS_OPCIONES = ['bracket', 'stats', 'pred16', 'duel'];
+const OTRAS_OPCIONES = ['stats', 'pred16', 'duel'];
 function switchSection(name) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('on'));
@@ -2202,7 +2243,7 @@ function switchSection(name) {
   document.querySelectorAll('.otras-menu-item').forEach(it => it.classList.remove('active'));
   if (OTRAS_OPCIONES.includes(name)) {
     const item = document.getElementById(
-      name === 'bracket' ? 'omiBracket' :
+
       name === 'stats'   ? 'omiStats'   :
       name === 'pred16'  ? 'omiPred16'  :
       name === 'duel'    ? 'omiDuel'    : 'omiPosibleLB'
@@ -2366,7 +2407,6 @@ async function fetchPartidosFromSheets() {
   renderLiveScores();
   renderDailyMessage();
   renderStd();
-  renderBracket();
   renderGroupStageStatus();
   startCountdown();
 }
@@ -2635,12 +2675,12 @@ function renderDailyMessage() {
           <div class="sbn-content">
 
             <div class="sbn-eyebrow">
-              HOY JUEGA MÉXICO
+              🔥 OCTAVOS DE FINAL · ELIMINACIÓN DIRECTA
               ${mxLive ? '<span class="sbn-live-chip">EN VIVO</span>' : ''}
             </div>
 
             <div class="sbn-main">
-              LA PRIMERA YA DESCANSA EN TENOCHTITLÁN
+              ¡HOY SE JUEGA TODO, FAMILIA! 🦅
             </div>
 
             <div class="sbn-match">
@@ -2685,7 +2725,7 @@ function applyModoMexico(mexicoMatch) {
   root.classList.toggle('modo-mexico-live', mxLive);
   if (metaTheme) metaTheme.setAttribute('content', '#070f0a');
 
-  // Solo se evalúa una vez por carga de página (al "entrar")
+  // Solo se evalúa una vez por carga de página
   if (!bienvenidaEvaluada) {
     bienvenidaEvaluada = true;
     if (mxLive) {
@@ -2693,45 +2733,109 @@ function applyModoMexico(mexicoMatch) {
       const golesRival = mexicoMatch.h === 'México' ? mexicoMatch.sA : mexicoMatch.sH;
       if (golesMx !== null && golesRival !== null && golesMx > golesRival) {
         celebrarMexicoGanando(mexicoMatch);
+      } else {
+        // En vivo pero no ganando — mostrar overlay épico de octavos
+        setTimeout(() => showMexicoOctavosOverlay(mexicoMatch, true), 600);
       }
+    } else if (mexicoMatch.st !== 'FIN') {
+      // Partido pendiente: mostrar overlay motivacional al entrar
+      setTimeout(() => showMexicoOctavosOverlay(mexicoMatch, false), 700);
     }
   }
 }
 
-function celebrarMexicoGanando(m) {
-  const toast = document.createElement('div');
-  toast.className = 'gol-toast';
-  toast.innerHTML = `
-    <div class="gol-toast-emoji">🇲🇽⚽</div>
-    <div class="gol-toast-text">¡MÉXICO VA GANANDO!</div>
-    <div class="gol-toast-score">${m.h} ${m.sH} – ${m.sA} ${m.a}</div>
+// ── OVERLAY ÉPICO — aparece al cargar cuando México juega hoy en octavos ──
+let mexOctavosShown = false;
+function showMexicoOctavosOverlay(m, isLive) {
+  if (mexOctavosShown) return;
+  mexOctavosShown = true;
+
+  const rival   = m.h === 'México' ? m.a : m.h;
+  const flagMx  = '🇲🇽';
+  const flagRiv = fl(rival);
+
+  const overlay = document.createElement('div');
+  overlay.className = 'mex-octavos-overlay';
+  overlay.innerHTML = `
+    <div class="mex-octavos-card" title="Toca para cerrar">
+      <div class="mex-oct-eyebrow">${isLive ? '⚡ PARTIDO EN VIVO ⚡' : '⚡ OCTAVOS DE FINAL · 2026 ⚡'}</div>
+      <div class="mex-oct-title">HOY SE<br>JUEGA<br>TODO</div>
+      <div class="mex-oct-vs">
+        <span class="mex-team">${flagMx} México</span>
+        <span class="mex-vsword">VS</span>
+        <span class="mex-team">${rival} ${flagRiv}</span>
+      </div>
+      <div class="mex-oct-stakes">🏆 Ganamos → Cuartos de Final</div>
+      <div class="mex-oct-sub">Eliminación directa. No hay mañana.<br>¡La Familia López Félix está lista! 🦅</div>
+      <button class="mex-oct-close" onclick="this.closest('.mex-octavos-overlay').classList.remove('show')">
+        ¡VAMOS MÉXICO! 🇲🇽
+      </button>
+      <div class="mex-oct-tap">Toca para cerrar</div>
+    </div>
   `;
-  document.body.appendChild(toast);
-  requestAnimationFrame(() => toast.classList.add('show'));
-  spawnConfetti();
-  setTimeout(() => {
-    toast.classList.remove('show');
-    setTimeout(() => toast.remove(), 500);
-  }, 4200);
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('show'));
+  spawnConfettiMexico(120, 7000);
+
+  const dismiss = () => {
+    overlay.classList.remove('show');
+    setTimeout(() => overlay.remove(), 500);
+  };
+  overlay.addEventListener('click', e => {
+    if (e.target === overlay) dismiss();
+  });
+  setTimeout(dismiss, 10000);
 }
 
-function spawnConfetti() {
+function celebrarMexicoGanando(m) {
+  const overlay = document.createElement('div');
+  overlay.className = 'mex-winning-overlay';
+  overlay.innerHTML = `
+    <div class="mex-winning-card" title="Toca para cerrar">
+      <div class="mex-win-emoji">🇲🇽⚽🔥</div>
+      <div class="mex-win-title">¡MÉXICO<br>VA GANANDO!</div>
+      <div class="mex-win-score">${m.h} ${m.sH} – ${m.sA} ${m.a}</div>
+      <div class="mex-win-sub">¡A CUARTOS! ¡A CUARTOS! ¡A CUARTOS! 🏆</div>
+      <div class="mex-win-tap">Toca para cerrar</div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => overlay.classList.add('show'));
+  spawnConfettiMexico(180, 8000);
+
+  const dismiss = () => {
+    overlay.classList.remove('show');
+    setTimeout(() => overlay.remove(), 500);
+  };
+  overlay.addEventListener('click', dismiss);
+  setTimeout(dismiss, 8000);
+}
+
+// Confetti tricolor más épico para octavos
+function spawnConfettiMexico(count = 120, duration = 6000) {
   const wrap = document.createElement('div');
   wrap.className = 'confetti-wrap';
-  const colors = ['#00c853', '#f6f6f0', '#ef3e45'];
-  for (let i = 0; i < 70; i++) {
+  const colors = ['#00c853','#00ff88','#f4f7f2','#ffffff','#ef3e45','#ff6b6b','#00a040','#cc0000'];
+  for (let i = 0; i < count; i++) {
     const p = document.createElement('span');
     p.className = 'confetti-piece';
-    p.style.left = Math.random() * 100 + '%';
-    p.style.background = colors[i % 3];
-    p.style.animationDelay = (Math.random() * 0.4) + 's';
-    p.style.animationDuration = (2.2 + Math.random() * 1.4) + 's';
+    p.style.left   = Math.random() * 100 + '%';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.width  = (5 + Math.random() * 10) + 'px';
+    p.style.height = (8 + Math.random() * 13) + 'px';
+    p.style.borderRadius = Math.random() > 0.6 ? '50%' : '2px';
+    p.style.animationDelay    = (Math.random() * 1.0) + 's';
+    p.style.animationDuration = (2.0 + Math.random() * 2.2) + 's';
     p.style.transform = `rotate(${Math.random() * 360}deg)`;
+    p.style.opacity = (0.75 + Math.random() * 0.25).toString();
     wrap.appendChild(p);
   }
   document.body.appendChild(wrap);
-  setTimeout(() => wrap.remove(), 4000);
+  setTimeout(() => wrap.remove(), duration);
 }
+
+// Alias para compatibilidad con código existente
+function spawnConfetti() { spawnConfettiMexico(90, 4500); }
 
  function celebrarGolCR7() {
   const overlay = document.createElement('div');
@@ -2973,428 +3077,6 @@ function renderStd() {
     <span><span class="qdot" style="display:inline-block"></span>Clasifica</span>
     <span><span class="qdot maybe" style="display:inline-block"></span>Posible 3ro</span>
   </div>`;
-}
-
-// ══════════════════════════════════════════════════════
-//  BRACKET DE dieciseisavos — FIFA WORLD CUP 2026 (48 equipos)
-// ══════════════════════════════════════════════════════
-// Cruces oficiales de dieciseisavos (32 partidos). "3xxxxx" = mejor 3er lugar entre esos grupos,
-// según el bracket publicado por la FIFA para el Mundial 2026.
-const BRACKET_FIXTURES_OFFICIAL = [
-  { id:'M1',  a:{type:'pos', g:'E', pos:1}, b:{type:'third', pool:'ABCDF'} },
-  { id:'M2',  a:{type:'pos', g:'I', pos:1}, b:{type:'third', pool:'CDFGH'} },
-  { id:'M3',  a:{type:'pos', g:'A', pos:2}, b:{type:'pos', g:'B', pos:2} },
-  { id:'M4',  a:{type:'pos', g:'F', pos:1}, b:{type:'pos', g:'C', pos:2} },
-  { id:'M5',  a:{type:'pos', g:'K', pos:2}, b:{type:'pos', g:'L', pos:2} },
-  { id:'M6',  a:{type:'pos', g:'H', pos:1}, b:{type:'pos', g:'J', pos:2} },
-  { id:'M7',  a:{type:'pos', g:'D', pos:1}, b:{type:'third', pool:'BEFIJ'} },
-  { id:'M8',  a:{type:'pos', g:'G', pos:1}, b:{type:'third', pool:'AEHIJ'} },
-  { id:'M9',  a:{type:'pos', g:'C', pos:1}, b:{type:'pos', g:'F', pos:2} },
-  { id:'M10', a:{type:'pos', g:'E', pos:2}, b:{type:'pos', g:'I', pos:2} },
-  { id:'M11', a:{type:'pos', g:'A', pos:1}, b:{type:'third', pool:'CEFHI'} },
-  { id:'M12', a:{type:'pos', g:'L', pos:1}, b:{type:'third', pool:'EHIJK'} },
-  { id:'M13', a:{type:'pos', g:'J', pos:1}, b:{type:'pos', g:'H', pos:2} },
-  { id:'M14', a:{type:'pos', g:'D', pos:2}, b:{type:'pos', g:'G', pos:2} },
-  { id:'M15', a:{type:'pos', g:'B', pos:1}, b:{type:'third', pool:'EFGIJ'} },
-  { id:'M16', a:{type:'pos', g:'K', pos:1}, b:{type:'third', pool:'DEIJL'} },
-];
-
-// ── EQUIPOS REALES DE 16AVOS (fijo, a mano) ──
-// Una vez que los cruces de 16avos quedaron definidos, se ponen aquí literal
-// para no depender de que la hoja "Partidos" y la hoja "16avos" del Sheet
-// coincidan texto por texto (espacios, tildes, mayúsculas, etc. pueden
-// desincronizarlas). Esta tabla SIEMPRE tiene prioridad sobre slot16TeamsMap.
-const SLOT16_FIXED_TEAMS = {
-  'M1':  { a:'Sudáfrica',        b:'Canadá' },
-  'M2':  { a:'Países Bajos',     b:'Marruecos' },
-  'M3':  { a:'Estados Unidos',   b:'Bosnia y H.' },
-  'M4':  { a:'Brasil',           b:'Japón' },
-  'M5':  { a:'Costa de Marfil',  b:'Noruega' },
-  'M6':  { a:'Australia',        b:'Egipto' },
-  'M7':  { a:'Alemania',         b:'Paraguay' },
-  'M8':  { a:'Francia',          b:'Suecia' },
-  'M9':  { a:'Argentina',        b:'Cabo Verde' },
-  'M10': { a:'Portugal',         b:'Croacia' },
-  'M11': { a:'España',           b:'Austria' },
-  'M12': { a:'Bélgica',          b:'Senegal' },
-  'M13': { a:'México',           b:'Ecuador' },
-  'M14': { a:'Inglaterra',       b:'RD Congo' },
-  'M15': { a:'Suiza',            b:'Argelia' },
-  'M16': { a:'Colombia',         b:'Ghana' },
-};
-// Devuelve {a,b} para un slot 'M#', priorizando la tabla fija de arriba
-// y cayendo a slot16TeamsMap (lo leído en vivo del Sheet) si el slot no
-// estuviera todavía en la tabla fija.
-function getSlot16Teams(slotKey) {
-  return SLOT16_FIXED_TEAMS[slotKey] || slot16TeamsMap[slotKey] || null;
-}
-
-function getGroupQualifiers() {
-  // Devuelve { A: {first, second, third}, ... } a partir de computeGroupTable
-  const out = {};
-  Object.keys(GROUPS).forEach(g => {
-    const t = computeGroupTable(g);
-    out[g] = { first: t[0] || null, second: t[1] || null, third: t[2] || null, finished: matchesPlayedInGroup(g) };
-  });
-  return out;
-}
-
-function matchesPlayedInGroup(g) {
-  const total = matches.filter(m => m.g === g).length;
-  const played = matches.filter(m => m.g === g && m.st === 'FIN').length;
-  return { played, total };
-}
-
-function getBestThirds(qualifiers) {
-  // Toma el 3er lugar de cada uno de los 12 grupos y ordena para sacar los 8 mejores
-  const thirds = Object.keys(GROUPS)
-    .map(g => qualifiers[g].third ? { group: g, ...qualifiers[g].third } : null)
-    .filter(Boolean)
-    .sort((x, y) => (y.pts - x.pts) || (y.gd - x.gd) || (y.gf - x.gf));
-  return thirds;
-}
-
-function allGroupsFinished(qualifiers) {
-  return Object.keys(GROUPS).every(g => {
-    const f = qualifiers[g].finished;
-    return f.total > 0 && f.played === f.total;
-  });
-}
-
-// ══════════════════════════════════════════════════════
-//  TRANSICIÓN FASE DE GRUPOS → 16AVOS
-// ══════════════════════════════════════════════════════
-let _gsCloseShown   = false; // ya se mostró/disparó el banner de cierre en esta sesión
-let _gsCloseDismissed = false; // el usuario lo cerró manualmente
-let _gsNextElimDate = null; // Date del próximo partido de 16avos (si se pudo leer)
-let _gsNextElimSlot  = null;
-let _gsCountdownInt  = null;
-
-async function fetchNextElimDate() {
-  // Lectura pública (sin contraseña) de la hoja "16avos" solo para sacar
-  // el slot con fecha más próxima que aún no se ha jugado.
-  try {
-    const r = await fetch(csvUrl(SID, GID_16AVOS));
-    if (!r.ok) return;
-    const rows = parseCSV(await r.text());
-    let hdrIdx = -1;
-    for (let i = 0; i < rows.length; i++) {
-      if (rows[i][0] && rows[i][0].trim().toLowerCase() === 'slot') { hdrIdx = i; break; }
-    }
-    if (hdrIdx === -1) return;
-    const hdr = rows[hdrIdx].map(h => (h || '').trim().toLowerCase());
-    const iSlot = hdr.indexOf('slot');
-    const iEst  = hdr.indexOf('estado');
-    const iFec  = hdr.indexOf('fecha');
-
-    let best = null;
-    for (let i = hdrIdx + 1; i < rows.length; i++) {
-      const row = rows[i];
-      const slot = (row[iSlot] || '').trim();
-      if (!/^M\d{1,2}$/i.test(slot)) continue;
-      const estado = (row[iEst] || 'SCHED').trim().toUpperCase();
-      const fechaStr = (row[iFec] || '').trim();
-      if (estado !== 'SCHED' || !fechaStr) continue;
-      const d = parseFecha(fechaStr);
-      if (!best || d < best.date) best = { date: d, slot: slot.toUpperCase() };
-    }
-    if (best) { _gsNextElimDate = best.date; _gsNextElimSlot = best.slot; }
-  } catch (e) {
-    console.error('Error leyendo fecha de 16avos:', e);
-  }
-}
-
-function spawnConfettiGS(container) {
-  const colors = ['#f5c842', '#00e676', '#4fc3f7', '#ffffff'];
-  const wrap = document.createElement('div');
-  wrap.className = 'gs-confetti-wrap';
-  for (let i = 0; i < 60; i++) {
-    const p = document.createElement('span');
-    p.className = 'gs-confetti-piece';
-    p.style.left = Math.random() * 100 + '%';
-    p.style.background = colors[i % colors.length];
-    p.style.animationDelay = (Math.random() * 1.2) + 's';
-    p.style.animationDuration = (2.4 + Math.random() * 1.8) + 's';
-    p.style.transform = `rotate(${Math.random() * 360}deg)`;
-    wrap.appendChild(p);
-  }
-  container.appendChild(wrap);
-  setTimeout(() => wrap.remove(), 4500);
-}
-
-function dismissGSClose() {
-  _gsCloseDismissed = true;
-  if (_gsCountdownInt) { clearInterval(_gsCountdownInt); _gsCountdownInt = null; }
-  const wrap = document.getElementById('groupStageWrap');
-  if (wrap) wrap.innerHTML = '';
-}
-
-function renderGroupStageStatus() {
-  const wrap = document.getElementById('groupStageWrap');
-  if (!wrap || _gsCloseDismissed) return;
-  if (!matches.length) { wrap.innerHTML = ''; return; }
-
-  const qualifiers = getGroupQualifiers();
-  const allDone = allGroupsFinished(qualifiers);
-
-  const groupMatches = matches.filter(m => GROUPS[m.g]); // partidos de fase de grupos
-  const totalPartidos = groupMatches.length;
-  const jugados = groupMatches.filter(m => m.st === 'FIN').length;
-  const pct = totalPartidos > 0 ? Math.round((jugados / totalPartidos) * 100) : 0;
-
-  if (jugados === 0) { wrap.innerHTML = ''; return; } // aún ni empieza el torneo, no mostrar nada
-
-  if (!allDone) {
-    // ── Barra de progreso "Camino a 16avos" ──
-    if (_gsCountdownInt) { clearInterval(_gsCountdownInt); _gsCountdownInt = null; }
-    const equiposClasificados = Object.keys(GROUPS).reduce((acc, g) => {
-      const f = qualifiers[g].finished;
-      const done = f.total > 0 && f.played === f.total;
-      return acc + (done ? 2 : 0); // 1ro y 2do confirmados cuando el grupo cierra
-    }, 0);
-    const liderActual = lbPlayers[0] ? lbPlayers[0].name : null;
-
-    wrap.innerHTML = `
-      <div class="gs-progress-card">
-        <div class="gs-progress-top">
-          <span class="gs-progress-title">🏟️ Camino a Dieciseisavos</span>
-          <span class="gs-progress-pct">${pct}% completado</span>
-        </div>
-        <div class="gs-progress-bar-bg"><div class="gs-progress-bar-fill" style="width:${pct}%"></div></div>
-        <div class="gs-progress-sub">
-          <span>⚽ <b>${jugados}/${totalPartidos}</b> partidos de grupos jugados</span>
-          <span>✅ <b>${equiposClasificados}</b> equipos ya confirmados</span>
-          ${liderActual ? `<span class="gs-progress-leader">🥇 Líder de la quiniela: <b>${liderActual}</b></span>` : ''}
-        </div>
-      </div>`;
-    return;
-  }
-
-  // ── Fase de grupos 100% terminada: banner especial de cierre ──
-  const champion = lbPlayers[0] || null;
-  const totalJugadores = lbPlayers.length;
-  const equiposClasificadosTotal = Object.keys(GROUPS).length * 2; // 1ro y 2do de cada grupo
-  const mejoresTerceros = 8;
-
-  let cdHTML = '';
-  if (_gsNextElimDate) {
-    cdHTML = `<div class="gs-close-cd" id="gsCloseCd">⏳ Arranca <b id="gsCloseCdVal">--:--:--</b></div>`;
-  }
-
-  const firstTimeShowingClose = !_gsCloseShown;
-  _gsCloseShown = true;
-
-  wrap.innerHTML = `
-    <div class="gs-close-banner" id="gsCloseBanner">
-      <button class="gs-close-dismiss" onclick="dismissGSClose()" title="Cerrar">×</button>
-      <div class="gs-close-inner">
-        <div class="gs-close-eyebrow"><span class="gs-dot"></span>Fase de Grupos Completa<span class="gs-dot"></span></div>
-        <div class="gs-close-title">¡SE ACABARON LOS GRUPOS!<br><span>RUMBO A DIECISEISAVOS 🏆</span></div>
-        <div class="gs-close-sub">Los 32 equipos que avanzan ya están definidos. Ahora todo se juega a una sola carta — manda tus predicciones de eliminación directa antes de que cierren y prepárate para la fiesta.</div>
-        <div class="gs-close-stats">
-          <div class="gs-close-stat"><div class="gcs-val">${totalPartidos}</div><div class="gcs-lbl">Partidos jugados</div></div>
-          <div class="gs-close-stat"><div class="gcs-val">${equiposClasificadosTotal}+${mejoresTerceros}</div><div class="gcs-lbl">Equipos a 16avos</div></div>
-          <div class="gs-close-stat"><div class="gcs-val">${totalJugadores}</div><div class="gcs-lbl">Participantes</div></div>
-          ${champion ? `<div class="gs-close-stat"><div class="gcs-val">🥇</div><div class="gcs-lbl">${champion.name}</div></div>` : ''}
-        </div>
-        ${cdHTML}
-        <div>
-          <button class="gs-close-cta" onclick="selectOtraOpcion('pred16')">Poner mis Pronósticos →</button>
-        </div>
-      </div>
-    </div>`;
-
-  if (firstTimeShowingClose) {
-    const banner = document.getElementById('gsCloseBanner');
-    if (banner) spawnConfettiGS(banner);
-  }
-
-  if (_gsNextElimDate) {
-    if (_gsCountdownInt) clearInterval(_gsCountdownInt);
-    const tick = () => {
-      const el = document.getElementById('gsCloseCdVal');
-      if (!el) { clearInterval(_gsCountdownInt); _gsCountdownInt = null; return; }
-      const diff = _gsNextElimDate - Date.now();
-      if (diff <= 0) { el.textContent = '¡Ya empezó!'; clearInterval(_gsCountdownInt); _gsCountdownInt = null; return; }
-      const d = Math.floor(diff / 86400000);
-      const h = Math.floor((diff % 86400000) / 3600000);
-      const m = Math.floor((diff % 3600000) / 60000);
-      const s = Math.floor((diff % 60000) / 1000);
-      const hh = String(h).padStart(2,'0'), mm = String(m).padStart(2,'0'), ss = String(s).padStart(2,'0');
-      el.textContent = d > 0 ? `${d}d ${hh}:${mm}:${ss}` : `${hh}:${mm}:${ss}`;
-    };
-    tick();
-    _gsCountdownInt = setInterval(tick, 1000);
-  }
-}
-
-// ── ¿Un equipo sigue "vivo" para fines de eliminación directa? ──
-// Reglas (siempre dando el beneficio de la duda al jugador):
-//  · Si no encontramos el equipo en ningún grupo → lo tratamos como vivo (no podemos afirmar lo contrario).
-//  · Si el grupo de ese equipo AÚN NO termina → vivo (todavía puede clasificar).
-//  · Si el grupo YA terminó → vivo solo si quedó 1º o 2º de su grupo, o entre los 8 mejores terceros.
-//    Si quedó 3º pero no entra en el top-8 de terceros, o quedó 4º → eliminado.
-// Esto NO seis a nada más allá de la fase de grupos: una vez que un equipo clasifica a dieciseisavos,
-// lo seguimos considerando "vivo" para cuartos/semis/final/campeón aunque pierda su partido de
-// eliminación directa, porque este sitio no registra resultados de esa fase todavía.
-function findTeamGroup(team) {
-  if (!team) return null;
-  const tNorm = team.trim().toLowerCase();
-  for (const g of Object.keys(GROUPS)) {
-    if (GROUPS[g].some(t => t.toLowerCase() === tNorm)) return g;
-  }
-  return null;
-}
-
-function isTeamAliveForElimination(team, qualifiersCache, bestThirdsCache) {
-  if (!team) return false;
-  const g = findTeamGroup(team);
-  if (!g) return true; // no lo encontramos en ningún grupo conocido: no afirmamos que está eliminado
-
-  const qualifiers = qualifiersCache || getGroupQualifiers();
-  const q = qualifiers[g];
-  if (!q) return true;
-
-  const groupDone = q.finished.total > 0 && q.finished.played === q.finished.total;
-  if (!groupDone) return true; // el grupo no ha terminado: todavía puede clasificar
-
-  const tNorm = team.trim().toLowerCase();
-  const isFirst  = q.first  && q.first.team.toLowerCase()  === tNorm;
-  const isSecond = q.second && q.second.team.toLowerCase() === tNorm;
-  if (isFirst || isSecond) return true;
-
-  const isThird = q.third && q.third.team.toLowerCase() === tNorm;
-  if (!isThird) return false; // quedó 4º de su grupo (ya cerrado): eliminado
-
-  const bestThirds = bestThirdsCache || getBestThirds(qualifiers);
-  const top8 = bestThirds.slice(0, 8).map(t => t.team.toLowerCase());
-  return top8.includes(tNorm); // 3º que sí entra al top-8 de terceros: vivo; si no, eliminado
-}
-
-// Asigna cada uno de los 8 mejores terceros a UN solo pool del bracket, respetando
-// el orden real de la FIFA: se recorren los 8 mejores terceros en orden de ranking
-// y cada uno se coloca en el primer pool (en el orden en que aparece en el bracket)
-// que lo contenga y que todavía no tenga equipo asignado.
-function assignThirdsToPools(bestThirds, thirdSlotsInOrder) {
-  const assignment = {}; // poolKey -> { team, group, pts, gd, gf, rank }
-  const usedPools = new Set();
-  const top8 = bestThirds.slice(0, 8);
-
-  top8.forEach((t, rankIdx) => {
-    const pool = thirdSlotsInOrder.find(p => !usedPools.has(p) && p.split('').includes(t.group));
-    if (pool) {
-      usedPools.add(pool);
-      assignment[pool] = { ...t, rank: rankIdx + 1 };
-    }
-  });
-
-  return assignment;
-}
-
-function resolveSlot(slot, qualifiers, bestThirds, thirdAssignment) {
-  // Devuelve { team, code, isProj } o null si aún no hay datos suficientes
-  if (slot.type === 'pos') {
-    const q = qualifiers[slot.g];
-    const entry = slot.pos === 1 ? q.first : q.second;
-    const code = `${slot.pos}${slot.g}`;
-    if (!entry) return { team: null, code, isProj: true };
-    const groupComplete = q.finished.played === q.finished.total && q.finished.total > 0;
-    return { team: entry.team, code, isProj: !groupComplete };
-  }
-  if (slot.type === 'third') {
-    const poolLetters = slot.pool.split('');
-    const code = `3${slot.pool}`;
-    const winner = thirdAssignment[slot.pool];
-    if (!winner) return { team: null, code, isProj: true };
-    const groupsReady = poolLetters.every(g => qualifiers[g].finished.played === qualifiers[g].finished.total && qualifiers[g].finished.total > 0);
-    return { team: winner.team, code, isProj: !groupsReady };
-  }
-  return { team: null, code: '?', isProj: true };
-}
-
-
-function renderBracket() {
-  const grid    = document.getElementById('bracketGrid');
-  const notice  = document.getElementById('bracketNotice');
-  const pill    = document.getElementById('bracketStatusPill');
-  if (!grid) return;
-
-  const qualifiers = getGroupQualifiers();
-  const bestThirds  = getBestThirds(qualifiers);
-  const allDone     = allGroupsFinished(qualifiers);
-  const groupsWithData = Object.keys(GROUPS).filter(g => qualifiers[g].finished.played > 0).length;
-
-  // Orden de los pools "third" tal como aparecen en el bracket oficial (de arriba a abajo)
-  const thirdSlotsInOrder = BRACKET_FIXTURES_OFFICIAL
-    .flatMap(fx => [fx.a, fx.b])
-    .filter(s => s.type === 'third')
-    .map(s => s.pool);
-  const thirdAssignment = assignThirdsToPools(bestThirds, thirdSlotsInOrder);
-
-  if (pill) {
-    pill.textContent = allDone
-      ? 'Fase de grupos completa — cruces confirmados'
-      : `Proyección en vivo (${groupsWithData}/12 grupos con partidos jugados)`;
-    pill.style.color = allDone ? 'var(--green)' : 'var(--blue)';
-    pill.style.borderColor = allDone ? 'rgba(0,230,118,0.35)' : 'rgba(79,195,247,0.35)';
-  }
-
-  if (notice) {
-    if (!allDone) {
-      notice.style.display = 'block';
-      notice.innerHTML = `⚠️ <b>Bracket provisional.</b> Los cruces se calculan con los resultados reales disponibles y, donde aún falta información, con una proyección basada en la tabla actual (incluye el ranking de los 8 mejores terceros lugares). Esto puede cambiar conforme se jueguen más partidos.`;
-    } else {
-      notice.style.display = 'none';
-    }
-  }
-
-  const cardsHTML = BRACKET_FIXTURES_OFFICIAL.map(fx => {
-    const ra = resolveSlot(fx.a, qualifiers, bestThirds, thirdAssignment);
-    const rb = resolveSlot(fx.b, qualifiers, bestThirds, thirdAssignment);
-    const isProjMatch = ra.isProj || rb.isProj;
-
-    const teamRow = (r) => {
-      const name = r.team
-        ? `<span class="bracket-team-name${r.isProj ? ' is-proj-team' : ''}">${r.team}</span>`
-        : `<span class="bracket-team-name tbd">Por definir</span>`;
-      const flag = r.team ? `<span class="bracket-team-flag">${fl(r.team)}</span>` : `<span class="bracket-team-flag">🏳️</span>`;
-      return `<div class="bracket-team-row">
-        <span class="bracket-slot-code">${r.code}</span>
-        ${flag}
-        ${name}
-      </div>`;
-    };
-
-    return `<div class="bracket-card${isProjMatch ? ' is-proj' : ''}">
-      <div class="bracket-card-head">
-        <span class="bracket-match-id">dieciseisavos · ${fx.id}</span>
-        <span class="bracket-tag ${isProjMatch ? 'proj' : 'real'}">${isProjMatch ? 'Proyección' : 'Confirmado'}</span>
-      </div>
-      ${teamRow(ra)}
-      ${teamRow(rb)}
-    </div>`;
-  }).join('');
-
-  const thirdsHTML = `
-    <div class="bracket-thirds-card">
-      <div class="bracket-thirds-head">
-        <span class="card-title" style="font-size:16px">🥉 Ranking de Terceros Lugares (mejores 8 clasifican)</span>
-      </div>
-      ${bestThirds.length ? bestThirds.map((t, i) => {
-        const assignedPool = Object.keys(thirdAssignment).find(pool => thirdAssignment[pool].team === t.team);
-        const qualified = !!assignedPool;
-        const crossInfo = assignedPool ? `→ Cruce 3${assignedPool}` : '';
-        return `<div class="bracket-thirds-row${qualified ? ' qualified' : ''}">
-          <span class="bt-rank">${i+1}</span>
-          <span class="bt-team">${fl(t.team)} ${t.team} <span style="font-size:10px;color:var(--muted)">(Grupo ${t.group}) ${crossInfo}</span></span>
-          <span class="bt-pts">${t.pts} pts</span>
-          <span class="bt-pts">DG ${t.gd>0?'+':''}${t.gd}</span>
-        </div>`;
-      }).join('') : `<div class="bracket-thirds-row"><span class="bt-rank">—</span><span class="bt-team" style="color:var(--muted)">Aún no hay datos de terceros lugares</span></div>`}
-    </div>`;
-
-  grid.innerHTML = `<div style="grid-column:1/-1;display:grid;grid-template-columns:repeat(2,1fr);gap:14px">${cardsHTML}</div>` +
-                    `<div style="grid-column:1/-1">${thirdsHTML}</div>`;
 }
 
 // ══════════════════════════════════════════════════════
@@ -3838,9 +3520,9 @@ async function fetchLeaderboard() {
 
 
 // Devuelve true si al jugador le falta enviar el pick de alguno de los
-// slots vigilados (WATCHED_ELIM_SLOTS: M1, M2, M4, M5, M7, M8, M13). Se mantiene el
+// slots vigilados (WATCHED_ELIM_SLOTS: M1, M2, M4, M7). Se mantiene el
 // nombre "missingM1" para no romper las llamadas existentes en el render
-// del leaderboard, pero ahora cubre esos 7 slots.
+// del leaderboard, pero ahora cubre los 4 slots.
 function missingM1(playerName) {
   const normName = playerName.trim().toLowerCase().replace(/\s+/g, ' ');
   if (!(normName in m1Status)) {
@@ -3968,7 +3650,7 @@ body.innerHTML = players.map((p, i) => {
  return `<div class="lb-row ${cls}${missingM1(p.name) ? ' missing-m1' : ''}" title="Ver Ficha" onclick="openPlayerCard('${p.name.replace(/'/g,"\\'")}',${p.total},${rank},${p.grupos},${p.pPartidos})">
     <div class="rank ${rc}">${em||rank}</div>
     <div class="name-wrap">
-      <div class="name">${p.name}${missingM1(p.name) ? '<span class="lb-missing-dot" title="Falta enviar M1, M2, M4, M5, M7, M8 y/o M13"></span>' : ''}</div>
+      <div class="name">${p.name}${missingM1(p.name) ? '<span class="lb-missing-dot" title="Falta enviar M1, M2, M4 y/o M7"></span>' : ''}</div>
       <div class="bar-bg"><div class="bar"></div></div>
       ${tieBadge}${getLivePrediction(p.name)}
     </div>
@@ -3996,7 +3678,7 @@ async function fetchDatosFormulario() {
     for (let i = 0; i < headers.length; i++) {
       if (headers[i].toLowerCase().includes('nombre') || headers[i].toLowerCase().includes('participante')) nameIdx = i;
     }
-    // Localizar las columnas exactas de los slots vigilados (M1, M2, M4, M5, M7, M8, M13 en el Sheet)
+    // Localizar las columnas exactas de los slots vigilados (M1, M2, M4, M7 en el Sheet)
     const watchedIdx = {}; // { 'M1': idx, 'M2': idx, ... }
     for (const slotName of WATCHED_ELIM_SLOTS) {
       for (let i = 0; i < headers.length; i++) {
@@ -4035,7 +3717,7 @@ async function fetchDatosFormulario() {
       }
       formPicks[pName] = picks;
     }
-    // Un jugador queda "completo" sólo si tiene TODOS los slots vigilados (M1, M2, M4, M5, M7, M8, M13).
+    // Un jugador queda "completo" sólo si tiene TODOS los slots vigilados (M1, M2, M4, M7).
     // Si le falta cualquiera de ellos, missingM1() lo marcará en el leaderboard.
     for (const pName in hasSlot) {
       const slotsFound = Object.keys(watchedIdx); // sólo los slots que sí existen como columna
