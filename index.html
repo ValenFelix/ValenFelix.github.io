@@ -2152,8 +2152,8 @@ let matches        = [];
 let lockedGroupPositions = {}; // { 'G-A-1': 'México', 'G-D-4': 'Turquía', ... }
 let slot16TeamsMap = {};
 let formPicks      = {};
-let m1Status       = {}; // nombre(lowercase) -> true/false, si el jugador completó TODOS los slots vigilados (M5, M8, M13)
-const WATCHED_ELIM_SLOTS = ['M5', 'M8', 'M13']; // slots de 16avos que ya se jugaron/están por jugarse: se marca al jugador si le falta cualquiera de estos
+let m1Status       = {}; // nombre(lowercase) -> true/false, si el jugador completó TODOS los slots vigilados (M1, M2, M4, M5, M7, M8, M13)
+const WATCHED_ELIM_SLOTS = ['M1', 'M2', 'M4', 'M5', 'M7', 'M8', 'M13']; // slots de 16avos que ya se jugaron/están por jugarse: se marca al jugador si le falta cualquiera de estos
 let admin16Cache   = []; // [{slot, equipoA, equipoB, golA, golB, estado, fecha}]
 
 // ── RESULTADOS MANUALES DE 16AVOS ──
@@ -3838,9 +3838,9 @@ async function fetchLeaderboard() {
 
 
 // Devuelve true si al jugador le falta enviar el pick de alguno de los
-// slots vigilados (WATCHED_ELIM_SLOTS: M5, M8, M13). Se mantiene el
+// slots vigilados (WATCHED_ELIM_SLOTS: M1, M2, M4, M5, M7, M8, M13). Se mantiene el
 // nombre "missingM1" para no romper las llamadas existentes en el render
-// del leaderboard, pero ahora cubre esos 3 slots.
+// del leaderboard, pero ahora cubre esos 7 slots.
 function missingM1(playerName) {
   const normName = playerName.trim().toLowerCase().replace(/\s+/g, ' ');
   if (!(normName in m1Status)) {
@@ -3968,7 +3968,7 @@ body.innerHTML = players.map((p, i) => {
  return `<div class="lb-row ${cls}${missingM1(p.name) ? ' missing-m1' : ''}" title="Ver Ficha" onclick="openPlayerCard('${p.name.replace(/'/g,"\\'")}',${p.total},${rank},${p.grupos},${p.pPartidos})">
     <div class="rank ${rc}">${em||rank}</div>
     <div class="name-wrap">
-      <div class="name">${p.name}${missingM1(p.name) ? '<span class="lb-missing-dot" title="Falta enviar M5, M8 y/o M13"></span>' : ''}</div>
+      <div class="name">${p.name}${missingM1(p.name) ? '<span class="lb-missing-dot" title="Falta enviar M1, M2, M4, M5, M7, M8 y/o M13"></span>' : ''}</div>
       <div class="bar-bg"><div class="bar"></div></div>
       ${tieBadge}${getLivePrediction(p.name)}
     </div>
@@ -3996,7 +3996,7 @@ async function fetchDatosFormulario() {
     for (let i = 0; i < headers.length; i++) {
       if (headers[i].toLowerCase().includes('nombre') || headers[i].toLowerCase().includes('participante')) nameIdx = i;
     }
-    // Localizar las columnas exactas de los slots vigilados (M5, M8, M13 en el Sheet)
+    // Localizar las columnas exactas de los slots vigilados (M1, M2, M4, M5, M7, M8, M13 en el Sheet)
     const watchedIdx = {}; // { 'M1': idx, 'M2': idx, ... }
     for (const slotName of WATCHED_ELIM_SLOTS) {
       for (let i = 0; i < headers.length; i++) {
@@ -4035,7 +4035,7 @@ async function fetchDatosFormulario() {
       }
       formPicks[pName] = picks;
     }
-    // Un jugador queda "completo" sólo si tiene TODOS los slots vigilados (M5, M8, M13).
+    // Un jugador queda "completo" sólo si tiene TODOS los slots vigilados (M1, M2, M4, M5, M7, M8, M13).
     // Si le falta cualquiera de ellos, missingM1() lo marcará en el leaderboard.
     for (const pName in hasSlot) {
       const slotsFound = Object.keys(watchedIdx); // sólo los slots que sí existen como columna
