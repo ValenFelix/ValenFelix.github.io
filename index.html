@@ -2152,8 +2152,8 @@ let matches        = [];
 let lockedGroupPositions = {}; // { 'G-A-1': 'México', 'G-D-4': 'Turquía', ... }
 let slot16TeamsMap = {};
 let formPicks      = {};
-let m1Status       = {}; // nombre(lowercase) -> true/false, si el jugador completó TODOS los slots vigilados (M1, M2, M4, M7)
-const WATCHED_ELIM_SLOTS = ['M1', 'M2', 'M4', 'M7']; // slots de 16avos que ya se jugaron/están por jugarse: se marca al jugador si le falta cualquiera de estos
+let m1Status       = {}; // nombre(lowercase) -> true/false, si el jugador completó TODOS los slots vigilados (M1, M2, M3, M4, M7, M12, M14)
+const WATCHED_ELIM_SLOTS = ['M1', 'M2', 'M3', 'M4', 'M7', 'M12', 'M14']; // slots de 16avos que ya se jugaron/están por jugarse: se marca al jugador si le falta cualquiera de estos
 let admin16Cache   = []; // [{slot, equipoA, equipoB, golA, golB, estado, fecha}]
 
 // ── RESULTADOS MANUALES DE 16AVOS ──
@@ -3838,14 +3838,14 @@ async function fetchLeaderboard() {
 
 
 // Devuelve true si al jugador le falta enviar el pick de alguno de los
-// slots vigilados (WATCHED_ELIM_SLOTS: M1, M2, M4, M7). Se mantiene el
-// nombre "missingM1" para no romper las llamadas existentes en el render
-// del leaderboard, pero ahora cubre los 4 slots.
+// slots vigilados (WATCHED_ELIM_SLOTS: M1, M2, M3, M4, M7, M12, M14). Se
+// mantiene el nombre "missingM1" para no romper las llamadas existentes
+// en el render del leaderboard, pero ahora cubre los 7 slots.
 function missingM1(playerName) {
   const normName = playerName.trim().toLowerCase().replace(/\s+/g, ' ');
   if (!(normName in m1Status)) {
     if (Object.keys(m1Status).length > 0) {
-      console.warn('[M1/M2/M4/M7 check] nombre del leaderboard no encontrado en Datos_Formulario:', JSON.stringify(playerName));
+      console.warn('[M1/M2/M3/M4/M7/M12/M14 check] nombre del leaderboard no encontrado en Datos_Formulario:', JSON.stringify(playerName));
     }
     return false; // sin datos del formulario aún (o nombre no encontrado), no marcar
   }
@@ -3968,7 +3968,7 @@ body.innerHTML = players.map((p, i) => {
  return `<div class="lb-row ${cls}${missingM1(p.name) ? ' missing-m1' : ''}" title="Ver Ficha" onclick="openPlayerCard('${p.name.replace(/'/g,"\\'")}',${p.total},${rank},${p.grupos},${p.pPartidos})">
     <div class="rank ${rc}">${em||rank}</div>
     <div class="name-wrap">
-      <div class="name">${p.name}${missingM1(p.name) ? '<span class="lb-missing-dot" title="Falta enviar M1, M2, M4 y/o M7"></span>' : ''}</div>
+      <div class="name">${p.name}${missingM1(p.name) ? '<span class="lb-missing-dot" title="Falta enviar M1, M2, M3, M4, M7, M12 y/o M14"></span>' : ''}</div>
       <div class="bar-bg"><div class="bar"></div></div>
       ${tieBadge}${getLivePrediction(p.name)}
     </div>
@@ -3996,7 +3996,7 @@ async function fetchDatosFormulario() {
     for (let i = 0; i < headers.length; i++) {
       if (headers[i].toLowerCase().includes('nombre') || headers[i].toLowerCase().includes('participante')) nameIdx = i;
     }
-    // Localizar las columnas exactas de los slots vigilados (M1, M2, M4, M7 en el Sheet)
+    // Localizar las columnas exactas de los slots vigilados (M1, M2, M3, M4, M7, M12, M14 en el Sheet)
     const watchedIdx = {}; // { 'M1': idx, 'M2': idx, ... }
     for (const slotName of WATCHED_ELIM_SLOTS) {
       for (let i = 0; i < headers.length; i++) {
@@ -4035,7 +4035,7 @@ async function fetchDatosFormulario() {
       }
       formPicks[pName] = picks;
     }
-    // Un jugador queda "completo" sólo si tiene TODOS los slots vigilados (M1, M2, M4, M7).
+    // Un jugador queda "completo" sólo si tiene TODOS los slots vigilados (M1, M2, M3, M4, M7, M12, M14).
     // Si le falta cualquiera de ellos, missingM1() lo marcará en el leaderboard.
     for (const pName in hasSlot) {
       const slotsFound = Object.keys(watchedIdx); // sólo los slots que sí existen como columna
@@ -4045,7 +4045,7 @@ async function fetchDatosFormulario() {
     renderCharts(globalStats);
     duelInjectPicks();
     if (document.getElementById('secStats')?.classList.contains('active')) renderStats();
-// Re-renderizar leaderboard para reflejar picks recién cargados (predicciones live + indicador M1 faltante)
+// Re-renderizar leaderboard para reflejar picks recién cargados (predicciones live + indicador de slots faltantes)
     const lbRows = document.querySelectorAll('.lb-row');
     if (lbRows.length) {
       fetchLeaderboard();
@@ -6421,5 +6421,4 @@ async function enviarPred16Slot(slot) {
 </script>
 </body>
 </html>
-
 
