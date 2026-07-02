@@ -2332,7 +2332,7 @@ async function fetchPartidosFromSheets() {
         st = 'LIVE';
       }
 
-      const dateObj = parseFecha(fechaStr);
+      const dateObj = parseFecha(fechaStr, grupoRaw);
 
       newMatches.push({
         g: grupoRaw,
@@ -2371,7 +2371,7 @@ async function fetchPartidosFromSheets() {
   startCountdown();
 }
 
-function parseFecha(str) {
+function parseFecha(str, grupo) {
   if (!str) return new Date('2026-06-11T00:00:00');
   const dayMatch  = str.match(/(\d{1,2})\s*[-–]/);
   const timeMatch = str.match(/(\d{1,2}):(\d{2})\s*(a\.?m\.?|p\.?m\.?)/i);
@@ -2381,7 +2381,13 @@ function parseFecha(str) {
   const ampm = timeMatch ? timeMatch[3].replace(/\./g,'').toLowerCase() : 'am';
   if (ampm === 'pm' && hour !== 12) hour += 12;
   if (ampm === 'am' && hour === 12) hour = 0;
-  const month = day <= 30 ? 6 : 7;
+
+  // Fase de grupos = SIEMPRE junio (11-27), se detecta porque "Grupo" es
+  // una sola letra A-L. Todo lo demás (16avos, Cuartos, Semis, Final...)
+  // es eliminación directa: día 29-30 → junio, día 1-19 → julio.
+  const isGroupStage = grupo && /^[A-L]$/i.test(grupo.trim());
+  const month = isGroupStage ? 6 : (day >= 29 ? 6 : 7);
+
   return new Date(Date.UTC(2026, month-1, day, hour + 6, min, 0));
 }
 
