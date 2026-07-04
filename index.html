@@ -1421,9 +1421,9 @@ html.modo-paraguay .rayas-paraguay-bar{display:flex}
   <div class="nav-more-wrap" id="navMoreWrap">
     <button class="main-tab" id="navOtras" onclick="toggleOtrasMenu(event)">🗂️ Otras Opciones</button>
     <div class="otras-menu" id="otrasMenu">
-      <button class="otras-menu-item" id="omiBracket" onclick="selectOtraOpcion('bracket')">
-        <span class="omi-emoji">🏟️</span>
-        <span class="omi-text"><b>Bracket</b><small>Cruces de eliminación directa</small></span>
+      <button class="otras-menu-item" id="omiResumen" onclick="selectOtraOpcion('resumen')">
+        <span class="omi-emoji">📇</span>
+        <span class="omi-text"><b>Resumen</b><small>Ficha completa de cualquier participante</small></span>
       </button>
       <button class="otras-menu-item" id="omiStats" onclick="selectOtraOpcion('stats')">
         <span class="omi-emoji">📊</span>
@@ -1640,17 +1640,19 @@ html.modo-paraguay .rayas-paraguay-bar{display:flex}
   </div>
 </div>
 
-<div class="section" id="secBracket">
+<div class="section" id="secResumen">
   <div class="bracket-wrap">
-    <div class="bracket-top-bar">
-      <div class="eyebrow-sm" style="margin-bottom:0">dieciseisavos de Final — Proyección Automática</div>
-      <span class="bracket-status-pill" id="bracketStatusPill">Calculando…</span>
-    </div>
-    <div id="bracketNotice" class="bracket-notice" style="display:none"></div>
-    <div id="bracketGrid" class="bracket-grid"></div>
-    <div class="bracket-legend">
-      <span><span class="bl-dot bl-real"></span>Confirmado por partidos jugados</span>
-      <span><span class="bl-dot bl-proj"></span>Proyección con datos actuales</span>
+    <div class="eyebrow-sm">📇 Resumen — Ficha completa por participante</div>
+    <div class="card" style="padding:20px">
+      <div class="cb-head-sub" style="margin-bottom:14px">
+        Elige un participante para ver el desglose completo: grupos, cada partido de grupos, 16avos, Octavos, Cuartos, Semis, Final, y las listas de equipos/campeón/goleador que eligió.
+      </div>
+      <select class="fb-input" id="resumenPlayerSelect" onchange="onResumenPlayerChange()">
+        <option value="">— Selecciona un participante —</option>
+      </select>
+      <div id="resumenContent" style="margin-top:16px">
+        <div class="pred16-empty-msg">Selecciona un participante para ver su resumen completo.</div>
+      </div>
     </div>
   </div>
 </div>
@@ -2248,7 +2250,7 @@ const GID_LOCKS = '1684909330';
 
 // 👇 PENDIENTE: crea cada hoja desde el menú 🏆 Quiniela 2026 → "Crear Hoja Octavos/Cuartos/Semis/Final"
 //    y pega aquí el GID real (lo ves en la URL de Sheets, después de "gid=")
-const GID_OCTAVOS = '27128007';
+const GID_OCTAVOS = 'PEGA_AQUI_GID_OCTAVOS';
 const GID_CUARTOS = 'PEGA_AQUI_GID_CUARTOS';
 const GID_SEMIS   = 'PEGA_AQUI_GID_SEMIS';
 const GID_FINAL   = 'PEGA_AQUI_GID_FINAL';
@@ -2340,6 +2342,63 @@ function getSlot16Result(slot) {
   if (cached) return { golA: cached.golA, golB: cached.golB, estado: cached.estado };
   return null;
 }
+
+// ── Mismo patrón que getSlot16Result(), para Octavos/Cuartos/Semis/Final ──
+// (tablas de override manual vacías por ahora; se pueden llenar igual que
+//  MANUAL_16AVOS_RESULTS si algún resultado no llega bien desde el Sheet)
+const MANUAL_OCTAVOS_RESULTS = {};
+const MANUAL_CUARTOS_RESULTS = {};
+const MANUAL_SEMIS_RESULTS   = {};
+const MANUAL_FINAL_RESULTS   = {};
+
+function getSlotOctavosResult(slot) {
+  const manual = MANUAL_OCTAVOS_RESULTS[slot];
+  if (manual) return manual;
+  const cached = adminOctavosCache.find(c => c.slot === slot);
+  if (cached) return { golA: cached.golA, golB: cached.golB, estado: cached.estado };
+  return null;
+}
+function getSlotCuartosResult(slot) {
+  const manual = MANUAL_CUARTOS_RESULTS[slot];
+  if (manual) return manual;
+  const cached = adminCuartosCache.find(c => c.slot === slot);
+  if (cached) return { golA: cached.golA, golB: cached.golB, estado: cached.estado };
+  return null;
+}
+function getSlotSemisResult(slot) {
+  const manual = MANUAL_SEMIS_RESULTS[slot];
+  if (manual) return manual;
+  const cached = adminSemisCache.find(c => c.slot === slot);
+  if (cached) return { golA: cached.golA, golB: cached.golB, estado: cached.estado };
+  return null;
+}
+function getSlotFinalResult(slot) {
+  const manual = MANUAL_FINAL_RESULTS[slot];
+  if (manual) return manual;
+  const cached = adminFinalCache.find(c => c.slot === slot);
+  if (cached) return { golA: cached.golA, golB: cached.golB, estado: cached.estado };
+  return null;
+}
+
+// ── Equipos de un cruce de Octavos/Cuartos/Semis/Final: SIEMPRE desde el
+//    cache leído del Sheet (a diferencia de 16avos, aquí no hay tabla fija
+//    posible porque el cruce depende del resultado real de la ronda anterior) ──
+function getSlotOctavosTeams(slot) {
+  const c = adminOctavosCache.find(x => x.slot === slot);
+  return (c && c.equipoA && c.equipoB) ? { a: c.equipoA, b: c.equipoB } : null;
+}
+function getSlotCuartosTeams(slot) {
+  const c = adminCuartosCache.find(x => x.slot === slot);
+  return (c && c.equipoA && c.equipoB) ? { a: c.equipoA, b: c.equipoB } : null;
+}
+function getSlotSemisTeams(slot) {
+  const c = adminSemisCache.find(x => x.slot === slot);
+  return (c && c.equipoA && c.equipoB) ? { a: c.equipoA, b: c.equipoB } : null;
+}
+function getSlotFinalTeams(slot) {
+  const c = adminFinalCache.find(x => x.slot === slot);
+  return (c && c.equipoA && c.equipoB) ? { a: c.equipoA, b: c.equipoB } : null;
+}
 let lbPlayers       = [];
 let chartInstances = {};
 let curTab         = 'r';
@@ -2354,7 +2413,7 @@ let paraguayCelebEvaluada = false;
 // ══════════════════════════════════════════════════════
 //  UTILIDADES
 // ══════════════════════════════════════════════════════
-const OTRAS_OPCIONES = ['bracket', 'stats', 'pred16', 'predOctavos', 'predCuartos', 'predSemis', 'predFinal', 'duel'];
+const OTRAS_OPCIONES = ['resumen', 'stats', 'pred16', 'predOctavos', 'predCuartos', 'predSemis', 'predFinal', 'duel'];
 function switchSection(name) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('on'));
@@ -2365,7 +2424,7 @@ function switchSection(name) {
   document.querySelectorAll('.otras-menu-item').forEach(it => it.classList.remove('active'));
   if (OTRAS_OPCIONES.includes(name)) {
     const item = document.getElementById(
-      name === 'bracket'     ? 'omiBracket'     :
+      name === 'resumen'      ? 'omiResumen'     :
       name === 'stats'       ? 'omiStats'       :
       name === 'pred16'      ? 'omiPred16'      :
       name === 'predOctavos' ? 'omiPredOctavos' :
@@ -2377,6 +2436,7 @@ function switchSection(name) {
     if (item) item.classList.add('active');
   }
   if (name === 'stats')       renderStats();
+  if (name === 'resumen')     populateResumenSelect();
   if (name === 'posiblelb')   renderPosibleLB();
   if (name === 'pred16')      initPred16Form();
   if (name === 'predOctavos') initPredOctavosForm();
@@ -2537,7 +2597,6 @@ async function fetchPartidosFromSheets() {
   renderLiveScores();
   renderDailyMessage();
   renderStd();
-  renderBracket();
   renderGroupStageStatus();
   startCountdown();
 }
@@ -3152,30 +3211,6 @@ function renderStd() {
   </div>`;
 }
 
-// ══════════════════════════════════════════════════════
-//  BRACKET DE dieciseisavos — FIFA WORLD CUP 2026 (48 equipos)
-// ══════════════════════════════════════════════════════
-// Cruces oficiales de dieciseisavos (32 partidos). "3xxxxx" = mejor 3er lugar entre esos grupos,
-// según el bracket publicado por la FIFA para el Mundial 2026.
-const BRACKET_FIXTURES_OFFICIAL = [
-  { id:'M1',  a:{type:'pos', g:'E', pos:1}, b:{type:'third', pool:'ABCDF'} },
-  { id:'M2',  a:{type:'pos', g:'I', pos:1}, b:{type:'third', pool:'CDFGH'} },
-  { id:'M3',  a:{type:'pos', g:'A', pos:2}, b:{type:'pos', g:'B', pos:2} },
-  { id:'M4',  a:{type:'pos', g:'F', pos:1}, b:{type:'pos', g:'C', pos:2} },
-  { id:'M5',  a:{type:'pos', g:'K', pos:2}, b:{type:'pos', g:'L', pos:2} },
-  { id:'M6',  a:{type:'pos', g:'H', pos:1}, b:{type:'pos', g:'J', pos:2} },
-  { id:'M7',  a:{type:'pos', g:'D', pos:1}, b:{type:'third', pool:'BEFIJ'} },
-  { id:'M8',  a:{type:'pos', g:'G', pos:1}, b:{type:'third', pool:'AEHIJ'} },
-  { id:'M9',  a:{type:'pos', g:'C', pos:1}, b:{type:'pos', g:'F', pos:2} },
-  { id:'M10', a:{type:'pos', g:'E', pos:2}, b:{type:'pos', g:'I', pos:2} },
-  { id:'M11', a:{type:'pos', g:'A', pos:1}, b:{type:'third', pool:'CEFHI'} },
-  { id:'M12', a:{type:'pos', g:'L', pos:1}, b:{type:'third', pool:'EHIJK'} },
-  { id:'M13', a:{type:'pos', g:'J', pos:1}, b:{type:'pos', g:'H', pos:2} },
-  { id:'M14', a:{type:'pos', g:'D', pos:2}, b:{type:'pos', g:'G', pos:2} },
-  { id:'M15', a:{type:'pos', g:'B', pos:1}, b:{type:'third', pool:'EFGIJ'} },
-  { id:'M16', a:{type:'pos', g:'K', pos:1}, b:{type:'third', pool:'DEIJL'} },
-];
-
 // ── EQUIPOS REALES DE 16AVOS (fijo, a mano) ──
 // Una vez que los cruces de 16avos quedaron definidos, se ponen aquí literal
 // para no depender de que la hoja "Partidos" y la hoja "16avos" del Sheet
@@ -3365,9 +3400,9 @@ function renderGroupStageStatus() {
     <div class="gs-close-banner" id="gsCloseBanner">
       <button class="gs-close-dismiss" onclick="dismissGSClose()" title="Cerrar">×</button>
       <div class="gs-close-inner">
-        <div class="gs-close-eyebrow"><span class="gs-dot"></span>Fase de 16avos Completa<span class="gs-dot"></span></div>
-        <div class="gs-close-title">¡SE ACABARON LOS 16avos!<br><span>RUMBO A DIECISEISAVOS 🏆</span></div>
-        <div class="gs-close-sub">Los 16 equipos que avanzan ya están definidos. Ahora todo se juega a una sola carta — manda tus predicciones de 16avos antes de que cierren.</div>
+        <div class="gs-close-eyebrow"><span class="gs-dot"></span>Fase de Grupos Completa<span class="gs-dot"></span></div>
+        <div class="gs-close-title">¡SE ACABARON LOS GRUPOS!<br><span>RUMBO A DIECISEISAVOS 🏆</span></div>
+        <div class="gs-close-sub">Los 32 equipos que avanzan ya están definidos. Ahora todo se juega a una sola carta — manda tus predicciones de eliminación directa antes de que cierren y prepárate para la fiesta.</div>
         <div class="gs-close-stats">
           <div class="gs-close-stat"><div class="gcs-val">${totalPartidos}</div><div class="gcs-lbl">Partidos jugados</div></div>
           <div class="gs-close-stat"><div class="gcs-val">${equiposClasificadosTotal}+${mejoresTerceros}</div><div class="gcs-lbl">Equipos a 16avos</div></div>
@@ -3446,132 +3481,6 @@ function isTeamAliveForElimination(team, qualifiersCache, bestThirdsCache) {
   const bestThirds = bestThirdsCache || getBestThirds(qualifiers);
   const top8 = bestThirds.slice(0, 8).map(t => t.team.toLowerCase());
   return top8.includes(tNorm); // 3º que sí entra al top-8 de terceros: vivo; si no, eliminado
-}
-
-// Asigna cada uno de los 8 mejores terceros a UN solo pool del bracket, respetando
-// el orden real de la FIFA: se recorren los 8 mejores terceros en orden de ranking
-// y cada uno se coloca en el primer pool (en el orden en que aparece en el bracket)
-// que lo contenga y que todavía no tenga equipo asignado.
-function assignThirdsToPools(bestThirds, thirdSlotsInOrder) {
-  const assignment = {}; // poolKey -> { team, group, pts, gd, gf, rank }
-  const usedPools = new Set();
-  const top8 = bestThirds.slice(0, 8);
-
-  top8.forEach((t, rankIdx) => {
-    const pool = thirdSlotsInOrder.find(p => !usedPools.has(p) && p.split('').includes(t.group));
-    if (pool) {
-      usedPools.add(pool);
-      assignment[pool] = { ...t, rank: rankIdx + 1 };
-    }
-  });
-
-  return assignment;
-}
-
-function resolveSlot(slot, qualifiers, bestThirds, thirdAssignment) {
-  // Devuelve { team, code, isProj } o null si aún no hay datos suficientes
-  if (slot.type === 'pos') {
-    const q = qualifiers[slot.g];
-    const entry = slot.pos === 1 ? q.first : q.second;
-    const code = `${slot.pos}${slot.g}`;
-    if (!entry) return { team: null, code, isProj: true };
-    const groupComplete = q.finished.played === q.finished.total && q.finished.total > 0;
-    return { team: entry.team, code, isProj: !groupComplete };
-  }
-  if (slot.type === 'third') {
-    const poolLetters = slot.pool.split('');
-    const code = `3${slot.pool}`;
-    const winner = thirdAssignment[slot.pool];
-    if (!winner) return { team: null, code, isProj: true };
-    const groupsReady = poolLetters.every(g => qualifiers[g].finished.played === qualifiers[g].finished.total && qualifiers[g].finished.total > 0);
-    return { team: winner.team, code, isProj: !groupsReady };
-  }
-  return { team: null, code: '?', isProj: true };
-}
-
-
-function renderBracket() {
-  const grid    = document.getElementById('bracketGrid');
-  const notice  = document.getElementById('bracketNotice');
-  const pill    = document.getElementById('bracketStatusPill');
-  if (!grid) return;
-
-  const qualifiers = getGroupQualifiers();
-  const bestThirds  = getBestThirds(qualifiers);
-  const allDone     = allGroupsFinished(qualifiers);
-  const groupsWithData = Object.keys(GROUPS).filter(g => qualifiers[g].finished.played > 0).length;
-
-  // Orden de los pools "third" tal como aparecen en el bracket oficial (de arriba a abajo)
-  const thirdSlotsInOrder = BRACKET_FIXTURES_OFFICIAL
-    .flatMap(fx => [fx.a, fx.b])
-    .filter(s => s.type === 'third')
-    .map(s => s.pool);
-  const thirdAssignment = assignThirdsToPools(bestThirds, thirdSlotsInOrder);
-
-  if (pill) {
-    pill.textContent = allDone
-      ? 'Fase de grupos completa — cruces confirmados'
-      : `Proyección en vivo (${groupsWithData}/12 grupos con partidos jugados)`;
-    pill.style.color = allDone ? 'var(--green)' : 'var(--blue)';
-    pill.style.borderColor = allDone ? 'rgba(0,230,118,0.35)' : 'rgba(79,195,247,0.35)';
-  }
-
-  if (notice) {
-    if (!allDone) {
-      notice.style.display = 'block';
-      notice.innerHTML = `⚠️ <b>Bracket provisional.</b> Los cruces se calculan con los resultados reales disponibles y, donde aún falta información, con una proyección basada en la tabla actual (incluye el ranking de los 8 mejores terceros lugares). Esto puede cambiar conforme se jueguen más partidos.`;
-    } else {
-      notice.style.display = 'none';
-    }
-  }
-
-  const cardsHTML = BRACKET_FIXTURES_OFFICIAL.map(fx => {
-    const ra = resolveSlot(fx.a, qualifiers, bestThirds, thirdAssignment);
-    const rb = resolveSlot(fx.b, qualifiers, bestThirds, thirdAssignment);
-    const isProjMatch = ra.isProj || rb.isProj;
-
-    const teamRow = (r) => {
-      const name = r.team
-        ? `<span class="bracket-team-name${r.isProj ? ' is-proj-team' : ''}">${r.team}</span>`
-        : `<span class="bracket-team-name tbd">Por definir</span>`;
-      const flag = r.team ? `<span class="bracket-team-flag">${fl(r.team)}</span>` : `<span class="bracket-team-flag">🏳️</span>`;
-      return `<div class="bracket-team-row">
-        <span class="bracket-slot-code">${r.code}</span>
-        ${flag}
-        ${name}
-      </div>`;
-    };
-
-    return `<div class="bracket-card${isProjMatch ? ' is-proj' : ''}">
-      <div class="bracket-card-head">
-        <span class="bracket-match-id">dieciseisavos · ${fx.id}</span>
-        <span class="bracket-tag ${isProjMatch ? 'proj' : 'real'}">${isProjMatch ? 'Proyección' : 'Confirmado'}</span>
-      </div>
-      ${teamRow(ra)}
-      ${teamRow(rb)}
-    </div>`;
-  }).join('');
-
-  const thirdsHTML = `
-    <div class="bracket-thirds-card">
-      <div class="bracket-thirds-head">
-        <span class="card-title" style="font-size:16px">🥉 Ranking de Terceros Lugares (mejores 8 clasifican)</span>
-      </div>
-      ${bestThirds.length ? bestThirds.map((t, i) => {
-        const assignedPool = Object.keys(thirdAssignment).find(pool => thirdAssignment[pool].team === t.team);
-        const qualified = !!assignedPool;
-        const crossInfo = assignedPool ? `→ Cruce 3${assignedPool}` : '';
-        return `<div class="bracket-thirds-row${qualified ? ' qualified' : ''}">
-          <span class="bt-rank">${i+1}</span>
-          <span class="bt-team">${fl(t.team)} ${t.team} <span style="font-size:10px;color:var(--muted)">(Grupo ${t.group}) ${crossInfo}</span></span>
-          <span class="bt-pts">${t.pts} pts</span>
-          <span class="bt-pts">DG ${t.gd>0?'+':''}${t.gd}</span>
-        </div>`;
-      }).join('') : `<div class="bracket-thirds-row"><span class="bt-rank">—</span><span class="bt-team" style="color:var(--muted)">Aún no hay datos de terceros lugares</span></div>`}
-    </div>`;
-
-  grid.innerHTML = `<div style="grid-column:1/-1;display:grid;grid-template-columns:repeat(2,1fr);gap:14px">${cardsHTML}</div>` +
-                    `<div style="grid-column:1/-1">${thirdsHTML}</div>`;
 }
 
 // ══════════════════════════════════════════════════════
@@ -3979,6 +3888,214 @@ function renderFunStats() {
     console.error('Error cargando mapa de equipos 16avos:', e);
   }
 }
+
+// ── Lectura pública (sin contraseña) de la hoja "Octavos", igual que
+//    fetchSlot16TeamsMap() pero llenando adminOctavosCache — así el Resumen
+//    puede calcular puntos y mostrar equipos reales sin abrir el panel admin. ──
+async function fetchSlotOctavosTeamsMap() {
+  try {
+    const r = await fetch(csvUrl(SID, GID_OCTAVOS));
+    if (!r.ok) return;
+    const rows = parseCSV(await r.text());
+    let hdrIdx = -1;
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i][0] && rows[i][0].trim().toLowerCase() === 'slot') { hdrIdx = i; break; }
+    }
+    if (hdrIdx === -1) return;
+
+    const hdr = rows[hdrIdx].map(h => (h || '').trim().toLowerCase());
+    const iSlot = hdr.findIndex(h => h === 'slot');
+    const iEqA  = hdr.findIndex(h => h === 'equipoa');
+    const iEqB  = hdr.findIndex(h => h === 'equipob');
+    const iGolA = hdr.findIndex(h => h === 'gola');
+    const iGolB = hdr.findIndex(h => h === 'golb');
+    const iEst  = hdr.findIndex(h => h === 'estado');
+    const iFec  = hdr.findIndex(h => h === 'fecha');
+
+    const cache = [];
+    for (let i = hdrIdx + 1; i < rows.length; i++) {
+      const row  = rows[i];
+      const slot = (row[iSlot >= 0 ? iSlot : 0] || '').trim().toUpperCase();
+      if (!/^O\\d{1,2}$/.test(slot)) continue;
+      const eqA = (row[iEqA >= 0 ? iEqA : 1] || '').replace(/\u00A0/g, ' ').trim().replace(/\s+/g, ' ');
+      const eqB = (row[iEqB >= 0 ? iEqB : 2] || '').replace(/\u00A0/g, ' ').trim().replace(/\s+/g, ' ');
+
+      const manual = MANUAL_OCTAVOS_RESULTS[slot];
+      cache.push({
+        slot,
+        equipoA: eqA,
+        equipoB: eqB,
+        golA:    manual ? String(manual.golA) : (iGolA >= 0 ? (row[iGolA] || '').trim() : ''),
+        golB:    manual ? String(manual.golB) : (iGolB >= 0 ? (row[iGolB] || '').trim() : ''),
+        estado:  manual ? manual.estado        : (iEst  >= 0 ? (row[iEst]  || 'SCHED').trim().toUpperCase() : 'SCHED'),
+        fecha:   iFec  >= 0 ? (row[iFec]  || '').trim() : '',
+      });
+    }
+    cache.sort((a, b) => parseInt(a.slot.slice(1)) - parseInt(b.slot.slice(1)));
+    adminOctavosCache = cache;
+    refreshOpenPlayerCardIfAny();
+    refreshResumenIfOpen();
+  } catch(e) {
+    console.error('Error cargando mapa de equipos Octavos:', e);
+  }
+}
+
+
+// ── Lectura pública (sin contraseña) de la hoja "Cuartos", igual que
+//    fetchSlot16TeamsMap() pero llenando adminCuartosCache — así el Resumen
+//    puede calcular puntos y mostrar equipos reales sin abrir el panel admin. ──
+async function fetchSlotCuartosTeamsMap() {
+  try {
+    const r = await fetch(csvUrl(SID, GID_CUARTOS));
+    if (!r.ok) return;
+    const rows = parseCSV(await r.text());
+    let hdrIdx = -1;
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i][0] && rows[i][0].trim().toLowerCase() === 'slot') { hdrIdx = i; break; }
+    }
+    if (hdrIdx === -1) return;
+
+    const hdr = rows[hdrIdx].map(h => (h || '').trim().toLowerCase());
+    const iSlot = hdr.findIndex(h => h === 'slot');
+    const iEqA  = hdr.findIndex(h => h === 'equipoa');
+    const iEqB  = hdr.findIndex(h => h === 'equipob');
+    const iGolA = hdr.findIndex(h => h === 'gola');
+    const iGolB = hdr.findIndex(h => h === 'golb');
+    const iEst  = hdr.findIndex(h => h === 'estado');
+    const iFec  = hdr.findIndex(h => h === 'fecha');
+
+    const cache = [];
+    for (let i = hdrIdx + 1; i < rows.length; i++) {
+      const row  = rows[i];
+      const slot = (row[iSlot >= 0 ? iSlot : 0] || '').trim().toUpperCase();
+      if (!/^C\\d{1,2}$/.test(slot)) continue;
+      const eqA = (row[iEqA >= 0 ? iEqA : 1] || '').replace(/\u00A0/g, ' ').trim().replace(/\s+/g, ' ');
+      const eqB = (row[iEqB >= 0 ? iEqB : 2] || '').replace(/\u00A0/g, ' ').trim().replace(/\s+/g, ' ');
+
+      const manual = MANUAL_CUARTOS_RESULTS[slot];
+      cache.push({
+        slot,
+        equipoA: eqA,
+        equipoB: eqB,
+        golA:    manual ? String(manual.golA) : (iGolA >= 0 ? (row[iGolA] || '').trim() : ''),
+        golB:    manual ? String(manual.golB) : (iGolB >= 0 ? (row[iGolB] || '').trim() : ''),
+        estado:  manual ? manual.estado        : (iEst  >= 0 ? (row[iEst]  || 'SCHED').trim().toUpperCase() : 'SCHED'),
+        fecha:   iFec  >= 0 ? (row[iFec]  || '').trim() : '',
+      });
+    }
+    cache.sort((a, b) => parseInt(a.slot.slice(1)) - parseInt(b.slot.slice(1)));
+    adminCuartosCache = cache;
+    refreshOpenPlayerCardIfAny();
+    refreshResumenIfOpen();
+  } catch(e) {
+    console.error('Error cargando mapa de equipos Cuartos:', e);
+  }
+}
+
+
+// ── Lectura pública (sin contraseña) de la hoja "Semis", igual que
+//    fetchSlot16TeamsMap() pero llenando adminSemisCache — así el Resumen
+//    puede calcular puntos y mostrar equipos reales sin abrir el panel admin. ──
+async function fetchSlotSemisTeamsMap() {
+  try {
+    const r = await fetch(csvUrl(SID, GID_SEMIS));
+    if (!r.ok) return;
+    const rows = parseCSV(await r.text());
+    let hdrIdx = -1;
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i][0] && rows[i][0].trim().toLowerCase() === 'slot') { hdrIdx = i; break; }
+    }
+    if (hdrIdx === -1) return;
+
+    const hdr = rows[hdrIdx].map(h => (h || '').trim().toLowerCase());
+    const iSlot = hdr.findIndex(h => h === 'slot');
+    const iEqA  = hdr.findIndex(h => h === 'equipoa');
+    const iEqB  = hdr.findIndex(h => h === 'equipob');
+    const iGolA = hdr.findIndex(h => h === 'gola');
+    const iGolB = hdr.findIndex(h => h === 'golb');
+    const iEst  = hdr.findIndex(h => h === 'estado');
+    const iFec  = hdr.findIndex(h => h === 'fecha');
+
+    const cache = [];
+    for (let i = hdrIdx + 1; i < rows.length; i++) {
+      const row  = rows[i];
+      const slot = (row[iSlot >= 0 ? iSlot : 0] || '').trim().toUpperCase();
+      if (!/^S\\d{1,2}$/.test(slot)) continue;
+      const eqA = (row[iEqA >= 0 ? iEqA : 1] || '').replace(/\u00A0/g, ' ').trim().replace(/\s+/g, ' ');
+      const eqB = (row[iEqB >= 0 ? iEqB : 2] || '').replace(/\u00A0/g, ' ').trim().replace(/\s+/g, ' ');
+
+      const manual = MANUAL_SEMIS_RESULTS[slot];
+      cache.push({
+        slot,
+        equipoA: eqA,
+        equipoB: eqB,
+        golA:    manual ? String(manual.golA) : (iGolA >= 0 ? (row[iGolA] || '').trim() : ''),
+        golB:    manual ? String(manual.golB) : (iGolB >= 0 ? (row[iGolB] || '').trim() : ''),
+        estado:  manual ? manual.estado        : (iEst  >= 0 ? (row[iEst]  || 'SCHED').trim().toUpperCase() : 'SCHED'),
+        fecha:   iFec  >= 0 ? (row[iFec]  || '').trim() : '',
+      });
+    }
+    cache.sort((a, b) => parseInt(a.slot.slice(1)) - parseInt(b.slot.slice(1)));
+    adminSemisCache = cache;
+    refreshOpenPlayerCardIfAny();
+    refreshResumenIfOpen();
+  } catch(e) {
+    console.error('Error cargando mapa de equipos Semis:', e);
+  }
+}
+
+
+// ── Lectura pública (sin contraseña) de la hoja "Final", igual que
+//    fetchSlot16TeamsMap() pero llenando adminFinalCache — así el Resumen
+//    puede calcular puntos y mostrar equipos reales sin abrir el panel admin. ──
+async function fetchSlotFinalTeamsMap() {
+  try {
+    const r = await fetch(csvUrl(SID, GID_FINAL));
+    if (!r.ok) return;
+    const rows = parseCSV(await r.text());
+    let hdrIdx = -1;
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i][0] && rows[i][0].trim().toLowerCase() === 'slot') { hdrIdx = i; break; }
+    }
+    if (hdrIdx === -1) return;
+
+    const hdr = rows[hdrIdx].map(h => (h || '').trim().toLowerCase());
+    const iSlot = hdr.findIndex(h => h === 'slot');
+    const iEqA  = hdr.findIndex(h => h === 'equipoa');
+    const iEqB  = hdr.findIndex(h => h === 'equipob');
+    const iGolA = hdr.findIndex(h => h === 'gola');
+    const iGolB = hdr.findIndex(h => h === 'golb');
+    const iEst  = hdr.findIndex(h => h === 'estado');
+    const iFec  = hdr.findIndex(h => h === 'fecha');
+
+    const cache = [];
+    for (let i = hdrIdx + 1; i < rows.length; i++) {
+      const row  = rows[i];
+      const slot = (row[iSlot >= 0 ? iSlot : 0] || '').trim().toUpperCase();
+      if (!/^F\\d{1,2}$/.test(slot)) continue;
+      const eqA = (row[iEqA >= 0 ? iEqA : 1] || '').replace(/\u00A0/g, ' ').trim().replace(/\s+/g, ' ');
+      const eqB = (row[iEqB >= 0 ? iEqB : 2] || '').replace(/\u00A0/g, ' ').trim().replace(/\s+/g, ' ');
+
+      const manual = MANUAL_FINAL_RESULTS[slot];
+      cache.push({
+        slot,
+        equipoA: eqA,
+        equipoB: eqB,
+        golA:    manual ? String(manual.golA) : (iGolA >= 0 ? (row[iGolA] || '').trim() : ''),
+        golB:    manual ? String(manual.golB) : (iGolB >= 0 ? (row[iGolB] || '').trim() : ''),
+        estado:  manual ? manual.estado        : (iEst  >= 0 ? (row[iEst]  || 'SCHED').trim().toUpperCase() : 'SCHED'),
+        fecha:   iFec  >= 0 ? (row[iFec]  || '').trim() : '',
+      });
+    }
+    cache.sort((a, b) => parseInt(a.slot.slice(1)) - parseInt(b.slot.slice(1)));
+    adminFinalCache = cache;
+    refreshOpenPlayerCardIfAny();
+    refreshResumenIfOpen();
+  } catch(e) {
+    console.error('Error cargando mapa de equipos Final:', e);
+  }
+}
+
 async function fetchResultadosReales() {
   try {
     const r = await fetch(csvUrl(SID, GID_LOCKS));
@@ -4085,6 +4202,12 @@ function getLivePrediction(playerName) {
     }
 
   lbPlayers = players;
+
+  // Guardamos el rango posicional (1º, 2º, 3º...) directo en cada jugador,
+  // para que la sección "📇 Resumen" pueda usarlo sin tener que recalcularlo
+  // (mismo criterio que usan las filas del Leaderboard más abajo).
+  lbPlayers.forEach((p, i) => { p.rank = i + 1; });
+  populateResumenSelect();
 
   const sPlayers = document.getElementById('sPlayers');
   if (sPlayers) sPlayers.textContent = `${players.length} participante${players.length!==1?'s':''}`;
@@ -4655,6 +4778,397 @@ function buildElim16HTML(picks) {
   return summaryBar + rows;
 }
 
+// ══════════════════════════════════════════════════════
+//  PUNTOS OCTAVOS (accordion dentro de ficha jugador)
+//  (mismo patrón que buildElim16HTML, usando getSlotOctavosTeams/Result
+//   en vez de los de 16avos)
+// ══════════════════════════════════════════════════════
+function buildElimOctavosHTML(picks) {
+  const elimPicks = picks.filter(p => /^O\\d{1,2}$/.test(p.q.trim().toUpperCase()));
+  if (!elimPicks.length) {
+    return `<div style="padding:14px;font-size:13px;color:var(--muted);text-align:center;font-style:italic">
+      Este jugador aún no envió predicciones de Octavos.
+    </div>`;
+  }
+
+  elimPicks.sort((a, b) => {
+    const na = parseInt(a.q.trim().slice(1)), nb = parseInt(b.q.trim().slice(1));
+    return na - nb;
+  });
+
+  let totalPts = 0;
+  let evaluated = 0;
+
+  const rows = elimPicks.map(p => {
+    const slot = p.q.trim().toUpperCase();
+    const predScore = parseScore(p.a);
+
+    const teamInfo = getSlotOctavosTeams(slot);
+    const teamA = teamInfo ? teamInfo.a : null;
+    const teamB = teamInfo ? teamInfo.b : null;
+    const fA = teamA ? fl(teamA) : '🏳️';
+    const fB = teamB ? fl(teamB) : '🏳️';
+
+    const realMatch = getSlotOctavosResult(slot);
+    const hasResult = !!(realMatch && realMatch.estado === 'FIN');
+    const realA = hasResult ? (parseInt(realMatch.golA) || 0) : null;
+    const realB = hasResult ? (parseInt(realMatch.golB) || 0) : null;
+
+    const predStr = predScore ? `${predScore[0]}–${predScore[1]}` : p.a;
+    const realStr = hasResult ? `${realA}–${realB}` : null;
+
+    let ptsBadge, borderLeft;
+    if (!hasResult || !predScore) {
+      ptsBadge   = `<span style="font-size:11px;color:var(--muted);font-style:italic">Pendiente</span>`;
+      borderLeft = 'var(--border)';
+    } else {
+      const pts = calcMatchPoints(predScore[0], predScore[1], realA, realB);
+      totalPts  += pts;
+      evaluated++;
+      borderLeft = pts===4?'var(--gold)':pts===3?'var(--green)':pts===2?'var(--blue)':pts===1?'var(--accent)':'var(--muted)';
+      ptsBadge = pts===4
+        ? `<span style="background:rgba(245,200,66,.15);color:var(--gold);border:1px solid rgba(245,200,66,.4);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+4 ⭐</span>`
+        : pts===3
+          ? `<span style="background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.35);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+3 ✅</span>`
+          : pts===2
+            ? `<span style="background:rgba(79,195,247,.12);color:var(--blue);border:1px solid rgba(79,195,247,.35);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+2</span>`
+            : pts===1
+              ? `<span style="background:rgba(255,87,34,.12);color:var(--accent);border:1px solid rgba(255,87,34,.35);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+1</span>`
+              : `<span style="background:rgba(84,110,122,.12);color:var(--muted);border:1px solid rgba(84,110,122,.3);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">0</span>`;
+    }
+
+    return `<div style="
+        display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;
+        background:rgba(255,255,255,0.025);border-radius:8px;
+        padding:10px 12px;margin-bottom:8px;
+        border-left:3px solid ${borderLeft};
+      ">
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px">${slot}${teamA && teamB ? ` · ${fA} ${teamA} vs ${teamB} ${fB}` : ''}</div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:5px">
+            <span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim)">Tu pick:</span>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--text)">${predStr}</span>
+          </div>
+          ${realStr ? `
+          <div style="display:flex;align-items:center;gap:5px">
+            <span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim)">Real:</span>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--text)">${realStr}</span>
+          </div>` : ''}
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">${ptsBadge}</div>
+    </div>`;
+  }).join('');
+
+  const summaryBar = evaluated > 0 ? `
+    <div style="
+      display:flex;justify-content:space-between;align-items:center;
+      background:rgba(255,255,255,0.04);border-radius:8px;
+      padding:10px 14px;margin-bottom:12px;
+      border:1px solid rgba(255,255,255,0.08);
+    ">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--dim)">${evaluated} partido${evaluated!==1?'s':''} evaluado${evaluated!==1?'s':''}</span>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--gold)">${totalPts} pts de Octavos</span>
+    </div>` : '';
+
+  return summaryBar + rows;
+}
+
+
+// ══════════════════════════════════════════════════════
+//  PUNTOS CUARTOS (accordion dentro de ficha jugador)
+//  (mismo patrón que buildElim16HTML, usando getSlotCuartosTeams/Result
+//   en vez de los de 16avos)
+// ══════════════════════════════════════════════════════
+function buildElimCuartosHTML(picks) {
+  const elimPicks = picks.filter(p => /^C\\d{1,2}$/.test(p.q.trim().toUpperCase()));
+  if (!elimPicks.length) {
+    return `<div style="padding:14px;font-size:13px;color:var(--muted);text-align:center;font-style:italic">
+      Este jugador aún no envió predicciones de Cuartos.
+    </div>`;
+  }
+
+  elimPicks.sort((a, b) => {
+    const na = parseInt(a.q.trim().slice(1)), nb = parseInt(b.q.trim().slice(1));
+    return na - nb;
+  });
+
+  let totalPts = 0;
+  let evaluated = 0;
+
+  const rows = elimPicks.map(p => {
+    const slot = p.q.trim().toUpperCase();
+    const predScore = parseScore(p.a);
+
+    const teamInfo = getSlotCuartosTeams(slot);
+    const teamA = teamInfo ? teamInfo.a : null;
+    const teamB = teamInfo ? teamInfo.b : null;
+    const fA = teamA ? fl(teamA) : '🏳️';
+    const fB = teamB ? fl(teamB) : '🏳️';
+
+    const realMatch = getSlotCuartosResult(slot);
+    const hasResult = !!(realMatch && realMatch.estado === 'FIN');
+    const realA = hasResult ? (parseInt(realMatch.golA) || 0) : null;
+    const realB = hasResult ? (parseInt(realMatch.golB) || 0) : null;
+
+    const predStr = predScore ? `${predScore[0]}–${predScore[1]}` : p.a;
+    const realStr = hasResult ? `${realA}–${realB}` : null;
+
+    let ptsBadge, borderLeft;
+    if (!hasResult || !predScore) {
+      ptsBadge   = `<span style="font-size:11px;color:var(--muted);font-style:italic">Pendiente</span>`;
+      borderLeft = 'var(--border)';
+    } else {
+      const pts = calcMatchPoints(predScore[0], predScore[1], realA, realB);
+      totalPts  += pts;
+      evaluated++;
+      borderLeft = pts===4?'var(--gold)':pts===3?'var(--green)':pts===2?'var(--blue)':pts===1?'var(--accent)':'var(--muted)';
+      ptsBadge = pts===4
+        ? `<span style="background:rgba(245,200,66,.15);color:var(--gold);border:1px solid rgba(245,200,66,.4);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+4 ⭐</span>`
+        : pts===3
+          ? `<span style="background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.35);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+3 ✅</span>`
+          : pts===2
+            ? `<span style="background:rgba(79,195,247,.12);color:var(--blue);border:1px solid rgba(79,195,247,.35);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+2</span>`
+            : pts===1
+              ? `<span style="background:rgba(255,87,34,.12);color:var(--accent);border:1px solid rgba(255,87,34,.35);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+1</span>`
+              : `<span style="background:rgba(84,110,122,.12);color:var(--muted);border:1px solid rgba(84,110,122,.3);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">0</span>`;
+    }
+
+    return `<div style="
+        display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;
+        background:rgba(255,255,255,0.025);border-radius:8px;
+        padding:10px 12px;margin-bottom:8px;
+        border-left:3px solid ${borderLeft};
+      ">
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px">${slot}${teamA && teamB ? ` · ${fA} ${teamA} vs ${teamB} ${fB}` : ''}</div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:5px">
+            <span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim)">Tu pick:</span>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--text)">${predStr}</span>
+          </div>
+          ${realStr ? `
+          <div style="display:flex;align-items:center;gap:5px">
+            <span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim)">Real:</span>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--text)">${realStr}</span>
+          </div>` : ''}
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">${ptsBadge}</div>
+    </div>`;
+  }).join('');
+
+  const summaryBar = evaluated > 0 ? `
+    <div style="
+      display:flex;justify-content:space-between;align-items:center;
+      background:rgba(255,255,255,0.04);border-radius:8px;
+      padding:10px 14px;margin-bottom:12px;
+      border:1px solid rgba(255,255,255,0.08);
+    ">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--dim)">${evaluated} partido${evaluated!==1?'s':''} evaluado${evaluated!==1?'s':''}</span>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--gold)">${totalPts} pts de Cuartos</span>
+    </div>` : '';
+
+  return summaryBar + rows;
+}
+
+
+// ══════════════════════════════════════════════════════
+//  PUNTOS SEMIS (accordion dentro de ficha jugador)
+//  (mismo patrón que buildElim16HTML, usando getSlotSemisTeams/Result
+//   en vez de los de 16avos)
+// ══════════════════════════════════════════════════════
+function buildElimSemisHTML(picks) {
+  const elimPicks = picks.filter(p => /^S\\d{1,2}$/.test(p.q.trim().toUpperCase()));
+  if (!elimPicks.length) {
+    return `<div style="padding:14px;font-size:13px;color:var(--muted);text-align:center;font-style:italic">
+      Este jugador aún no envió predicciones de Semis.
+    </div>`;
+  }
+
+  elimPicks.sort((a, b) => {
+    const na = parseInt(a.q.trim().slice(1)), nb = parseInt(b.q.trim().slice(1));
+    return na - nb;
+  });
+
+  let totalPts = 0;
+  let evaluated = 0;
+
+  const rows = elimPicks.map(p => {
+    const slot = p.q.trim().toUpperCase();
+    const predScore = parseScore(p.a);
+
+    const teamInfo = getSlotSemisTeams(slot);
+    const teamA = teamInfo ? teamInfo.a : null;
+    const teamB = teamInfo ? teamInfo.b : null;
+    const fA = teamA ? fl(teamA) : '🏳️';
+    const fB = teamB ? fl(teamB) : '🏳️';
+
+    const realMatch = getSlotSemisResult(slot);
+    const hasResult = !!(realMatch && realMatch.estado === 'FIN');
+    const realA = hasResult ? (parseInt(realMatch.golA) || 0) : null;
+    const realB = hasResult ? (parseInt(realMatch.golB) || 0) : null;
+
+    const predStr = predScore ? `${predScore[0]}–${predScore[1]}` : p.a;
+    const realStr = hasResult ? `${realA}–${realB}` : null;
+
+    let ptsBadge, borderLeft;
+    if (!hasResult || !predScore) {
+      ptsBadge   = `<span style="font-size:11px;color:var(--muted);font-style:italic">Pendiente</span>`;
+      borderLeft = 'var(--border)';
+    } else {
+      const pts = calcMatchPoints(predScore[0], predScore[1], realA, realB);
+      totalPts  += pts;
+      evaluated++;
+      borderLeft = pts===4?'var(--gold)':pts===3?'var(--green)':pts===2?'var(--blue)':pts===1?'var(--accent)':'var(--muted)';
+      ptsBadge = pts===4
+        ? `<span style="background:rgba(245,200,66,.15);color:var(--gold);border:1px solid rgba(245,200,66,.4);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+4 ⭐</span>`
+        : pts===3
+          ? `<span style="background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.35);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+3 ✅</span>`
+          : pts===2
+            ? `<span style="background:rgba(79,195,247,.12);color:var(--blue);border:1px solid rgba(79,195,247,.35);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+2</span>`
+            : pts===1
+              ? `<span style="background:rgba(255,87,34,.12);color:var(--accent);border:1px solid rgba(255,87,34,.35);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+1</span>`
+              : `<span style="background:rgba(84,110,122,.12);color:var(--muted);border:1px solid rgba(84,110,122,.3);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">0</span>`;
+    }
+
+    return `<div style="
+        display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;
+        background:rgba(255,255,255,0.025);border-radius:8px;
+        padding:10px 12px;margin-bottom:8px;
+        border-left:3px solid ${borderLeft};
+      ">
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px">${slot}${teamA && teamB ? ` · ${fA} ${teamA} vs ${teamB} ${fB}` : ''}</div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:5px">
+            <span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim)">Tu pick:</span>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--text)">${predStr}</span>
+          </div>
+          ${realStr ? `
+          <div style="display:flex;align-items:center;gap:5px">
+            <span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim)">Real:</span>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--text)">${realStr}</span>
+          </div>` : ''}
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">${ptsBadge}</div>
+    </div>`;
+  }).join('');
+
+  const summaryBar = evaluated > 0 ? `
+    <div style="
+      display:flex;justify-content:space-between;align-items:center;
+      background:rgba(255,255,255,0.04);border-radius:8px;
+      padding:10px 14px;margin-bottom:12px;
+      border:1px solid rgba(255,255,255,0.08);
+    ">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--dim)">${evaluated} partido${evaluated!==1?'s':''} evaluado${evaluated!==1?'s':''}</span>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--gold)">${totalPts} pts de Semis</span>
+    </div>` : '';
+
+  return summaryBar + rows;
+}
+
+
+// ══════════════════════════════════════════════════════
+//  PUNTOS FINAL (accordion dentro de ficha jugador)
+//  (mismo patrón que buildElim16HTML, usando getSlotFinalTeams/Result
+//   en vez de los de 16avos)
+// ══════════════════════════════════════════════════════
+function buildElimFinalHTML(picks) {
+  const elimPicks = picks.filter(p => /^F\\d{1,2}$/.test(p.q.trim().toUpperCase()));
+  if (!elimPicks.length) {
+    return `<div style="padding:14px;font-size:13px;color:var(--muted);text-align:center;font-style:italic">
+      Este jugador aún no envió predicciones de la Final.
+    </div>`;
+  }
+
+  elimPicks.sort((a, b) => {
+    const na = parseInt(a.q.trim().slice(1)), nb = parseInt(b.q.trim().slice(1));
+    return na - nb;
+  });
+
+  let totalPts = 0;
+  let evaluated = 0;
+
+  const rows = elimPicks.map(p => {
+    const slot = p.q.trim().toUpperCase();
+    const predScore = parseScore(p.a);
+
+    const teamInfo = getSlotFinalTeams(slot);
+    const teamA = teamInfo ? teamInfo.a : null;
+    const teamB = teamInfo ? teamInfo.b : null;
+    const fA = teamA ? fl(teamA) : '🏳️';
+    const fB = teamB ? fl(teamB) : '🏳️';
+
+    const realMatch = getSlotFinalResult(slot);
+    const hasResult = !!(realMatch && realMatch.estado === 'FIN');
+    const realA = hasResult ? (parseInt(realMatch.golA) || 0) : null;
+    const realB = hasResult ? (parseInt(realMatch.golB) || 0) : null;
+
+    const predStr = predScore ? `${predScore[0]}–${predScore[1]}` : p.a;
+    const realStr = hasResult ? `${realA}–${realB}` : null;
+
+    let ptsBadge, borderLeft;
+    if (!hasResult || !predScore) {
+      ptsBadge   = `<span style="font-size:11px;color:var(--muted);font-style:italic">Pendiente</span>`;
+      borderLeft = 'var(--border)';
+    } else {
+      const pts = calcMatchPoints(predScore[0], predScore[1], realA, realB);
+      totalPts  += pts;
+      evaluated++;
+      borderLeft = pts===4?'var(--gold)':pts===3?'var(--green)':pts===2?'var(--blue)':pts===1?'var(--accent)':'var(--muted)';
+      ptsBadge = pts===4
+        ? `<span style="background:rgba(245,200,66,.15);color:var(--gold);border:1px solid rgba(245,200,66,.4);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+4 ⭐</span>`
+        : pts===3
+          ? `<span style="background:rgba(0,230,118,.12);color:var(--green);border:1px solid rgba(0,230,118,.35);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+3 ✅</span>`
+          : pts===2
+            ? `<span style="background:rgba(79,195,247,.12);color:var(--blue);border:1px solid rgba(79,195,247,.35);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+2</span>`
+            : pts===1
+              ? `<span style="background:rgba(255,87,34,.12);color:var(--accent);border:1px solid rgba(255,87,34,.35);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">+1</span>`
+              : `<span style="background:rgba(84,110,122,.12);color:var(--muted);border:1px solid rgba(84,110,122,.3);border-radius:6px;padding:2px 8px;font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900">0</span>`;
+    }
+
+    return `<div style="
+        display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;
+        background:rgba(255,255,255,0.025);border-radius:8px;
+        padding:10px 12px;margin-bottom:8px;
+        border-left:3px solid ${borderLeft};
+      ">
+      <div>
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:4px">${slot}${teamA && teamB ? ` · ${fA} ${teamA} vs ${teamB} ${fB}` : ''}</div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="display:flex;align-items:center;gap:5px">
+            <span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim)">Tu pick:</span>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--text)">${predStr}</span>
+          </div>
+          ${realStr ? `
+          <div style="display:flex;align-items:center;gap:5px">
+            <span style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim)">Real:</span>
+            <span style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:var(--text)">${realStr}</span>
+          </div>` : ''}
+        </div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">${ptsBadge}</div>
+    </div>`;
+  }).join('');
+
+  const summaryBar = evaluated > 0 ? `
+    <div style="
+      display:flex;justify-content:space-between;align-items:center;
+      background:rgba(255,255,255,0.04);border-radius:8px;
+      padding:10px 14px;margin-bottom:12px;
+      border:1px solid rgba(255,255,255,0.08);
+    ">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--dim)">${evaluated} partido${evaluated!==1?'s':''} evaluado${evaluated!==1?'s':''}</span>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--gold)">${totalPts} pts de la Final</span>
+    </div>` : '';
+
+  return summaryBar + rows;
+}
+
   // ══════════════════════════════════════════════════════
 //  PUNTOS POR GRUPO (para ficha jugador)
 // ══════════════════════════════════════════════════════
@@ -4803,17 +5317,18 @@ function buildGroupPointsHTML(picks) {
 // ══════════════════════════════════════════════════════
 let _openPlayerCardArgs = null; // 👈 recuerda qué tarjeta está abierta, para poder refrescarla cuando lleguen datos async (p.ej. slot16TeamsMap)
 
-function openPlayerCard(rawName, pts, rank, gPts, pPts) {
-  _openPlayerCardArgs = { rawName, pts, rank, gPts, pPts };
-  const modal   = document.getElementById('playerModal');
-  const content = document.getElementById('fcContent');
+// ══════════════════════════════════════════════════════
+//  CONSTRUCTOR COMPARTIDO DE LA FICHA DE JUGADOR
+//  (usado tanto por el modal "Ver Ficha" del Leaderboard como por la
+//   sección "📇 Resumen" — mismo contenido, dos lugares donde se muestra)
+// ══════════════════════════════════════════════════════
+function buildPlayerProfileHTML(rawName, pts, rank, gPts, pPts) {
   const normName= rawName.trim().toLowerCase();
   const picks   = formPicks[normName] || [];
   let rColor = 'var(--muted)', borderColor = 'var(--border)';
   if (rank===1){ rColor='var(--gold)'; borderColor='var(--gold)'; }
   if (rank===2){ rColor='var(--silver)'; borderColor='var(--silver)'; }
   if (rank===3){ rColor='var(--bronze)'; borderColor='var(--bronze)'; }
-  content.style.borderTop = `4px solid ${borderColor}`;
 
   // ── Separar picks en generales vs por grupo ──
   const generalPicks = [];
@@ -4839,7 +5354,6 @@ function openPlayerCard(rawName, pts, rank, gPts, pPts) {
 
   // ── HTML cabecera ──
   let html = `
-    <button class="close-btn" onclick="closePlayerCard()">×</button>
     <div class="fc-header">
       <div class="fc-rank" style="color:${rColor}">${rank}</div>
       <div class="fc-info"><h2>${rawName}</h2>
@@ -4932,8 +5446,49 @@ function openPlayerCard(rawName, pts, rank, gPts, pPts) {
         </div>
         <div class="acc-body">${elim16HTML}</div>
       </div>`;
+
+    // ── SECCIÓN: Eliminatorias — Octavos/Cuartos/Semis/Final ──
+    const elimOctavosHTML = buildElimOctavosHTML(picks);
+    html += `
+      <div class="acc-section">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span class="acc-title" style="color:var(--blue)">🏟️ Eliminatorias — Octavos</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">${elimOctavosHTML}</div>
+      </div>`;
+
+    const elimCuartosHTML = buildElimCuartosHTML(picks);
+    html += `
+      <div class="acc-section">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span class="acc-title" style="color:var(--blue)">🏟️ Eliminatorias — Cuartos</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">${elimCuartosHTML}</div>
+      </div>`;
+
+    const elimSemisHTML = buildElimSemisHTML(picks);
+    html += `
+      <div class="acc-section">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span class="acc-title" style="color:var(--blue)">🏟️ Eliminatorias — Semis</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">${elimSemisHTML}</div>
+      </div>`;
+
+    const elimFinalHTML = buildElimFinalHTML(picks);
+    html += `
+      <div class="acc-section">
+        <div class="acc-header" onclick="toggleAcc(this)">
+          <span class="acc-title" style="color:var(--blue)">🏟️ Eliminatoria — Final</span>
+          <span class="acc-arrow">▼</span>
+        </div>
+        <div class="acc-body">${elimFinalHTML}</div>
+      </div>`;
+
       // ── SECCIÓN: Puntos por Grupo ──
-// ── Puntos por Grupo ──
     const groupPointsHTML = buildGroupPointsHTML(picks);
     html += `
       <div class="acc-section">
@@ -4956,7 +5511,20 @@ function openPlayerCard(rawName, pts, rank, gPts, pPts) {
   }
 
   html += '</div>'; // cierra fc-body
-  content.innerHTML = html;
+  return html;
+}
+
+function openPlayerCard(rawName, pts, rank, gPts, pPts) {
+  _openPlayerCardArgs = { rawName, pts, rank, gPts, pPts };
+  const modal   = document.getElementById('playerModal');
+  const content = document.getElementById('fcContent');
+  let borderColor = 'var(--border)';
+  if (rank===1) borderColor='var(--gold)';
+  if (rank===2) borderColor='var(--silver)';
+  if (rank===3) borderColor='var(--bronze)';
+  content.style.borderTop = `4px solid ${borderColor}`;
+  content.innerHTML = `<button class="close-btn" onclick="closePlayerCard()">×</button>` +
+    buildPlayerProfileHTML(rawName, pts, rank, gPts, pPts);
   modal.classList.add('active');
 }
 function closePlayerCard() { document.getElementById('playerModal').classList.remove('active'); _openPlayerCardArgs = null; }
@@ -4971,6 +5539,62 @@ function refreshOpenPlayerCardIfAny() {
   const { rawName, pts, rank, gPts, pPts } = _openPlayerCardArgs;
   openPlayerCard(rawName, pts, rank, gPts, pPts);
 }
+
+// ══════════════════════════════════════════════════════
+//  SECCIÓN "📇 RESUMEN" — misma ficha que el modal, pero elegida
+//  desde una lista desplegable en vez de dar clic en el Leaderboard.
+// ══════════════════════════════════════════════════════
+let _resumenCurrentName = null; // nombre actualmente seleccionado en el <select>, para poder refrescar
+
+function populateResumenSelect() {
+  const sel = document.getElementById('resumenPlayerSelect');
+  if (!sel) return;
+  const prevValue = sel.value || _resumenCurrentName || '';
+
+  const sorted = [...lbPlayers].sort((a, b) => a.name.localeCompare(b.name, 'es'));
+  sel.innerHTML = '<option value="">— Selecciona un participante —</option>' +
+    sorted.map(p => `<option value="${p.name.replace(/"/g, '&quot;')}">${p.name} — ${p.total} pts (#${p.rank})</option>`).join('');
+
+  if (prevValue && sorted.some(p => p.name === prevValue)) {
+    sel.value = prevValue;
+    renderResumenProfile(prevValue);
+  }
+}
+
+function onResumenPlayerChange() {
+  const sel = document.getElementById('resumenPlayerSelect');
+  const name = sel ? sel.value : '';
+  _resumenCurrentName = name || null;
+  const container = document.getElementById('resumenContent');
+  if (!container) return;
+  if (!name) {
+    container.innerHTML = `<div class="pred16-empty-msg">Selecciona un participante para ver su resumen completo.</div>`;
+    return;
+  }
+  renderResumenProfile(name);
+}
+
+function renderResumenProfile(rawName) {
+  const container = document.getElementById('resumenContent');
+  if (!container) return;
+  const p = lbPlayers.find(pl => pl.name === rawName);
+  if (!p) {
+    container.innerHTML = `<div class="err">No encontré datos de este participante en el Leaderboard.</div>`;
+    return;
+  }
+  _resumenCurrentName = p.name;
+  container.innerHTML = buildPlayerProfileHTML(p.name, p.total, p.rank, p.grupos, p.pPartidos);
+}
+
+// Si la sección Resumen tiene un participante elegido cuando llegan datos async
+// (p.ej. los mapas de equipos de Octavos/Cuartos/Semis/Final), la repintamos.
+function refreshResumenIfOpen() {
+  if (!_resumenCurrentName) return;
+  const container = document.getElementById('resumenContent');
+  if (!container) return;
+  renderResumenProfile(_resumenCurrentName);
+}
+
   function toggleAcc(header) {
   const arrow = header.querySelector('.acc-arrow');
   const body  = header.nextElementSibling;
@@ -6792,7 +7416,11 @@ await Promise.allSettled([
     fetchGamesLeaderboard(),
     fetchResultadosReales(),
     fetchNextElimDate(),
-    fetchSlot16TeamsMap()   // 👈 nueva
+    fetchSlot16TeamsMap(),  // 👈 nueva
+    fetchSlotOctavosTeamsMap(),
+    fetchSlotCuartosTeamsMap(),
+    fetchSlotSemisTeamsMap(),
+    fetchSlotFinalTeamsMap()
 ]);
   renderGroupStageStatus(); // refresca con la fecha de 16avos ya cargada (si aplica)
   if(sStatus)sStatus.textContent='Sincronizado';if(sDot)sDot.classList.add('live');
