@@ -1433,6 +1433,22 @@ html.modo-paraguay .rayas-paraguay-bar{display:flex}
         <span class="omi-emoji">📝</span>
         <span class="omi-text"><b>Predicciones 16avos</b><small>Envía tu marcador para cada cruce</small></span>
       </button>
+      <button class="otras-menu-item" id="omiPredOctavos" onclick="selectOtraOpcion('predOctavos')">
+        <span class="omi-emoji">📝</span>
+        <span class="omi-text"><b>Predicciones Octavos</b><small>Envía tu marcador para cada cruce</small></span>
+      </button>
+      <button class="otras-menu-item" id="omiPredCuartos" onclick="selectOtraOpcion('predCuartos')">
+        <span class="omi-emoji">📝</span>
+        <span class="omi-text"><b>Predicciones Cuartos</b><small>Envía tu marcador para cada cruce</small></span>
+      </button>
+      <button class="otras-menu-item" id="omiPredSemis" onclick="selectOtraOpcion('predSemis')">
+        <span class="omi-emoji">📝</span>
+        <span class="omi-text"><b>Predicciones Semis</b><small>Envía tu marcador para cada cruce</small></span>
+      </button>
+      <button class="otras-menu-item" id="omiPredFinal" onclick="selectOtraOpcion('predFinal')">
+        <span class="omi-emoji">📝</span>
+        <span class="omi-text"><b>Predicciones Final</b><small>Envía tu marcador del partido</small></span>
+      </button>
       <button class="otras-menu-item" id="omiDuel" onclick="selectOtraOpcion('duel')">
         <span class="omi-emoji">⚔️</span>
         <span class="omi-text"><b>1v1</b><small>Compara predicciones cara a cara</small></span>
@@ -1696,6 +1712,94 @@ html.modo-paraguay .rayas-paraguay-bar{display:flex}
 
       <button class="fb-submit" id="pred16SubmitBtn" onclick="enviarPred16()" style="margin-top:14px">Enviar Predicciones 🚀</button>
       <div class="pred16-status" id="pred16Status"></div>
+    </div>
+  </div>
+</div>
+  <div class="section" id="secPredOctavos">
+  <div class="bracket-wrap">
+    <div class="eyebrow-sm">📝 Predicciones de Octavos de Final</div>
+    <div class="card" style="padding:20px">
+      <div class="cb-head-sub" style="margin-bottom:16px">
+        Escribe tu nombre y el teléfono con el que te registraste en la quiniela, y manda tu marcador para cada cruce que esté abierto. Solo puedes enviarlas una vez. EL MARCADOR SÓLO ES VÁLIDO PARA LOS PRIMEROS 90 MINUTOS DE JUEGO.
+      </div>
+
+      <div class="fb-label">Tu nombre</div>
+      <input class="fb-input" id="pOctavosNombre" type="text" placeholder="Nombre completo" maxlength="60" autocomplete="off">
+
+      <div class="fb-label" style="margin-top:12px">Tu teléfono registrado</div>
+      <input class="fb-input" id="pOctavosTelefono" type="tel" placeholder="10 dígitos" maxlength="20" autocomplete="off">
+
+      <div class="fb-label" style="margin-top:20px">Cruces de Octavos</div>
+      <div id="predOctavosCrucesList"><div class="pred16-empty-msg">⏳ Cargando cruces…</div></div>
+
+      <button class="fb-submit" id="predOctavosSubmitBtn" style="margin-top:14px;display:none">Enviar Predicciones 🚀</button>
+      <div class="pred16-status" id="predOctavosStatus"></div>
+    </div>
+  </div>
+</div>
+  <div class="section" id="secPredCuartos">
+  <div class="bracket-wrap">
+    <div class="eyebrow-sm">📝 Predicciones de Cuartos de Final</div>
+    <div class="card" style="padding:20px">
+      <div class="cb-head-sub" style="margin-bottom:16px">
+        Escribe tu nombre y el teléfono con el que te registraste en la quiniela, y manda tu marcador para cada cruce que esté abierto. Solo puedes enviarlas una vez. EL MARCADOR SÓLO ES VÁLIDO PARA LOS PRIMEROS 90 MINUTOS DE JUEGO.
+      </div>
+
+      <div class="fb-label">Tu nombre</div>
+      <input class="fb-input" id="pCuartosNombre" type="text" placeholder="Nombre completo" maxlength="60" autocomplete="off">
+
+      <div class="fb-label" style="margin-top:12px">Tu teléfono registrado</div>
+      <input class="fb-input" id="pCuartosTelefono" type="tel" placeholder="10 dígitos" maxlength="20" autocomplete="off">
+
+      <div class="fb-label" style="margin-top:20px">Cruces de Cuartos</div>
+      <div id="predCuartosCrucesList"><div class="pred16-empty-msg">⏳ Cargando cruces…</div></div>
+
+      <button class="fb-submit" id="predCuartosSubmitBtn" style="margin-top:14px;display:none">Enviar Predicciones 🚀</button>
+      <div class="pred16-status" id="predCuartosStatus"></div>
+    </div>
+  </div>
+</div>
+  <div class="section" id="secPredSemis">
+  <div class="bracket-wrap">
+    <div class="eyebrow-sm">📝 Predicciones de Semifinales</div>
+    <div class="card" style="padding:20px">
+      <div class="cb-head-sub" style="margin-bottom:16px">
+        Escribe tu nombre y el teléfono con el que te registraste en la quiniela, y manda tu marcador para cada cruce que esté abierto. Solo puedes enviarlas una vez. EL MARCADOR SÓLO ES VÁLIDO PARA LOS PRIMEROS 90 MINUTOS DE JUEGO.
+      </div>
+
+      <div class="fb-label">Tu nombre</div>
+      <input class="fb-input" id="pSemisNombre" type="text" placeholder="Nombre completo" maxlength="60" autocomplete="off">
+
+      <div class="fb-label" style="margin-top:12px">Tu teléfono registrado</div>
+      <input class="fb-input" id="pSemisTelefono" type="tel" placeholder="10 dígitos" maxlength="20" autocomplete="off">
+
+      <div class="fb-label" style="margin-top:20px">Cruces de Semifinales</div>
+      <div id="predSemisCrucesList"><div class="pred16-empty-msg">⏳ Cargando cruces…</div></div>
+
+      <button class="fb-submit" id="predSemisSubmitBtn" style="margin-top:14px;display:none">Enviar Predicciones 🚀</button>
+      <div class="pred16-status" id="predSemisStatus"></div>
+    </div>
+  </div>
+</div>
+  <div class="section" id="secPredFinal">
+  <div class="bracket-wrap">
+    <div class="eyebrow-sm">📝 Predicción de la Final</div>
+    <div class="card" style="padding:20px">
+      <div class="cb-head-sub" style="margin-bottom:16px">
+        Escribe tu nombre y el teléfono con el que te registraste en la quiniela, y manda tu marcador para la Final. Solo puedes enviarla una vez. EL MARCADOR SÓLO ES VÁLIDO PARA LOS PRIMEROS 90 MINUTOS DE JUEGO.
+      </div>
+
+      <div class="fb-label">Tu nombre</div>
+      <input class="fb-input" id="pFinalNombre" type="text" placeholder="Nombre completo" maxlength="60" autocomplete="off">
+
+      <div class="fb-label" style="margin-top:12px">Tu teléfono registrado</div>
+      <input class="fb-input" id="pFinalTelefono" type="tel" placeholder="10 dígitos" maxlength="20" autocomplete="off">
+
+      <div class="fb-label" style="margin-top:20px">La Final</div>
+      <div id="predFinalCrucesList"><div class="pred16-empty-msg">⏳ Cargando el cruce…</div></div>
+
+      <button class="fb-submit" id="predFinalSubmitBtn" style="margin-top:14px;display:none">Enviar Predicción 🚀</button>
+      <div class="pred16-status" id="predFinalStatus"></div>
     </div>
   </div>
 </div>
@@ -2082,6 +2186,54 @@ html.modo-paraguay .rayas-paraguay-bar{display:flex}
   </div>
 </div>
 
+<div class="admin16-overlay" id="adminOctavosOverlay" onclick="if(event.target===this)closeAdminOctavosModal()">
+  <div class="admin16-modal">
+    <div class="admin16-head">
+      <span class="admin16-title">🔐 Actualizar Resultados — Octavos</span>
+      <button class="admin16-close" onclick="closeAdminOctavosModal()">×</button>
+    </div>
+    <div class="admin16-body" id="adminOctavosBody">
+      <div class="admin16-loading">⏳ Cargando cruces desde Google Sheets…</div>
+    </div>
+  </div>
+</div>
+
+<div class="admin16-overlay" id="adminCuartosOverlay" onclick="if(event.target===this)closeAdminCuartosModal()">
+  <div class="admin16-modal">
+    <div class="admin16-head">
+      <span class="admin16-title">🔐 Actualizar Resultados — Cuartos</span>
+      <button class="admin16-close" onclick="closeAdminCuartosModal()">×</button>
+    </div>
+    <div class="admin16-body" id="adminCuartosBody">
+      <div class="admin16-loading">⏳ Cargando cruces desde Google Sheets…</div>
+    </div>
+  </div>
+</div>
+
+<div class="admin16-overlay" id="adminSemisOverlay" onclick="if(event.target===this)closeAdminSemisModal()">
+  <div class="admin16-modal">
+    <div class="admin16-head">
+      <span class="admin16-title">🔐 Actualizar Resultados — Semis</span>
+      <button class="admin16-close" onclick="closeAdminSemisModal()">×</button>
+    </div>
+    <div class="admin16-body" id="adminSemisBody">
+      <div class="admin16-loading">⏳ Cargando cruces desde Google Sheets…</div>
+    </div>
+  </div>
+</div>
+
+<div class="admin16-overlay" id="adminFinalOverlay" onclick="if(event.target===this)closeAdminFinalModal()">
+  <div class="admin16-modal">
+    <div class="admin16-head">
+      <span class="admin16-title">🔐 Actualizar Resultados — Final</span>
+      <button class="admin16-close" onclick="closeAdminFinalModal()">×</button>
+    </div>
+    <div class="admin16-body" id="adminFinalBody">
+      <div class="admin16-loading">⏳ Cargando cruces desde Google Sheets…</div>
+    </div>
+  </div>
+</div>
+
   
 <script>
 // ══════════════════════════════════════════════════════
@@ -2093,6 +2245,13 @@ const GID_DATOS       = '0';
 const GID_PARTIDOS    = '164525355';
 const GID_RESULTADOS  = '1510594452'; // Abre Resultados_Reales en Sheets → URL → busca gid=XXXXXXXX
 const GID_LOCKS = '1684909330';
+
+// 👇 PENDIENTE: crea cada hoja desde el menú 🏆 Quiniela 2026 → "Crear Hoja Octavos/Cuartos/Semis/Final"
+//    y pega aquí el GID real (lo ves en la URL de Sheets, después de "gid=")
+const GID_OCTAVOS = 'PEGA_AQUI_GID_OCTAVOS';
+const GID_CUARTOS = 'PEGA_AQUI_GID_CUARTOS';
+const GID_SEMIS   = 'PEGA_AQUI_GID_SEMIS';
+const GID_FINAL   = 'PEGA_AQUI_GID_FINAL';
 
 const GAMES_SID        = '1pDcY7q9SMP1mLGL12jKY3GKeD4RywOZtA_V7QjAYfDQ';
 const GAMES_GID        = '0';
@@ -2155,6 +2314,10 @@ let formPicks      = {};
 let m1Status       = {}; // nombre(lowercase) -> true/false, si el jugador completó TODOS los slots vigilados (M1, M2, M3, M4, M7, M12, M14)
 const WATCHED_ELIM_SLOTS = ['M1', 'M2', 'M3', 'M4', 'M7', 'M12', 'M14']; // slots de 16avos que ya se jugaron/están por jugarse: se marca al jugador si le falta cualquiera de estos
 let admin16Cache   = []; // [{slot, equipoA, equipoB, golA, golB, estado, fecha}]
+let adminOctavosCache = [];
+let adminCuartosCache = [];
+let adminSemisCache   = [];
+let adminFinalCache   = [];
 
 // ── RESULTADOS MANUALES DE 16AVOS ──
 // Si por cualquier motivo el dato que llega desde Sheets no trae bien el marcador
@@ -2191,7 +2354,7 @@ let paraguayCelebEvaluada = false;
 // ══════════════════════════════════════════════════════
 //  UTILIDADES
 // ══════════════════════════════════════════════════════
-const OTRAS_OPCIONES = ['bracket', 'stats', 'pred16', 'duel'];
+const OTRAS_OPCIONES = ['bracket', 'stats', 'pred16', 'predOctavos', 'predCuartos', 'predSemis', 'predFinal', 'duel'];
 function switchSection(name) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.main-tab').forEach(t => t.classList.remove('on'));
@@ -2202,17 +2365,25 @@ function switchSection(name) {
   document.querySelectorAll('.otras-menu-item').forEach(it => it.classList.remove('active'));
   if (OTRAS_OPCIONES.includes(name)) {
     const item = document.getElementById(
-      name === 'bracket' ? 'omiBracket' :
-      name === 'stats'   ? 'omiStats'   :
-      name === 'pred16'  ? 'omiPred16'  :
-      name === 'duel'    ? 'omiDuel'    : 'omiPosibleLB'
+      name === 'bracket'     ? 'omiBracket'     :
+      name === 'stats'       ? 'omiStats'       :
+      name === 'pred16'      ? 'omiPred16'      :
+      name === 'predOctavos' ? 'omiPredOctavos' :
+      name === 'predCuartos' ? 'omiPredCuartos' :
+      name === 'predSemis'   ? 'omiPredSemis'   :
+      name === 'predFinal'   ? 'omiPredFinal'   :
+      name === 'duel'        ? 'omiDuel'        : 'omiPosibleLB'
     );
     if (item) item.classList.add('active');
   }
-  if (name === 'stats')     renderStats();
-  if (name === 'posiblelb') renderPosibleLB();
-  if (name === 'pred16')    initPred16Form();
-  if (name === 'leyendas')  fetchGlobalPollCounts().then(() => initPolls());
+  if (name === 'stats')       renderStats();
+  if (name === 'posiblelb')   renderPosibleLB();
+  if (name === 'pred16')      initPred16Form();
+  if (name === 'predOctavos') initPredOctavosForm();
+  if (name === 'predCuartos') initPredCuartosForm();
+  if (name === 'predSemis')   initPredSemisForm();
+  if (name === 'predFinal')   initPredFinalForm();
+  if (name === 'leyendas')    fetchGlobalPollCounts().then(() => initPolls());
 }
 
 function toggleOtrasMenu(e) {
@@ -3940,8 +4111,12 @@ function getLivePrediction(playerName) {
       <div><div style="font-size:16px;">🥇</div><span style="font-size:11px;color:#aaa">1º (50%)</span><br><strong style="color:#fff;font-size:14px;">$${p1.toLocaleString('es-MX')}</strong></div>
       <div><div style="font-size:16px;">🥈</div><span style="font-size:11px;color:#aaa">2º (30%)</span><br><strong style="color:#fff;font-size:14px;">$${p2.toLocaleString('es-MX')}</strong></div>
       <div><div style="font-size:16px;">🥉</div><span style="font-size:11px;color:#aaa">3º (20%)</span><br><strong style="color:#fff;font-size:14px;">$${p3.toLocaleString('es-MX')}</strong></div>
-      <div style="grid-column:span 3">
+      <div style="grid-column:span 3;display:flex;flex-wrap:wrap;gap:8px;justify-content:center">
         <button type="button" class="admin-update-btn" onclick="adminPromptUpdateResults()">🔐 Actualizar Resultados (16avos)</button>
+        <button type="button" class="admin-update-btn" onclick="adminPromptUpdateResultsOctavos()">🔐 Actualizar Resultados (Octavos)</button>
+        <button type="button" class="admin-update-btn" onclick="adminPromptUpdateResultsCuartos()">🔐 Actualizar Resultados (Cuartos)</button>
+        <button type="button" class="admin-update-btn" onclick="adminPromptUpdateResultsSemis()">🔐 Actualizar Resultados (Semis)</button>
+        <button type="button" class="admin-update-btn" onclick="adminPromptUpdateResultsFinal()">🔐 Actualizar Resultados (Final)</button>
       </div>`;
     if (!players.length) { body.innerHTML = '<div class="err">No hay participantes.</div>'; return; }
     // ── Calcular rangos reales (empates comparten el mismo lugar) ──
@@ -5935,7 +6110,670 @@ async function saveAdmin16Row(idx) {
     btn.disabled = false;
   }
 }
-  
+
+// ══════════════════════════════════════════════════════
+//  ADMIN: ACTUALIZAR RESULTADOS OCTAVOS (protegido por clave)
+//  (mismo patrón que el bloque ADMIN de 16avos, reutiliza ADMIN_PASSWORD
+//   y ADMIN16_SCRIPT_URL — es el mismo backend/deploy para todas las fases)
+// ══════════════════════════════════════════════════════
+function adminPromptUpdateResultsOctavos() {
+  const pass = prompt('🔐 Ingresa la contraseña de administrador:');
+  if (pass === null) return; // cancelado
+  if (pass !== ADMIN_PASSWORD) {
+    alert('❌ Contraseña incorrecta.');
+    return;
+  }
+  openAdminOctavosModal();
+}
+
+async function openAdminOctavosModal() {
+  document.getElementById('adminOctavosOverlay').classList.add('active');
+  await fetchAdminOctavosData();
+  renderAdminOctavosModal();
+}
+
+function closeAdminOctavosModal() {
+  document.getElementById('adminOctavosOverlay').classList.remove('active');
+}
+
+async function fetchAdminOctavosData() {
+  const body = document.getElementById('adminOctavosBody');
+  try {
+    const r = await fetch(csvUrl(SID, GID_OCTAVOS));
+    if (!r.ok) throw new Error('No se pudo leer la hoja Octavos');
+    const rows = parseCSV(await r.text());
+
+    // Buscar la fila de encabezados reales (Slot, EquipoA, EquipoB...)
+    let hdrIdx = -1;
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i][0] && rows[i][0].trim().toLowerCase() === 'slot') { hdrIdx = i; break; }
+    }
+    if (hdrIdx === -1) throw new Error('No encontré la fila de encabezados ("Slot") en la hoja Octavos.');
+
+    const hdr = rows[hdrIdx].map(h => (h || '').trim().toLowerCase());
+    const iSlot = hdr.indexOf('slot');
+    const iEqA  = hdr.indexOf('equipoa');
+    const iEqB  = hdr.indexOf('equipob');
+    const iGolA = hdr.indexOf('gola');
+    const iGolB = hdr.indexOf('golb');
+    const iEst  = hdr.indexOf('estado');
+    const iFec  = hdr.indexOf('fecha');
+
+    const list = [];
+    for (let i = hdrIdx + 1; i < rows.length; i++) {
+      const row = rows[i];
+      const slot = (row[iSlot] || '').trim();
+      if (!/^O\\d{1,2}$/i.test(slot)) continue;
+      list.push({
+        slot: slot.toUpperCase(),
+        equipoA: (row[iEqA] || '').trim(),
+        equipoB: (row[iEqB] || '').trim(),
+        golA: (row[iGolA] || '').trim(),
+        golB: (row[iGolB] || '').trim(),
+        estado: (row[iEst] || 'SCHED').trim().toUpperCase(),
+        fecha: (row[iFec] || '').trim(),
+      });
+    }
+    // Ordenar O1..ON numéricamente
+    list.sort((a, b) => parseInt(a.slot.slice(1)) - parseInt(b.slot.slice(1)));
+    adminOctavosCache = list;
+  } catch (e) {
+    console.error('Error cargando Octavos:', e);
+    body.innerHTML = `<div class="admin16-loading" style="color:var(--accent)">❌ ${e.message || 'Error al cargar los cruces.'}</div>`;
+    adminOctavosCache = [];
+  }
+}
+
+function renderAdminOctavosModal() {
+  const body = document.getElementById('adminOctavosBody');
+  if (!adminOctavosCache.length) {
+    body.innerHTML = `<div class="admin16-loading">No hay cruces capturados todavía en la hoja "Octavos".</div>`;
+    return;
+  }
+
+  body.innerHTML = adminOctavosCache.map((m, idx) => {
+    const estClass = m.estado === 'LIVE' ? 'live' : m.estado === 'FIN' ? 'fin' : 'sched';
+    const golAView = (m.estado === 'FIN' && m.golA === '') ? '0' : m.golA;
+    const golBView = (m.estado === 'FIN' && m.golB === '') ? '0' : m.golB;
+    return `<div class="admin16-row" id="adminOctavosrow-${idx}">
+      <div class="admin16-row-head">
+        <span class="admin16-slot">${m.slot}</span>
+        <span class="admin16-estado-tag ${estClass}" id="adminOctavostag-${idx}">${m.estado}</span>
+      </div>
+      <div class="admin16-grid">
+        <input class="admin16-team-input" id="adminOctavos-eqA-${idx}" value="${m.equipoA}" placeholder="Equipo A">
+        <input class="admin16-gol-input" id="adminOctavos-golA-${idx}" value="${golAView}" placeholder="-" inputmode="numeric">
+        <span class="admin16-sep">VS</span>
+        <input class="admin16-gol-input" id="adminOctavos-golB-${idx}" value="${golBView}" placeholder="-" inputmode="numeric">
+        <input class="admin16-team-input" id="adminOctavos-eqB-${idx}" value="${m.equipoB}" placeholder="Equipo B">
+      </div>
+      <div class="admin16-extra-row">
+        <select class="admin16-select" id="adminOctavos-estado-${idx}">
+          <option value="SCHED"${m.estado==='SCHED'?' selected':''}>SCHED — Sin jugar</option>
+          <option value="LIVE"${m.estado==='LIVE'?' selected':''}>LIVE — En vivo</option>
+          <option value="FIN"${m.estado==='FIN'?' selected':''}>FIN — Finalizado</option>
+        </select>
+        <input class="admin16-fecha-input" id="adminOctavos-fecha-${idx}" value="${m.fecha}" placeholder="Ej: 12 - 3:00pm">
+        <button class="admin16-save-btn" onclick="saveAdminOctavosRow(${idx})">💾 Guardar</button>
+      </div>
+      <div class="admin16-row-status" id="adminOctavos-status-${idx}"></div>
+    </div>`;
+  }).join('');
+}
+
+async function saveAdminOctavosRow(idx) {
+  const m = adminOctavosCache[idx];
+  const statusEl = document.getElementById(`adminOctavos-status-${idx}`);
+  const btn = document.querySelector(`#adminOctavosrow-${idx} .admin16-save-btn`);
+
+  const payload = {
+    clave: ADMIN_PASSWORD,
+    fase: 'octavos',
+    slot: m.slot,
+    equipoA: document.getElementById(`adminOctavos-eqA-${idx}`).value.trim(),
+    equipoB: document.getElementById(`adminOctavos-eqB-${idx}`).value.trim(),
+    golA: document.getElementById(`adminOctavos-golA-${idx}`).value.trim(),
+    golB: document.getElementById(`adminOctavos-golB-${idx}`).value.trim(),
+    estado: document.getElementById(`adminOctavos-estado-${idx}`).value,
+    fecha: document.getElementById(`adminOctavos-fecha-${idx}`).value.trim(),
+  };
+
+  if (ADMIN16_SCRIPT_URL.includes('PEGA_AQUI')) {
+    statusEl.textContent = '⚠️ Falta configurar ADMIN16_SCRIPT_URL en el código.';
+    statusEl.className = 'admin16-row-status err';
+    return;
+  }
+
+  btn.disabled = true;
+  statusEl.textContent = 'Guardando...';
+  statusEl.className = 'admin16-row-status';
+
+  try {
+    const r = await fetch(ADMIN16_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+    });
+    const data = await r.json();
+    if (data.ok) {
+      statusEl.textContent = `✅ ${m.slot} guardado correctamente.`;
+      statusEl.className = 'admin16-row-status ok';
+      const tag = document.getElementById(`adminOctavostag-${idx}`);
+      tag.textContent = payload.estado;
+      tag.className = 'admin16-estado-tag ' + (payload.estado === 'LIVE' ? 'live' : payload.estado === 'FIN' ? 'fin' : 'sched');
+      // Actualizar caché local
+      adminOctavosCache[idx] = { ...m, ...payload };
+    } else {
+      statusEl.textContent = `❌ ${data.error || 'Error al guardar.'}`;
+      statusEl.className = 'admin16-row-status err';
+    }
+  } catch (e) {
+    console.error('Error guardando cruce Octavos:', e);
+    statusEl.textContent = '❌ No se pudo conectar con el servidor.';
+    statusEl.className = 'admin16-row-status err';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+
+// ══════════════════════════════════════════════════════
+//  ADMIN: ACTUALIZAR RESULTADOS CUARTOS (protegido por clave)
+//  (mismo patrón que el bloque ADMIN de 16avos, reutiliza ADMIN_PASSWORD
+//   y ADMIN16_SCRIPT_URL — es el mismo backend/deploy para todas las fases)
+// ══════════════════════════════════════════════════════
+function adminPromptUpdateResultsCuartos() {
+  const pass = prompt('🔐 Ingresa la contraseña de administrador:');
+  if (pass === null) return; // cancelado
+  if (pass !== ADMIN_PASSWORD) {
+    alert('❌ Contraseña incorrecta.');
+    return;
+  }
+  openAdminCuartosModal();
+}
+
+async function openAdminCuartosModal() {
+  document.getElementById('adminCuartosOverlay').classList.add('active');
+  await fetchAdminCuartosData();
+  renderAdminCuartosModal();
+}
+
+function closeAdminCuartosModal() {
+  document.getElementById('adminCuartosOverlay').classList.remove('active');
+}
+
+async function fetchAdminCuartosData() {
+  const body = document.getElementById('adminCuartosBody');
+  try {
+    const r = await fetch(csvUrl(SID, GID_CUARTOS));
+    if (!r.ok) throw new Error('No se pudo leer la hoja Cuartos');
+    const rows = parseCSV(await r.text());
+
+    // Buscar la fila de encabezados reales (Slot, EquipoA, EquipoB...)
+    let hdrIdx = -1;
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i][0] && rows[i][0].trim().toLowerCase() === 'slot') { hdrIdx = i; break; }
+    }
+    if (hdrIdx === -1) throw new Error('No encontré la fila de encabezados ("Slot") en la hoja Cuartos.');
+
+    const hdr = rows[hdrIdx].map(h => (h || '').trim().toLowerCase());
+    const iSlot = hdr.indexOf('slot');
+    const iEqA  = hdr.indexOf('equipoa');
+    const iEqB  = hdr.indexOf('equipob');
+    const iGolA = hdr.indexOf('gola');
+    const iGolB = hdr.indexOf('golb');
+    const iEst  = hdr.indexOf('estado');
+    const iFec  = hdr.indexOf('fecha');
+
+    const list = [];
+    for (let i = hdrIdx + 1; i < rows.length; i++) {
+      const row = rows[i];
+      const slot = (row[iSlot] || '').trim();
+      if (!/^C\\d{1,2}$/i.test(slot)) continue;
+      list.push({
+        slot: slot.toUpperCase(),
+        equipoA: (row[iEqA] || '').trim(),
+        equipoB: (row[iEqB] || '').trim(),
+        golA: (row[iGolA] || '').trim(),
+        golB: (row[iGolB] || '').trim(),
+        estado: (row[iEst] || 'SCHED').trim().toUpperCase(),
+        fecha: (row[iFec] || '').trim(),
+      });
+    }
+    // Ordenar C1..CN numéricamente
+    list.sort((a, b) => parseInt(a.slot.slice(1)) - parseInt(b.slot.slice(1)));
+    adminCuartosCache = list;
+  } catch (e) {
+    console.error('Error cargando Cuartos:', e);
+    body.innerHTML = `<div class="admin16-loading" style="color:var(--accent)">❌ ${e.message || 'Error al cargar los cruces.'}</div>`;
+    adminCuartosCache = [];
+  }
+}
+
+function renderAdminCuartosModal() {
+  const body = document.getElementById('adminCuartosBody');
+  if (!adminCuartosCache.length) {
+    body.innerHTML = `<div class="admin16-loading">No hay cruces capturados todavía en la hoja "Cuartos".</div>`;
+    return;
+  }
+
+  body.innerHTML = adminCuartosCache.map((m, idx) => {
+    const estClass = m.estado === 'LIVE' ? 'live' : m.estado === 'FIN' ? 'fin' : 'sched';
+    const golAView = (m.estado === 'FIN' && m.golA === '') ? '0' : m.golA;
+    const golBView = (m.estado === 'FIN' && m.golB === '') ? '0' : m.golB;
+    return `<div class="admin16-row" id="adminCuartosrow-${idx}">
+      <div class="admin16-row-head">
+        <span class="admin16-slot">${m.slot}</span>
+        <span class="admin16-estado-tag ${estClass}" id="adminCuartostag-${idx}">${m.estado}</span>
+      </div>
+      <div class="admin16-grid">
+        <input class="admin16-team-input" id="adminCuartos-eqA-${idx}" value="${m.equipoA}" placeholder="Equipo A">
+        <input class="admin16-gol-input" id="adminCuartos-golA-${idx}" value="${golAView}" placeholder="-" inputmode="numeric">
+        <span class="admin16-sep">VS</span>
+        <input class="admin16-gol-input" id="adminCuartos-golB-${idx}" value="${golBView}" placeholder="-" inputmode="numeric">
+        <input class="admin16-team-input" id="adminCuartos-eqB-${idx}" value="${m.equipoB}" placeholder="Equipo B">
+      </div>
+      <div class="admin16-extra-row">
+        <select class="admin16-select" id="adminCuartos-estado-${idx}">
+          <option value="SCHED"${m.estado==='SCHED'?' selected':''}>SCHED — Sin jugar</option>
+          <option value="LIVE"${m.estado==='LIVE'?' selected':''}>LIVE — En vivo</option>
+          <option value="FIN"${m.estado==='FIN'?' selected':''}>FIN — Finalizado</option>
+        </select>
+        <input class="admin16-fecha-input" id="adminCuartos-fecha-${idx}" value="${m.fecha}" placeholder="Ej: 12 - 3:00pm">
+        <button class="admin16-save-btn" onclick="saveAdminCuartosRow(${idx})">💾 Guardar</button>
+      </div>
+      <div class="admin16-row-status" id="adminCuartos-status-${idx}"></div>
+    </div>`;
+  }).join('');
+}
+
+async function saveAdminCuartosRow(idx) {
+  const m = adminCuartosCache[idx];
+  const statusEl = document.getElementById(`adminCuartos-status-${idx}`);
+  const btn = document.querySelector(`#adminCuartosrow-${idx} .admin16-save-btn`);
+
+  const payload = {
+    clave: ADMIN_PASSWORD,
+    fase: 'cuartos',
+    slot: m.slot,
+    equipoA: document.getElementById(`adminCuartos-eqA-${idx}`).value.trim(),
+    equipoB: document.getElementById(`adminCuartos-eqB-${idx}`).value.trim(),
+    golA: document.getElementById(`adminCuartos-golA-${idx}`).value.trim(),
+    golB: document.getElementById(`adminCuartos-golB-${idx}`).value.trim(),
+    estado: document.getElementById(`adminCuartos-estado-${idx}`).value,
+    fecha: document.getElementById(`adminCuartos-fecha-${idx}`).value.trim(),
+  };
+
+  if (ADMIN16_SCRIPT_URL.includes('PEGA_AQUI')) {
+    statusEl.textContent = '⚠️ Falta configurar ADMIN16_SCRIPT_URL en el código.';
+    statusEl.className = 'admin16-row-status err';
+    return;
+  }
+
+  btn.disabled = true;
+  statusEl.textContent = 'Guardando...';
+  statusEl.className = 'admin16-row-status';
+
+  try {
+    const r = await fetch(ADMIN16_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+    });
+    const data = await r.json();
+    if (data.ok) {
+      statusEl.textContent = `✅ ${m.slot} guardado correctamente.`;
+      statusEl.className = 'admin16-row-status ok';
+      const tag = document.getElementById(`adminCuartostag-${idx}`);
+      tag.textContent = payload.estado;
+      tag.className = 'admin16-estado-tag ' + (payload.estado === 'LIVE' ? 'live' : payload.estado === 'FIN' ? 'fin' : 'sched');
+      // Actualizar caché local
+      adminCuartosCache[idx] = { ...m, ...payload };
+    } else {
+      statusEl.textContent = `❌ ${data.error || 'Error al guardar.'}`;
+      statusEl.className = 'admin16-row-status err';
+    }
+  } catch (e) {
+    console.error('Error guardando cruce Cuartos:', e);
+    statusEl.textContent = '❌ No se pudo conectar con el servidor.';
+    statusEl.className = 'admin16-row-status err';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+
+// ══════════════════════════════════════════════════════
+//  ADMIN: ACTUALIZAR RESULTADOS SEMIS (protegido por clave)
+//  (mismo patrón que el bloque ADMIN de 16avos, reutiliza ADMIN_PASSWORD
+//   y ADMIN16_SCRIPT_URL — es el mismo backend/deploy para todas las fases)
+// ══════════════════════════════════════════════════════
+function adminPromptUpdateResultsSemis() {
+  const pass = prompt('🔐 Ingresa la contraseña de administrador:');
+  if (pass === null) return; // cancelado
+  if (pass !== ADMIN_PASSWORD) {
+    alert('❌ Contraseña incorrecta.');
+    return;
+  }
+  openAdminSemisModal();
+}
+
+async function openAdminSemisModal() {
+  document.getElementById('adminSemisOverlay').classList.add('active');
+  await fetchAdminSemisData();
+  renderAdminSemisModal();
+}
+
+function closeAdminSemisModal() {
+  document.getElementById('adminSemisOverlay').classList.remove('active');
+}
+
+async function fetchAdminSemisData() {
+  const body = document.getElementById('adminSemisBody');
+  try {
+    const r = await fetch(csvUrl(SID, GID_SEMIS));
+    if (!r.ok) throw new Error('No se pudo leer la hoja Semis');
+    const rows = parseCSV(await r.text());
+
+    // Buscar la fila de encabezados reales (Slot, EquipoA, EquipoB...)
+    let hdrIdx = -1;
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i][0] && rows[i][0].trim().toLowerCase() === 'slot') { hdrIdx = i; break; }
+    }
+    if (hdrIdx === -1) throw new Error('No encontré la fila de encabezados ("Slot") en la hoja Semis.');
+
+    const hdr = rows[hdrIdx].map(h => (h || '').trim().toLowerCase());
+    const iSlot = hdr.indexOf('slot');
+    const iEqA  = hdr.indexOf('equipoa');
+    const iEqB  = hdr.indexOf('equipob');
+    const iGolA = hdr.indexOf('gola');
+    const iGolB = hdr.indexOf('golb');
+    const iEst  = hdr.indexOf('estado');
+    const iFec  = hdr.indexOf('fecha');
+
+    const list = [];
+    for (let i = hdrIdx + 1; i < rows.length; i++) {
+      const row = rows[i];
+      const slot = (row[iSlot] || '').trim();
+      if (!/^S\\d{1,2}$/i.test(slot)) continue;
+      list.push({
+        slot: slot.toUpperCase(),
+        equipoA: (row[iEqA] || '').trim(),
+        equipoB: (row[iEqB] || '').trim(),
+        golA: (row[iGolA] || '').trim(),
+        golB: (row[iGolB] || '').trim(),
+        estado: (row[iEst] || 'SCHED').trim().toUpperCase(),
+        fecha: (row[iFec] || '').trim(),
+      });
+    }
+    // Ordenar S1..SN numéricamente
+    list.sort((a, b) => parseInt(a.slot.slice(1)) - parseInt(b.slot.slice(1)));
+    adminSemisCache = list;
+  } catch (e) {
+    console.error('Error cargando Semis:', e);
+    body.innerHTML = `<div class="admin16-loading" style="color:var(--accent)">❌ ${e.message || 'Error al cargar los cruces.'}</div>`;
+    adminSemisCache = [];
+  }
+}
+
+function renderAdminSemisModal() {
+  const body = document.getElementById('adminSemisBody');
+  if (!adminSemisCache.length) {
+    body.innerHTML = `<div class="admin16-loading">No hay cruces capturados todavía en la hoja "Semis".</div>`;
+    return;
+  }
+
+  body.innerHTML = adminSemisCache.map((m, idx) => {
+    const estClass = m.estado === 'LIVE' ? 'live' : m.estado === 'FIN' ? 'fin' : 'sched';
+    const golAView = (m.estado === 'FIN' && m.golA === '') ? '0' : m.golA;
+    const golBView = (m.estado === 'FIN' && m.golB === '') ? '0' : m.golB;
+    return `<div class="admin16-row" id="adminSemisrow-${idx}">
+      <div class="admin16-row-head">
+        <span class="admin16-slot">${m.slot}</span>
+        <span class="admin16-estado-tag ${estClass}" id="adminSemistag-${idx}">${m.estado}</span>
+      </div>
+      <div class="admin16-grid">
+        <input class="admin16-team-input" id="adminSemis-eqA-${idx}" value="${m.equipoA}" placeholder="Equipo A">
+        <input class="admin16-gol-input" id="adminSemis-golA-${idx}" value="${golAView}" placeholder="-" inputmode="numeric">
+        <span class="admin16-sep">VS</span>
+        <input class="admin16-gol-input" id="adminSemis-golB-${idx}" value="${golBView}" placeholder="-" inputmode="numeric">
+        <input class="admin16-team-input" id="adminSemis-eqB-${idx}" value="${m.equipoB}" placeholder="Equipo B">
+      </div>
+      <div class="admin16-extra-row">
+        <select class="admin16-select" id="adminSemis-estado-${idx}">
+          <option value="SCHED"${m.estado==='SCHED'?' selected':''}>SCHED — Sin jugar</option>
+          <option value="LIVE"${m.estado==='LIVE'?' selected':''}>LIVE — En vivo</option>
+          <option value="FIN"${m.estado==='FIN'?' selected':''}>FIN — Finalizado</option>
+        </select>
+        <input class="admin16-fecha-input" id="adminSemis-fecha-${idx}" value="${m.fecha}" placeholder="Ej: 12 - 3:00pm">
+        <button class="admin16-save-btn" onclick="saveAdminSemisRow(${idx})">💾 Guardar</button>
+      </div>
+      <div class="admin16-row-status" id="adminSemis-status-${idx}"></div>
+    </div>`;
+  }).join('');
+}
+
+async function saveAdminSemisRow(idx) {
+  const m = adminSemisCache[idx];
+  const statusEl = document.getElementById(`adminSemis-status-${idx}`);
+  const btn = document.querySelector(`#adminSemisrow-${idx} .admin16-save-btn`);
+
+  const payload = {
+    clave: ADMIN_PASSWORD,
+    fase: 'semis',
+    slot: m.slot,
+    equipoA: document.getElementById(`adminSemis-eqA-${idx}`).value.trim(),
+    equipoB: document.getElementById(`adminSemis-eqB-${idx}`).value.trim(),
+    golA: document.getElementById(`adminSemis-golA-${idx}`).value.trim(),
+    golB: document.getElementById(`adminSemis-golB-${idx}`).value.trim(),
+    estado: document.getElementById(`adminSemis-estado-${idx}`).value,
+    fecha: document.getElementById(`adminSemis-fecha-${idx}`).value.trim(),
+  };
+
+  if (ADMIN16_SCRIPT_URL.includes('PEGA_AQUI')) {
+    statusEl.textContent = '⚠️ Falta configurar ADMIN16_SCRIPT_URL en el código.';
+    statusEl.className = 'admin16-row-status err';
+    return;
+  }
+
+  btn.disabled = true;
+  statusEl.textContent = 'Guardando...';
+  statusEl.className = 'admin16-row-status';
+
+  try {
+    const r = await fetch(ADMIN16_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+    });
+    const data = await r.json();
+    if (data.ok) {
+      statusEl.textContent = `✅ ${m.slot} guardado correctamente.`;
+      statusEl.className = 'admin16-row-status ok';
+      const tag = document.getElementById(`adminSemistag-${idx}`);
+      tag.textContent = payload.estado;
+      tag.className = 'admin16-estado-tag ' + (payload.estado === 'LIVE' ? 'live' : payload.estado === 'FIN' ? 'fin' : 'sched');
+      // Actualizar caché local
+      adminSemisCache[idx] = { ...m, ...payload };
+    } else {
+      statusEl.textContent = `❌ ${data.error || 'Error al guardar.'}`;
+      statusEl.className = 'admin16-row-status err';
+    }
+  } catch (e) {
+    console.error('Error guardando cruce Semis:', e);
+    statusEl.textContent = '❌ No se pudo conectar con el servidor.';
+    statusEl.className = 'admin16-row-status err';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+
+// ══════════════════════════════════════════════════════
+//  ADMIN: ACTUALIZAR RESULTADOS FINAL (protegido por clave)
+//  (mismo patrón que el bloque ADMIN de 16avos, reutiliza ADMIN_PASSWORD
+//   y ADMIN16_SCRIPT_URL — es el mismo backend/deploy para todas las fases)
+// ══════════════════════════════════════════════════════
+function adminPromptUpdateResultsFinal() {
+  const pass = prompt('🔐 Ingresa la contraseña de administrador:');
+  if (pass === null) return; // cancelado
+  if (pass !== ADMIN_PASSWORD) {
+    alert('❌ Contraseña incorrecta.');
+    return;
+  }
+  openAdminFinalModal();
+}
+
+async function openAdminFinalModal() {
+  document.getElementById('adminFinalOverlay').classList.add('active');
+  await fetchAdminFinalData();
+  renderAdminFinalModal();
+}
+
+function closeAdminFinalModal() {
+  document.getElementById('adminFinalOverlay').classList.remove('active');
+}
+
+async function fetchAdminFinalData() {
+  const body = document.getElementById('adminFinalBody');
+  try {
+    const r = await fetch(csvUrl(SID, GID_FINAL));
+    if (!r.ok) throw new Error('No se pudo leer la hoja Final');
+    const rows = parseCSV(await r.text());
+
+    // Buscar la fila de encabezados reales (Slot, EquipoA, EquipoB...)
+    let hdrIdx = -1;
+    for (let i = 0; i < rows.length; i++) {
+      if (rows[i][0] && rows[i][0].trim().toLowerCase() === 'slot') { hdrIdx = i; break; }
+    }
+    if (hdrIdx === -1) throw new Error('No encontré la fila de encabezados ("Slot") en la hoja Final.');
+
+    const hdr = rows[hdrIdx].map(h => (h || '').trim().toLowerCase());
+    const iSlot = hdr.indexOf('slot');
+    const iEqA  = hdr.indexOf('equipoa');
+    const iEqB  = hdr.indexOf('equipob');
+    const iGolA = hdr.indexOf('gola');
+    const iGolB = hdr.indexOf('golb');
+    const iEst  = hdr.indexOf('estado');
+    const iFec  = hdr.indexOf('fecha');
+
+    const list = [];
+    for (let i = hdrIdx + 1; i < rows.length; i++) {
+      const row = rows[i];
+      const slot = (row[iSlot] || '').trim();
+      if (!/^F\\d{1,2}$/i.test(slot)) continue;
+      list.push({
+        slot: slot.toUpperCase(),
+        equipoA: (row[iEqA] || '').trim(),
+        equipoB: (row[iEqB] || '').trim(),
+        golA: (row[iGolA] || '').trim(),
+        golB: (row[iGolB] || '').trim(),
+        estado: (row[iEst] || 'SCHED').trim().toUpperCase(),
+        fecha: (row[iFec] || '').trim(),
+      });
+    }
+    // Ordenar F1..FN numéricamente
+    list.sort((a, b) => parseInt(a.slot.slice(1)) - parseInt(b.slot.slice(1)));
+    adminFinalCache = list;
+  } catch (e) {
+    console.error('Error cargando Final:', e);
+    body.innerHTML = `<div class="admin16-loading" style="color:var(--accent)">❌ ${e.message || 'Error al cargar los cruces.'}</div>`;
+    adminFinalCache = [];
+  }
+}
+
+function renderAdminFinalModal() {
+  const body = document.getElementById('adminFinalBody');
+  if (!adminFinalCache.length) {
+    body.innerHTML = `<div class="admin16-loading">No hay cruces capturados todavía en la hoja "Final".</div>`;
+    return;
+  }
+
+  body.innerHTML = adminFinalCache.map((m, idx) => {
+    const estClass = m.estado === 'LIVE' ? 'live' : m.estado === 'FIN' ? 'fin' : 'sched';
+    const golAView = (m.estado === 'FIN' && m.golA === '') ? '0' : m.golA;
+    const golBView = (m.estado === 'FIN' && m.golB === '') ? '0' : m.golB;
+    return `<div class="admin16-row" id="adminFinalrow-${idx}">
+      <div class="admin16-row-head">
+        <span class="admin16-slot">${m.slot}</span>
+        <span class="admin16-estado-tag ${estClass}" id="adminFinaltag-${idx}">${m.estado}</span>
+      </div>
+      <div class="admin16-grid">
+        <input class="admin16-team-input" id="adminFinal-eqA-${idx}" value="${m.equipoA}" placeholder="Equipo A">
+        <input class="admin16-gol-input" id="adminFinal-golA-${idx}" value="${golAView}" placeholder="-" inputmode="numeric">
+        <span class="admin16-sep">VS</span>
+        <input class="admin16-gol-input" id="adminFinal-golB-${idx}" value="${golBView}" placeholder="-" inputmode="numeric">
+        <input class="admin16-team-input" id="adminFinal-eqB-${idx}" value="${m.equipoB}" placeholder="Equipo B">
+      </div>
+      <div class="admin16-extra-row">
+        <select class="admin16-select" id="adminFinal-estado-${idx}">
+          <option value="SCHED"${m.estado==='SCHED'?' selected':''}>SCHED — Sin jugar</option>
+          <option value="LIVE"${m.estado==='LIVE'?' selected':''}>LIVE — En vivo</option>
+          <option value="FIN"${m.estado==='FIN'?' selected':''}>FIN — Finalizado</option>
+        </select>
+        <input class="admin16-fecha-input" id="adminFinal-fecha-${idx}" value="${m.fecha}" placeholder="Ej: 12 - 3:00pm">
+        <button class="admin16-save-btn" onclick="saveAdminFinalRow(${idx})">💾 Guardar</button>
+      </div>
+      <div class="admin16-row-status" id="adminFinal-status-${idx}"></div>
+    </div>`;
+  }).join('');
+}
+
+async function saveAdminFinalRow(idx) {
+  const m = adminFinalCache[idx];
+  const statusEl = document.getElementById(`adminFinal-status-${idx}`);
+  const btn = document.querySelector(`#adminFinalrow-${idx} .admin16-save-btn`);
+
+  const payload = {
+    clave: ADMIN_PASSWORD,
+    fase: 'final',
+    slot: m.slot,
+    equipoA: document.getElementById(`adminFinal-eqA-${idx}`).value.trim(),
+    equipoB: document.getElementById(`adminFinal-eqB-${idx}`).value.trim(),
+    golA: document.getElementById(`adminFinal-golA-${idx}`).value.trim(),
+    golB: document.getElementById(`adminFinal-golB-${idx}`).value.trim(),
+    estado: document.getElementById(`adminFinal-estado-${idx}`).value,
+    fecha: document.getElementById(`adminFinal-fecha-${idx}`).value.trim(),
+  };
+
+  if (ADMIN16_SCRIPT_URL.includes('PEGA_AQUI')) {
+    statusEl.textContent = '⚠️ Falta configurar ADMIN16_SCRIPT_URL en el código.';
+    statusEl.className = 'admin16-row-status err';
+    return;
+  }
+
+  btn.disabled = true;
+  statusEl.textContent = 'Guardando...';
+  statusEl.className = 'admin16-row-status';
+
+  try {
+    const r = await fetch(ADMIN16_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+    });
+    const data = await r.json();
+    if (data.ok) {
+      statusEl.textContent = `✅ ${m.slot} guardado correctamente.`;
+      statusEl.className = 'admin16-row-status ok';
+      const tag = document.getElementById(`adminFinaltag-${idx}`);
+      tag.textContent = payload.estado;
+      tag.className = 'admin16-estado-tag ' + (payload.estado === 'LIVE' ? 'live' : payload.estado === 'FIN' ? 'fin' : 'sched');
+      // Actualizar caché local
+      adminFinalCache[idx] = { ...m, ...payload };
+    } else {
+      statusEl.textContent = `❌ ${data.error || 'Error al guardar.'}`;
+      statusEl.className = 'admin16-row-status err';
+    }
+  } catch (e) {
+    console.error('Error guardando cruce Final:', e);
+    statusEl.textContent = '❌ No se pudo conectar con el servidor.';
+    statusEl.className = 'admin16-row-status err';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
 // ══════════════════════════════════════════════════════
 //  ARRANQUE
 // ══════════════════════════════════════════════════════
@@ -6424,7 +7262,942 @@ async function enviarPred16Slot(slot) {
     pred16Sending.delete(slot);
   }
 }
+
+// ══════════════════════════════════════════════════════
+//  FORMULARIO PÚBLICO: PREDICCIONES OCTAVOS (POR PARTIDO)
+//  (mismo patrón que el bloque de 16avos, reutiliza PRED16_SCRIPT_URL
+//   porque es el mismo backend/deploy para todas las fases; se distingue
+//   con "fase": 'octavos' en el payload)
+// ══════════════════════════════════════════════════════
+let predOctavosCruces          = [];
+let predOctavosLoaded          = false;
+const predOctavosSending       = new Set();   // slots cuyo fetch está en curso
+let predOctavosSubmittedSlots  = new Set();   // slots enviados esta sesión
+
+/* ── localStorage: guardar y recuperar slots enviados por usuario ── */
+function predOctavosStoreKey(nombre, tel) {
+  return 'po_' + (nombre + '|' + tel).trim().toLowerCase().replace(/[^a-z0-9|]/gi, '_');
+}
+function predOctavosGetSaved() {
+  const n = (document.getElementById('pOctavosNombre')?.value  || '').trim();
+  const t = (document.getElementById('pOctavosTelefono')?.value || '').trim();
+  if (!n || !t) return new Set();
+  try { return new Set(JSON.parse(localStorage.getItem(predOctavosStoreKey(n, t)) || '[]')); }
+  catch(e) { return new Set(); }
+}
+function predOctavosPersistSlot(slot) {
+  const n = (document.getElementById('pOctavosNombre')?.value  || '').trim();
+  const t = (document.getElementById('pOctavosTelefono')?.value || '').trim();
+  if (!n || !t) return;
+  try {
+    const key = predOctavosStoreKey(n, t);
+    const arr = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!arr.includes(slot)) arr.push(slot);
+    localStorage.setItem(key, JSON.stringify(arr));
+  } catch(e) {}
+}
+
+/* ── bloquear visualmente un slot ya enviado ── */
+function predOctavosLockSlotUI(slot) {
+  const card   = document.getElementById(`predOctavos-card-${slot}`);
+  const golA   = document.getElementById(`pOctavos-golA-${slot}`);
+  const golB   = document.getElementById(`pOctavos-golB-${slot}`);
+  const btnRow = document.getElementById(`predOctavos-btnrow-${slot}`);
+  const tag    = document.getElementById(`predOctavos-tag-${slot}`);
+
+  if (card)   card.classList.add('locked');
+  if (golA)   golA.disabled = true;
+  if (golB)   golB.disabled = true;
+  if (tag)  { tag.textContent = '✅ ENVIADO'; tag.className = 'pred16-lock-tag'; }
+  if (btnRow) btnRow.innerHTML =
+    `<div class="pred16-status ok" id="predOctavos-status-${slot}">✅ Predicción guardada para este partido.</div>`;
+}
+
+/* ── refrescar locks cuando el usuario escribe nombre / teléfono ── */
+function predOctavosRefreshLocks() {
+  predOctavosSubmittedSlots = predOctavosGetSaved();
+  predOctavosSubmittedSlots.forEach(predOctavosLockSlotUI);
+}
+
+/* ── inicializar la sección ── */
+async function initPredOctavosForm() {
+  // Ocultar el botón global (reemplazado por botones por partido)
+  const globalBtn = document.getElementById('predOctavosSubmitBtn');
+  if (globalBtn) globalBtn.style.display = 'none';
+
+  if (predOctavosLoaded) { predOctavosRefreshLocks(); return; }
+
+  await fetchPredOctavosCruces();
+  renderPredOctavosForm();
+
+  // Aplicar locks cuando el usuario rellene nombre / teléfono
+  ['pOctavosNombre', 'pOctavosTelefono'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.addEventListener('change', predOctavosRefreshLocks); el.addEventListener('blur', predOctavosRefreshLocks); }
+  });
+
+  predOctavosLoaded = true;
+}
+
+/* ── consultar cruces al servidor ── */
+async function fetchPredOctavosCruces() {
+  const listEl = document.getElementById('predOctavosCrucesList');
+  try {
+    const r = await fetch(PRED16_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ accion: 'consultarCrucesOctavos' }),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+    });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error || 'No se pudieron cargar los cruces.');
+    predOctavosCruces = data.cruces || [];
+  } catch(e) {
+    console.error('Error cargando cruces Octavos:', e);
+    if (listEl) listEl.innerHTML =
+      `<div class="pred16-empty-msg" style="color:var(--accent)">❌ ${e.message || 'No se pudieron cargar los cruces.'}</div>`;
+    predOctavosCruces = [];
+  }
+}
+
+/* ── pintar el formulario ── */
+function renderPredOctavosForm() {
+  const listEl = document.getElementById('predOctavosCrucesList');
+  const globalBtn = document.getElementById('predOctavosSubmitBtn');
+  if (globalBtn) globalBtn.style.display = 'none';
+
+  if (!predOctavosCruces.length) {
+    listEl.innerHTML = `<div class="pred16-empty-msg">Aún no hay cruces capturados. Vuelve más tarde.</div>`;
+    return;
+  }
+  if (predOctavosCruces.every(c => !c.equipoA || !c.equipoB)) {
+    listEl.innerHTML = `<div class="pred16-empty-msg">⏳ Los cruces todavía no están definidos. Vuelve cuando termine la ronda anterior.</div>`;
+    return;
+  }
+
+  predOctavosSubmittedSlots = predOctavosGetSaved();
+
+  listEl.innerHTML = predOctavosCruces.map(c => {
+    const serverLocked = c.estado === 'LIVE' || c.estado === 'FIN';
+    const submitted    = predOctavosSubmittedSlots.has(c.slot);
+    const locked       = serverLocked || submitted;
+
+    const tagLabel = submitted           ? '✅ ENVIADO'
+                   : c.estado === 'LIVE' ? 'EN VIVO'
+                   : c.estado === 'FIN'  ? 'FINALIZADO'
+                   : 'ABIERTO';
+    const tagCls   = submitted ? '' : c.estado === 'LIVE' ? 'live' : c.estado === 'FIN' ? 'fin' : '';
+    const flagA = fl(c.equipoA), flagB = fl(c.equipoB);
+
+    if (!c.equipoA || !c.equipoB) return `
+      <div class="pred16-cruce-card locked">
+        <div class="pred16-cruce-head">
+          <span class="pred16-slot-tag">${c.slot}</span>
+          <span class="pred16-lock-tag">POR DEFINIR</span>
+        </div>
+        <div style="font-size:13px;color:var(--muted);font-style:italic;padding:8px 0">Equipos aún no confirmados</div>
+      </div>`;
+
+    const actionHTML = locked
+      ? `<div class="pred16-status ${submitted ? 'ok' : ''}" id="predOctavos-status-${c.slot}"
+           style="margin-top:8px;text-align:right">
+           ${submitted ? '✅ Predicción guardada para este partido.' : '🔒 Partido cerrado.'}
+         </div>`
+      : `<div id="predOctavos-btnrow-${c.slot}"
+             style="display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:10px;flex-wrap:wrap">
+           <span class="pred16-status" id="predOctavos-status-${c.slot}" style="flex:1;min-width:0"></span>
+           <button class="fb-submit" id="predOctavos-btn-${c.slot}"
+             onclick="enviarPredOctavosSlot('${c.slot}')"
+             style="width:auto;padding:9px 22px;margin:0;flex-shrink:0">
+             Enviar ${c.slot} 🚀
+           </button>
+         </div>`;
+
+    return `
+      <div class="pred16-cruce-card${locked ? ' locked' : ''}" id="predOctavos-card-${c.slot}">
+        <div class="pred16-cruce-head">
+          <span class="pred16-slot-tag">${c.slot}</span>
+          <span class="pred16-lock-tag ${tagCls}" id="predOctavos-tag-${c.slot}">${tagLabel}</span>
+        </div>
+        <div class="pred16-teams-row">
+          <span class="pred16-team-name">${flagA} ${c.equipoA}</span>
+          <input class="pred16-gol-input" id="pOctavos-golA-${c.slot}" type="number" min="0" max="20"
+            ${locked ? 'disabled' : ''} placeholder="-">
+          <span class="pred16-vs">VS</span>
+          <input class="pred16-gol-input" id="pOctavos-golB-${c.slot}" type="number" min="0" max="20"
+            ${locked ? 'disabled' : ''} placeholder="-">
+          <span class="pred16-team-name">${c.equipoB} ${flagB}</span>
+        </div>
+        ${actionHTML}
+      </div>`;
+  }).join('');
+}
+
+/* ── enviar predicción de UN solo partido ── */
+async function enviarPredOctavosSlot(slot) {
+  if (predOctavosSending.has(slot)) return;
+
+  const statusEl = document.getElementById(`predOctavos-status-${slot}`);
+  const btn      = document.getElementById(`predOctavos-btn-${slot}`);
+  const nombre   = (document.getElementById('pOctavosNombre')?.value  || '').trim();
+  const telefono = (document.getElementById('pOctavosTelefono')?.value || '').trim();
+
+  const setStatus = (msg, cls) => {
+    if (!statusEl) return;
+    statusEl.textContent = msg;
+    statusEl.className   = `pred16-status${cls ? ' ' + cls : ''}`;
+  };
+
+  if (!nombre || !telefono) {
+    setStatus('⚠️ Escribe tu nombre y teléfono primero.', 'err');
+    document.getElementById('pOctavosNombre')?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('pOctavosNombre')?.focus();
+    return;
+  }
+
+  const golA = (document.getElementById(`pOctavos-golA-${slot}`)?.value || '').trim();
+  const golB = (document.getElementById(`pOctavos-golB-${slot}`)?.value || '').trim();
+
+  if (!golA || !golB)  { setStatus('⚠️ Escribe los dos marcadores.', 'err'); return; }
+  if (isNaN(Number(golA)) || isNaN(Number(golB)) || Number(golA) < 0 || Number(golB) < 0) {
+    setStatus('⚠️ Marcadores inválidos.', 'err'); return;
+  }
+
+  predOctavosSending.add(slot);
+  if (btn) btn.disabled = true;
+  setStatus('Enviando…', '');
+
+  try {
+    const res  = await fetch(PRED16_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        nombre,
+        telefono,
+        fase: 'octavos',
+        picks: { [slot]: `${parseInt(golA, 10)}-${parseInt(golB, 10)}` }
+      }),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      predOctavosSubmittedSlots.add(slot);
+      predOctavosPersistSlot(slot);
+      predOctavosLockSlotUI(slot);
+    } else {
+      setStatus(`❌ ${data.error || 'No se pudo guardar.'}`, 'err');
+      if (btn) btn.disabled = false;
+    }
+  } catch(e) {
+    console.error('Error enviando pick:', e);
+    setStatus('❌ Error de conexión. Intenta de nuevo.', 'err');
+    if (btn) btn.disabled = false;
+  } finally {
+    predOctavosSending.delete(slot);
+  }
+}
+
+
+// ══════════════════════════════════════════════════════
+//  FORMULARIO PÚBLICO: PREDICCIONES CUARTOS (POR PARTIDO)
+//  (mismo patrón que el bloque de 16avos, reutiliza PRED16_SCRIPT_URL
+//   porque es el mismo backend/deploy para todas las fases; se distingue
+//   con "fase": 'cuartos' en el payload)
+// ══════════════════════════════════════════════════════
+let predCuartosCruces          = [];
+let predCuartosLoaded          = false;
+const predCuartosSending       = new Set();   // slots cuyo fetch está en curso
+let predCuartosSubmittedSlots  = new Set();   // slots enviados esta sesión
+
+/* ── localStorage: guardar y recuperar slots enviados por usuario ── */
+function predCuartosStoreKey(nombre, tel) {
+  return 'pc_' + (nombre + '|' + tel).trim().toLowerCase().replace(/[^a-z0-9|]/gi, '_');
+}
+function predCuartosGetSaved() {
+  const n = (document.getElementById('pCuartosNombre')?.value  || '').trim();
+  const t = (document.getElementById('pCuartosTelefono')?.value || '').trim();
+  if (!n || !t) return new Set();
+  try { return new Set(JSON.parse(localStorage.getItem(predCuartosStoreKey(n, t)) || '[]')); }
+  catch(e) { return new Set(); }
+}
+function predCuartosPersistSlot(slot) {
+  const n = (document.getElementById('pCuartosNombre')?.value  || '').trim();
+  const t = (document.getElementById('pCuartosTelefono')?.value || '').trim();
+  if (!n || !t) return;
+  try {
+    const key = predCuartosStoreKey(n, t);
+    const arr = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!arr.includes(slot)) arr.push(slot);
+    localStorage.setItem(key, JSON.stringify(arr));
+  } catch(e) {}
+}
+
+/* ── bloquear visualmente un slot ya enviado ── */
+function predCuartosLockSlotUI(slot) {
+  const card   = document.getElementById(`predCuartos-card-${slot}`);
+  const golA   = document.getElementById(`pCuartos-golA-${slot}`);
+  const golB   = document.getElementById(`pCuartos-golB-${slot}`);
+  const btnRow = document.getElementById(`predCuartos-btnrow-${slot}`);
+  const tag    = document.getElementById(`predCuartos-tag-${slot}`);
+
+  if (card)   card.classList.add('locked');
+  if (golA)   golA.disabled = true;
+  if (golB)   golB.disabled = true;
+  if (tag)  { tag.textContent = '✅ ENVIADO'; tag.className = 'pred16-lock-tag'; }
+  if (btnRow) btnRow.innerHTML =
+    `<div class="pred16-status ok" id="predCuartos-status-${slot}">✅ Predicción guardada para este partido.</div>`;
+}
+
+/* ── refrescar locks cuando el usuario escribe nombre / teléfono ── */
+function predCuartosRefreshLocks() {
+  predCuartosSubmittedSlots = predCuartosGetSaved();
+  predCuartosSubmittedSlots.forEach(predCuartosLockSlotUI);
+}
+
+/* ── inicializar la sección ── */
+async function initPredCuartosForm() {
+  // Ocultar el botón global (reemplazado por botones por partido)
+  const globalBtn = document.getElementById('predCuartosSubmitBtn');
+  if (globalBtn) globalBtn.style.display = 'none';
+
+  if (predCuartosLoaded) { predCuartosRefreshLocks(); return; }
+
+  await fetchPredCuartosCruces();
+  renderPredCuartosForm();
+
+  // Aplicar locks cuando el usuario rellene nombre / teléfono
+  ['pCuartosNombre', 'pCuartosTelefono'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.addEventListener('change', predCuartosRefreshLocks); el.addEventListener('blur', predCuartosRefreshLocks); }
+  });
+
+  predCuartosLoaded = true;
+}
+
+/* ── consultar cruces al servidor ── */
+async function fetchPredCuartosCruces() {
+  const listEl = document.getElementById('predCuartosCrucesList');
+  try {
+    const r = await fetch(PRED16_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ accion: 'consultarCrucesCuartos' }),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+    });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error || 'No se pudieron cargar los cruces.');
+    predCuartosCruces = data.cruces || [];
+  } catch(e) {
+    console.error('Error cargando cruces Cuartos:', e);
+    if (listEl) listEl.innerHTML =
+      `<div class="pred16-empty-msg" style="color:var(--accent)">❌ ${e.message || 'No se pudieron cargar los cruces.'}</div>`;
+    predCuartosCruces = [];
+  }
+}
+
+/* ── pintar el formulario ── */
+function renderPredCuartosForm() {
+  const listEl = document.getElementById('predCuartosCrucesList');
+  const globalBtn = document.getElementById('predCuartosSubmitBtn');
+  if (globalBtn) globalBtn.style.display = 'none';
+
+  if (!predCuartosCruces.length) {
+    listEl.innerHTML = `<div class="pred16-empty-msg">Aún no hay cruces capturados. Vuelve más tarde.</div>`;
+    return;
+  }
+  if (predCuartosCruces.every(c => !c.equipoA || !c.equipoB)) {
+    listEl.innerHTML = `<div class="pred16-empty-msg">⏳ Los cruces todavía no están definidos. Vuelve cuando termine la ronda anterior.</div>`;
+    return;
+  }
+
+  predCuartosSubmittedSlots = predCuartosGetSaved();
+
+  listEl.innerHTML = predCuartosCruces.map(c => {
+    const serverLocked = c.estado === 'LIVE' || c.estado === 'FIN';
+    const submitted    = predCuartosSubmittedSlots.has(c.slot);
+    const locked       = serverLocked || submitted;
+
+    const tagLabel = submitted           ? '✅ ENVIADO'
+                   : c.estado === 'LIVE' ? 'EN VIVO'
+                   : c.estado === 'FIN'  ? 'FINALIZADO'
+                   : 'ABIERTO';
+    const tagCls   = submitted ? '' : c.estado === 'LIVE' ? 'live' : c.estado === 'FIN' ? 'fin' : '';
+    const flagA = fl(c.equipoA), flagB = fl(c.equipoB);
+
+    if (!c.equipoA || !c.equipoB) return `
+      <div class="pred16-cruce-card locked">
+        <div class="pred16-cruce-head">
+          <span class="pred16-slot-tag">${c.slot}</span>
+          <span class="pred16-lock-tag">POR DEFINIR</span>
+        </div>
+        <div style="font-size:13px;color:var(--muted);font-style:italic;padding:8px 0">Equipos aún no confirmados</div>
+      </div>`;
+
+    const actionHTML = locked
+      ? `<div class="pred16-status ${submitted ? 'ok' : ''}" id="predCuartos-status-${c.slot}"
+           style="margin-top:8px;text-align:right">
+           ${submitted ? '✅ Predicción guardada para este partido.' : '🔒 Partido cerrado.'}
+         </div>`
+      : `<div id="predCuartos-btnrow-${c.slot}"
+             style="display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:10px;flex-wrap:wrap">
+           <span class="pred16-status" id="predCuartos-status-${c.slot}" style="flex:1;min-width:0"></span>
+           <button class="fb-submit" id="predCuartos-btn-${c.slot}"
+             onclick="enviarPredCuartosSlot('${c.slot}')"
+             style="width:auto;padding:9px 22px;margin:0;flex-shrink:0">
+             Enviar ${c.slot} 🚀
+           </button>
+         </div>`;
+
+    return `
+      <div class="pred16-cruce-card${locked ? ' locked' : ''}" id="predCuartos-card-${c.slot}">
+        <div class="pred16-cruce-head">
+          <span class="pred16-slot-tag">${c.slot}</span>
+          <span class="pred16-lock-tag ${tagCls}" id="predCuartos-tag-${c.slot}">${tagLabel}</span>
+        </div>
+        <div class="pred16-teams-row">
+          <span class="pred16-team-name">${flagA} ${c.equipoA}</span>
+          <input class="pred16-gol-input" id="pCuartos-golA-${c.slot}" type="number" min="0" max="20"
+            ${locked ? 'disabled' : ''} placeholder="-">
+          <span class="pred16-vs">VS</span>
+          <input class="pred16-gol-input" id="pCuartos-golB-${c.slot}" type="number" min="0" max="20"
+            ${locked ? 'disabled' : ''} placeholder="-">
+          <span class="pred16-team-name">${c.equipoB} ${flagB}</span>
+        </div>
+        ${actionHTML}
+      </div>`;
+  }).join('');
+}
+
+/* ── enviar predicción de UN solo partido ── */
+async function enviarPredCuartosSlot(slot) {
+  if (predCuartosSending.has(slot)) return;
+
+  const statusEl = document.getElementById(`predCuartos-status-${slot}`);
+  const btn      = document.getElementById(`predCuartos-btn-${slot}`);
+  const nombre   = (document.getElementById('pCuartosNombre')?.value  || '').trim();
+  const telefono = (document.getElementById('pCuartosTelefono')?.value || '').trim();
+
+  const setStatus = (msg, cls) => {
+    if (!statusEl) return;
+    statusEl.textContent = msg;
+    statusEl.className   = `pred16-status${cls ? ' ' + cls : ''}`;
+  };
+
+  if (!nombre || !telefono) {
+    setStatus('⚠️ Escribe tu nombre y teléfono primero.', 'err');
+    document.getElementById('pCuartosNombre')?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('pCuartosNombre')?.focus();
+    return;
+  }
+
+  const golA = (document.getElementById(`pCuartos-golA-${slot}`)?.value || '').trim();
+  const golB = (document.getElementById(`pCuartos-golB-${slot}`)?.value || '').trim();
+
+  if (!golA || !golB)  { setStatus('⚠️ Escribe los dos marcadores.', 'err'); return; }
+  if (isNaN(Number(golA)) || isNaN(Number(golB)) || Number(golA) < 0 || Number(golB) < 0) {
+    setStatus('⚠️ Marcadores inválidos.', 'err'); return;
+  }
+
+  predCuartosSending.add(slot);
+  if (btn) btn.disabled = true;
+  setStatus('Enviando…', '');
+
+  try {
+    const res  = await fetch(PRED16_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        nombre,
+        telefono,
+        fase: 'cuartos',
+        picks: { [slot]: `${parseInt(golA, 10)}-${parseInt(golB, 10)}` }
+      }),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      predCuartosSubmittedSlots.add(slot);
+      predCuartosPersistSlot(slot);
+      predCuartosLockSlotUI(slot);
+    } else {
+      setStatus(`❌ ${data.error || 'No se pudo guardar.'}`, 'err');
+      if (btn) btn.disabled = false;
+    }
+  } catch(e) {
+    console.error('Error enviando pick:', e);
+    setStatus('❌ Error de conexión. Intenta de nuevo.', 'err');
+    if (btn) btn.disabled = false;
+  } finally {
+    predCuartosSending.delete(slot);
+  }
+}
+
+
+// ══════════════════════════════════════════════════════
+//  FORMULARIO PÚBLICO: PREDICCIONES SEMIS (POR PARTIDO)
+//  (mismo patrón que el bloque de 16avos, reutiliza PRED16_SCRIPT_URL
+//   porque es el mismo backend/deploy para todas las fases; se distingue
+//   con "fase": 'semis' en el payload)
+// ══════════════════════════════════════════════════════
+let predSemisCruces          = [];
+let predSemisLoaded          = false;
+const predSemisSending       = new Set();   // slots cuyo fetch está en curso
+let predSemisSubmittedSlots  = new Set();   // slots enviados esta sesión
+
+/* ── localStorage: guardar y recuperar slots enviados por usuario ── */
+function predSemisStoreKey(nombre, tel) {
+  return 'ps_' + (nombre + '|' + tel).trim().toLowerCase().replace(/[^a-z0-9|]/gi, '_');
+}
+function predSemisGetSaved() {
+  const n = (document.getElementById('pSemisNombre')?.value  || '').trim();
+  const t = (document.getElementById('pSemisTelefono')?.value || '').trim();
+  if (!n || !t) return new Set();
+  try { return new Set(JSON.parse(localStorage.getItem(predSemisStoreKey(n, t)) || '[]')); }
+  catch(e) { return new Set(); }
+}
+function predSemisPersistSlot(slot) {
+  const n = (document.getElementById('pSemisNombre')?.value  || '').trim();
+  const t = (document.getElementById('pSemisTelefono')?.value || '').trim();
+  if (!n || !t) return;
+  try {
+    const key = predSemisStoreKey(n, t);
+    const arr = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!arr.includes(slot)) arr.push(slot);
+    localStorage.setItem(key, JSON.stringify(arr));
+  } catch(e) {}
+}
+
+/* ── bloquear visualmente un slot ya enviado ── */
+function predSemisLockSlotUI(slot) {
+  const card   = document.getElementById(`predSemis-card-${slot}`);
+  const golA   = document.getElementById(`pSemis-golA-${slot}`);
+  const golB   = document.getElementById(`pSemis-golB-${slot}`);
+  const btnRow = document.getElementById(`predSemis-btnrow-${slot}`);
+  const tag    = document.getElementById(`predSemis-tag-${slot}`);
+
+  if (card)   card.classList.add('locked');
+  if (golA)   golA.disabled = true;
+  if (golB)   golB.disabled = true;
+  if (tag)  { tag.textContent = '✅ ENVIADO'; tag.className = 'pred16-lock-tag'; }
+  if (btnRow) btnRow.innerHTML =
+    `<div class="pred16-status ok" id="predSemis-status-${slot}">✅ Predicción guardada para este partido.</div>`;
+}
+
+/* ── refrescar locks cuando el usuario escribe nombre / teléfono ── */
+function predSemisRefreshLocks() {
+  predSemisSubmittedSlots = predSemisGetSaved();
+  predSemisSubmittedSlots.forEach(predSemisLockSlotUI);
+}
+
+/* ── inicializar la sección ── */
+async function initPredSemisForm() {
+  // Ocultar el botón global (reemplazado por botones por partido)
+  const globalBtn = document.getElementById('predSemisSubmitBtn');
+  if (globalBtn) globalBtn.style.display = 'none';
+
+  if (predSemisLoaded) { predSemisRefreshLocks(); return; }
+
+  await fetchPredSemisCruces();
+  renderPredSemisForm();
+
+  // Aplicar locks cuando el usuario rellene nombre / teléfono
+  ['pSemisNombre', 'pSemisTelefono'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.addEventListener('change', predSemisRefreshLocks); el.addEventListener('blur', predSemisRefreshLocks); }
+  });
+
+  predSemisLoaded = true;
+}
+
+/* ── consultar cruces al servidor ── */
+async function fetchPredSemisCruces() {
+  const listEl = document.getElementById('predSemisCrucesList');
+  try {
+    const r = await fetch(PRED16_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ accion: 'consultarCrucesSemis' }),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+    });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error || 'No se pudieron cargar los cruces.');
+    predSemisCruces = data.cruces || [];
+  } catch(e) {
+    console.error('Error cargando cruces Semis:', e);
+    if (listEl) listEl.innerHTML =
+      `<div class="pred16-empty-msg" style="color:var(--accent)">❌ ${e.message || 'No se pudieron cargar los cruces.'}</div>`;
+    predSemisCruces = [];
+  }
+}
+
+/* ── pintar el formulario ── */
+function renderPredSemisForm() {
+  const listEl = document.getElementById('predSemisCrucesList');
+  const globalBtn = document.getElementById('predSemisSubmitBtn');
+  if (globalBtn) globalBtn.style.display = 'none';
+
+  if (!predSemisCruces.length) {
+    listEl.innerHTML = `<div class="pred16-empty-msg">Aún no hay cruces capturados. Vuelve más tarde.</div>`;
+    return;
+  }
+  if (predSemisCruces.every(c => !c.equipoA || !c.equipoB)) {
+    listEl.innerHTML = `<div class="pred16-empty-msg">⏳ Los cruces todavía no están definidos. Vuelve cuando termine la ronda anterior.</div>`;
+    return;
+  }
+
+  predSemisSubmittedSlots = predSemisGetSaved();
+
+  listEl.innerHTML = predSemisCruces.map(c => {
+    const serverLocked = c.estado === 'LIVE' || c.estado === 'FIN';
+    const submitted    = predSemisSubmittedSlots.has(c.slot);
+    const locked       = serverLocked || submitted;
+
+    const tagLabel = submitted           ? '✅ ENVIADO'
+                   : c.estado === 'LIVE' ? 'EN VIVO'
+                   : c.estado === 'FIN'  ? 'FINALIZADO'
+                   : 'ABIERTO';
+    const tagCls   = submitted ? '' : c.estado === 'LIVE' ? 'live' : c.estado === 'FIN' ? 'fin' : '';
+    const flagA = fl(c.equipoA), flagB = fl(c.equipoB);
+
+    if (!c.equipoA || !c.equipoB) return `
+      <div class="pred16-cruce-card locked">
+        <div class="pred16-cruce-head">
+          <span class="pred16-slot-tag">${c.slot}</span>
+          <span class="pred16-lock-tag">POR DEFINIR</span>
+        </div>
+        <div style="font-size:13px;color:var(--muted);font-style:italic;padding:8px 0">Equipos aún no confirmados</div>
+      </div>`;
+
+    const actionHTML = locked
+      ? `<div class="pred16-status ${submitted ? 'ok' : ''}" id="predSemis-status-${c.slot}"
+           style="margin-top:8px;text-align:right">
+           ${submitted ? '✅ Predicción guardada para este partido.' : '🔒 Partido cerrado.'}
+         </div>`
+      : `<div id="predSemis-btnrow-${c.slot}"
+             style="display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:10px;flex-wrap:wrap">
+           <span class="pred16-status" id="predSemis-status-${c.slot}" style="flex:1;min-width:0"></span>
+           <button class="fb-submit" id="predSemis-btn-${c.slot}"
+             onclick="enviarPredSemisSlot('${c.slot}')"
+             style="width:auto;padding:9px 22px;margin:0;flex-shrink:0">
+             Enviar ${c.slot} 🚀
+           </button>
+         </div>`;
+
+    return `
+      <div class="pred16-cruce-card${locked ? ' locked' : ''}" id="predSemis-card-${c.slot}">
+        <div class="pred16-cruce-head">
+          <span class="pred16-slot-tag">${c.slot}</span>
+          <span class="pred16-lock-tag ${tagCls}" id="predSemis-tag-${c.slot}">${tagLabel}</span>
+        </div>
+        <div class="pred16-teams-row">
+          <span class="pred16-team-name">${flagA} ${c.equipoA}</span>
+          <input class="pred16-gol-input" id="pSemis-golA-${c.slot}" type="number" min="0" max="20"
+            ${locked ? 'disabled' : ''} placeholder="-">
+          <span class="pred16-vs">VS</span>
+          <input class="pred16-gol-input" id="pSemis-golB-${c.slot}" type="number" min="0" max="20"
+            ${locked ? 'disabled' : ''} placeholder="-">
+          <span class="pred16-team-name">${c.equipoB} ${flagB}</span>
+        </div>
+        ${actionHTML}
+      </div>`;
+  }).join('');
+}
+
+/* ── enviar predicción de UN solo partido ── */
+async function enviarPredSemisSlot(slot) {
+  if (predSemisSending.has(slot)) return;
+
+  const statusEl = document.getElementById(`predSemis-status-${slot}`);
+  const btn      = document.getElementById(`predSemis-btn-${slot}`);
+  const nombre   = (document.getElementById('pSemisNombre')?.value  || '').trim();
+  const telefono = (document.getElementById('pSemisTelefono')?.value || '').trim();
+
+  const setStatus = (msg, cls) => {
+    if (!statusEl) return;
+    statusEl.textContent = msg;
+    statusEl.className   = `pred16-status${cls ? ' ' + cls : ''}`;
+  };
+
+  if (!nombre || !telefono) {
+    setStatus('⚠️ Escribe tu nombre y teléfono primero.', 'err');
+    document.getElementById('pSemisNombre')?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('pSemisNombre')?.focus();
+    return;
+  }
+
+  const golA = (document.getElementById(`pSemis-golA-${slot}`)?.value || '').trim();
+  const golB = (document.getElementById(`pSemis-golB-${slot}`)?.value || '').trim();
+
+  if (!golA || !golB)  { setStatus('⚠️ Escribe los dos marcadores.', 'err'); return; }
+  if (isNaN(Number(golA)) || isNaN(Number(golB)) || Number(golA) < 0 || Number(golB) < 0) {
+    setStatus('⚠️ Marcadores inválidos.', 'err'); return;
+  }
+
+  predSemisSending.add(slot);
+  if (btn) btn.disabled = true;
+  setStatus('Enviando…', '');
+
+  try {
+    const res  = await fetch(PRED16_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        nombre,
+        telefono,
+        fase: 'semis',
+        picks: { [slot]: `${parseInt(golA, 10)}-${parseInt(golB, 10)}` }
+      }),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      predSemisSubmittedSlots.add(slot);
+      predSemisPersistSlot(slot);
+      predSemisLockSlotUI(slot);
+    } else {
+      setStatus(`❌ ${data.error || 'No se pudo guardar.'}`, 'err');
+      if (btn) btn.disabled = false;
+    }
+  } catch(e) {
+    console.error('Error enviando pick:', e);
+    setStatus('❌ Error de conexión. Intenta de nuevo.', 'err');
+    if (btn) btn.disabled = false;
+  } finally {
+    predSemisSending.delete(slot);
+  }
+}
+
+
+// ══════════════════════════════════════════════════════
+//  FORMULARIO PÚBLICO: PREDICCIONES FINAL (POR PARTIDO)
+//  (mismo patrón que el bloque de 16avos, reutiliza PRED16_SCRIPT_URL
+//   porque es el mismo backend/deploy para todas las fases; se distingue
+//   con "fase": 'final' en el payload)
+// ══════════════════════════════════════════════════════
+let predFinalCruces          = [];
+let predFinalLoaded          = false;
+const predFinalSending       = new Set();   // slots cuyo fetch está en curso
+let predFinalSubmittedSlots  = new Set();   // slots enviados esta sesión
+
+/* ── localStorage: guardar y recuperar slots enviados por usuario ── */
+function predFinalStoreKey(nombre, tel) {
+  return 'pf_' + (nombre + '|' + tel).trim().toLowerCase().replace(/[^a-z0-9|]/gi, '_');
+}
+function predFinalGetSaved() {
+  const n = (document.getElementById('pFinalNombre')?.value  || '').trim();
+  const t = (document.getElementById('pFinalTelefono')?.value || '').trim();
+  if (!n || !t) return new Set();
+  try { return new Set(JSON.parse(localStorage.getItem(predFinalStoreKey(n, t)) || '[]')); }
+  catch(e) { return new Set(); }
+}
+function predFinalPersistSlot(slot) {
+  const n = (document.getElementById('pFinalNombre')?.value  || '').trim();
+  const t = (document.getElementById('pFinalTelefono')?.value || '').trim();
+  if (!n || !t) return;
+  try {
+    const key = predFinalStoreKey(n, t);
+    const arr = JSON.parse(localStorage.getItem(key) || '[]');
+    if (!arr.includes(slot)) arr.push(slot);
+    localStorage.setItem(key, JSON.stringify(arr));
+  } catch(e) {}
+}
+
+/* ── bloquear visualmente un slot ya enviado ── */
+function predFinalLockSlotUI(slot) {
+  const card   = document.getElementById(`predFinal-card-${slot}`);
+  const golA   = document.getElementById(`pFinal-golA-${slot}`);
+  const golB   = document.getElementById(`pFinal-golB-${slot}`);
+  const btnRow = document.getElementById(`predFinal-btnrow-${slot}`);
+  const tag    = document.getElementById(`predFinal-tag-${slot}`);
+
+  if (card)   card.classList.add('locked');
+  if (golA)   golA.disabled = true;
+  if (golB)   golB.disabled = true;
+  if (tag)  { tag.textContent = '✅ ENVIADO'; tag.className = 'pred16-lock-tag'; }
+  if (btnRow) btnRow.innerHTML =
+    `<div class="pred16-status ok" id="predFinal-status-${slot}">✅ Predicción guardada para este partido.</div>`;
+}
+
+/* ── refrescar locks cuando el usuario escribe nombre / teléfono ── */
+function predFinalRefreshLocks() {
+  predFinalSubmittedSlots = predFinalGetSaved();
+  predFinalSubmittedSlots.forEach(predFinalLockSlotUI);
+}
+
+/* ── inicializar la sección ── */
+async function initPredFinalForm() {
+  // Ocultar el botón global (reemplazado por botones por partido)
+  const globalBtn = document.getElementById('predFinalSubmitBtn');
+  if (globalBtn) globalBtn.style.display = 'none';
+
+  if (predFinalLoaded) { predFinalRefreshLocks(); return; }
+
+  await fetchPredFinalCruces();
+  renderPredFinalForm();
+
+  // Aplicar locks cuando el usuario rellene nombre / teléfono
+  ['pFinalNombre', 'pFinalTelefono'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) { el.addEventListener('change', predFinalRefreshLocks); el.addEventListener('blur', predFinalRefreshLocks); }
+  });
+
+  predFinalLoaded = true;
+}
+
+/* ── consultar cruces al servidor ── */
+async function fetchPredFinalCruces() {
+  const listEl = document.getElementById('predFinalCrucesList');
+  try {
+    const r = await fetch(PRED16_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ accion: 'consultarCrucesFinal' }),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+    });
+    const data = await r.json();
+    if (!data.ok) throw new Error(data.error || 'No se pudieron cargar los cruces.');
+    predFinalCruces = data.cruces || [];
+  } catch(e) {
+    console.error('Error cargando cruces Final:', e);
+    if (listEl) listEl.innerHTML =
+      `<div class="pred16-empty-msg" style="color:var(--accent)">❌ ${e.message || 'No se pudieron cargar los cruces.'}</div>`;
+    predFinalCruces = [];
+  }
+}
+
+/* ── pintar el formulario ── */
+function renderPredFinalForm() {
+  const listEl = document.getElementById('predFinalCrucesList');
+  const globalBtn = document.getElementById('predFinalSubmitBtn');
+  if (globalBtn) globalBtn.style.display = 'none';
+
+  if (!predFinalCruces.length) {
+    listEl.innerHTML = `<div class="pred16-empty-msg">Aún no hay cruces capturados. Vuelve más tarde.</div>`;
+    return;
+  }
+  if (predFinalCruces.every(c => !c.equipoA || !c.equipoB)) {
+    listEl.innerHTML = `<div class="pred16-empty-msg">⏳ Los cruces todavía no están definidos. Vuelve cuando termine la ronda anterior.</div>`;
+    return;
+  }
+
+  predFinalSubmittedSlots = predFinalGetSaved();
+
+  listEl.innerHTML = predFinalCruces.map(c => {
+    const serverLocked = c.estado === 'LIVE' || c.estado === 'FIN';
+    const submitted    = predFinalSubmittedSlots.has(c.slot);
+    const locked       = serverLocked || submitted;
+
+    const tagLabel = submitted           ? '✅ ENVIADO'
+                   : c.estado === 'LIVE' ? 'EN VIVO'
+                   : c.estado === 'FIN'  ? 'FINALIZADO'
+                   : 'ABIERTO';
+    const tagCls   = submitted ? '' : c.estado === 'LIVE' ? 'live' : c.estado === 'FIN' ? 'fin' : '';
+    const flagA = fl(c.equipoA), flagB = fl(c.equipoB);
+
+    if (!c.equipoA || !c.equipoB) return `
+      <div class="pred16-cruce-card locked">
+        <div class="pred16-cruce-head">
+          <span class="pred16-slot-tag">${c.slot}</span>
+          <span class="pred16-lock-tag">POR DEFINIR</span>
+        </div>
+        <div style="font-size:13px;color:var(--muted);font-style:italic;padding:8px 0">Equipos aún no confirmados</div>
+      </div>`;
+
+    const actionHTML = locked
+      ? `<div class="pred16-status ${submitted ? 'ok' : ''}" id="predFinal-status-${c.slot}"
+           style="margin-top:8px;text-align:right">
+           ${submitted ? '✅ Predicción guardada para este partido.' : '🔒 Partido cerrado.'}
+         </div>`
+      : `<div id="predFinal-btnrow-${c.slot}"
+             style="display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:10px;flex-wrap:wrap">
+           <span class="pred16-status" id="predFinal-status-${c.slot}" style="flex:1;min-width:0"></span>
+           <button class="fb-submit" id="predFinal-btn-${c.slot}"
+             onclick="enviarPredFinalSlot('${c.slot}')"
+             style="width:auto;padding:9px 22px;margin:0;flex-shrink:0">
+             Enviar ${c.slot} 🚀
+           </button>
+         </div>`;
+
+    return `
+      <div class="pred16-cruce-card${locked ? ' locked' : ''}" id="predFinal-card-${c.slot}">
+        <div class="pred16-cruce-head">
+          <span class="pred16-slot-tag">${c.slot}</span>
+          <span class="pred16-lock-tag ${tagCls}" id="predFinal-tag-${c.slot}">${tagLabel}</span>
+        </div>
+        <div class="pred16-teams-row">
+          <span class="pred16-team-name">${flagA} ${c.equipoA}</span>
+          <input class="pred16-gol-input" id="pFinal-golA-${c.slot}" type="number" min="0" max="20"
+            ${locked ? 'disabled' : ''} placeholder="-">
+          <span class="pred16-vs">VS</span>
+          <input class="pred16-gol-input" id="pFinal-golB-${c.slot}" type="number" min="0" max="20"
+            ${locked ? 'disabled' : ''} placeholder="-">
+          <span class="pred16-team-name">${c.equipoB} ${flagB}</span>
+        </div>
+        ${actionHTML}
+      </div>`;
+  }).join('');
+}
+
+/* ── enviar predicción de UN solo partido ── */
+async function enviarPredFinalSlot(slot) {
+  if (predFinalSending.has(slot)) return;
+
+  const statusEl = document.getElementById(`predFinal-status-${slot}`);
+  const btn      = document.getElementById(`predFinal-btn-${slot}`);
+  const nombre   = (document.getElementById('pFinalNombre')?.value  || '').trim();
+  const telefono = (document.getElementById('pFinalTelefono')?.value || '').trim();
+
+  const setStatus = (msg, cls) => {
+    if (!statusEl) return;
+    statusEl.textContent = msg;
+    statusEl.className   = `pred16-status${cls ? ' ' + cls : ''}`;
+  };
+
+  if (!nombre || !telefono) {
+    setStatus('⚠️ Escribe tu nombre y teléfono primero.', 'err');
+    document.getElementById('pFinalNombre')?.scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('pFinalNombre')?.focus();
+    return;
+  }
+
+  const golA = (document.getElementById(`pFinal-golA-${slot}`)?.value || '').trim();
+  const golB = (document.getElementById(`pFinal-golB-${slot}`)?.value || '').trim();
+
+  if (!golA || !golB)  { setStatus('⚠️ Escribe los dos marcadores.', 'err'); return; }
+  if (isNaN(Number(golA)) || isNaN(Number(golB)) || Number(golA) < 0 || Number(golB) < 0) {
+    setStatus('⚠️ Marcadores inválidos.', 'err'); return;
+  }
+
+  predFinalSending.add(slot);
+  if (btn) btn.disabled = true;
+  setStatus('Enviando…', '');
+
+  try {
+    const res  = await fetch(PRED16_SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({
+        nombre,
+        telefono,
+        fase: 'final',
+        picks: { [slot]: `${parseInt(golA, 10)}-${parseInt(golB, 10)}` }
+      }),
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      predFinalSubmittedSlots.add(slot);
+      predFinalPersistSlot(slot);
+      predFinalLockSlotUI(slot);
+    } else {
+      setStatus(`❌ ${data.error || 'No se pudo guardar.'}`, 'err');
+      if (btn) btn.disabled = false;
+    }
+  } catch(e) {
+    console.error('Error enviando pick:', e);
+    setStatus('❌ Error de conexión. Intenta de nuevo.', 'err');
+    if (btn) btn.disabled = false;
+  } finally {
+    predFinalSending.delete(slot);
+  }
+}
+
 </script>
 </body>
 </html>
-
