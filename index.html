@@ -227,8 +227,6 @@
     .lb-cols{display:grid;grid-template-columns:45px 1fr 55px 55px 60px;padding:8px 20px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);background:var(--surface)}
     .lb-cols span:nth-child(n+3){text-align:right}
     .lb-row{display:grid;grid-template-columns:45px 1fr 55px 55px 60px;align-items:center;padding:12px 20px;border-bottom:1px solid var(--border);transition:all .2s ease;cursor:pointer}
-    .lb-row.missing-m1{border-left:3px solid var(--accent);background:rgba(255,87,34,0.05)}
-    .lb-missing-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-left:6px;flex-shrink:0;vertical-align:middle;box-shadow:0 0 6px rgba(255,87,34,0.6)}
     .lb-row:last-child{border-bottom:none}
     .lb-row:hover{background:rgba(255,255,255,.04);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.3)}
     .lb-row.r1{background:rgba(245,200,66,0.03)}.lb-row.r2{background:rgba(176,190,197,0.02)}.lb-row.r3{background:rgba(205,127,50,0.02)}
@@ -4268,10 +4266,10 @@ body.innerHTML = players.map((p, i) => {
 // Predicción del jugador para partido(s) live
    
 
- return `<div class="lb-row ${cls}${missingM1(p.name) ? ' missing-m1' : ''}" title="Ver Ficha" onclick="openPlayerCard('${p.name.replace(/'/g,"\\'")}',${p.total},${rank},${p.grupos},${p.pPartidos})">
+ return `<div class="lb-row ${cls}" title="Ver Ficha" onclick="openPlayerCard('${p.name.replace(/'/g,"\\'")}',${p.total},${rank},${p.grupos},${p.pPartidos})">
     <div class="rank ${rc}">${em||rank}</div>
     <div class="name-wrap">
-      <div class="name">${p.name}${missingM1(p.name) ? '<span class="lb-missing-dot" title="Falta enviar M1, M2, M3, M4, M7, M12 y/o M14"></span>' : ''}</div>
+      <div class="name">${p.name}</div>
       <div class="bar-bg"><div class="bar"></div></div>
       ${tieBadge}${getLivePrediction(p.name)}
     </div>
