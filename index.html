@@ -3400,18 +3400,17 @@ function renderGroupStageStatus() {
     <div class="gs-close-banner" id="gsCloseBanner">
       <button class="gs-close-dismiss" onclick="dismissGSClose()" title="Cerrar">×</button>
       <div class="gs-close-inner">
-        <div class="gs-close-eyebrow"><span class="gs-dot"></span>Fase de Grupos Completa<span class="gs-dot"></span></div>
-        <div class="gs-close-title">¡SE ACABARON LOS GRUPOS!<br><span>RUMBO A DIECISEISAVOS 🏆</span></div>
-        <div class="gs-close-sub">Los 32 equipos que avanzan ya están definidos. Ahora todo se juega a una sola carta — manda tus predicciones de eliminación directa antes de que cierren y prepárate para la fiesta.</div>
+        <div class="gs-close-eyebrow"><span class="gs-dot"></span>Octavos de Final<span class="gs-dot"></span></div>
+        <div class="gs-close-title">¡LOS OCTAVOS ESTÁN POR TERMINAR!<br><span>RUMBO A CUARTOS DE FINAL 🏆</span></div>
+        <div class="gs-close-sub">Ya casi se define quién sigue en el camino. Revisa o manda tus predicciones de octavos antes de que cierren para no quedarte fuera de la fiesta.</div>
         <div class="gs-close-stats">
           <div class="gs-close-stat"><div class="gcs-val">${totalPartidos}</div><div class="gcs-lbl">Partidos jugados</div></div>
-          <div class="gs-close-stat"><div class="gcs-val">${equiposClasificadosTotal}+${mejoresTerceros}</div><div class="gcs-lbl">Equipos a 16avos</div></div>
           <div class="gs-close-stat"><div class="gcs-val">${totalJugadores}</div><div class="gcs-lbl">Participantes</div></div>
           ${champion ? `<div class="gs-close-stat"><div class="gcs-val">🥇</div><div class="gcs-lbl">${champion.name}</div></div>` : ''}
         </div>
         ${cdHTML}
         <div>
-          <button class="gs-close-cta" onclick="selectOtraOpcion('pred16')">Poner mis Pronósticos →</button>
+          <button class="gs-close-cta" onclick="selectOtraOpcion('predOctavos')">Ver mis Predicciones de Octavos →</button>
         </div>
       </div>
     </div>`;
