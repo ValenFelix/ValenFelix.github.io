@@ -5,45 +5,94 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Quiniela Mundial 2026</title>
 <style>
-:root{--bg:#0a0c10;--card:#161b23;--border:#1f2733;--gold:#f5c842;--silver:#b0bec5;--bronze:#cd7f32;--green:#00e676;--text:#e8edf2;--dim:#8a9ab0;--muted:#546e7a;}
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800;900&family=Barlow:wght@400;500;600&display=swap');
+:root{
+  --bg:#0a0c10;--surface:#10141b;--card:#161b23;--border:#232b38;
+  --gold:#f5c842;--silver:#c8d3da;--bronze:#d98a4a;--green:#00e676;
+  --text:#eef2f7;--dim:#93a3b8;--muted:#5c6b80;--accent:#4fc3f7;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:sans-serif;font-size:15px;padding-bottom:40px}
-header{padding:22px 16px;text-align:center;border-bottom:1px solid var(--border)}
-h1{font-size:26px;font-weight:900}
-h1 span{color:var(--gold)}
-nav{display:flex;justify-content:center;gap:8px;padding:12px;border-bottom:1px solid var(--border)}
-nav button{background:transparent;border:1px solid var(--border);color:var(--dim);padding:8px 18px;border-radius:8px;cursor:pointer;font-weight:700}
-nav button.on{background:var(--card);color:var(--text);border-color:var(--gold)}
-.wrap{max-width:800px;margin:0 auto;padding:20px 16px}
-.section{display:none}.section.active{display:block}
-.card{background:var(--card);border:1px solid var(--border);border-radius:10px;overflow:hidden}
-.lb-cols,.lb-row{display:grid;grid-template-columns:40px 1fr 60px;padding:10px 16px;align-items:center}
-.lb-cols{font-size:11px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)}
-.lb-row{border-bottom:1px solid var(--border)}
+body{
+  background:radial-gradient(circle at 50% -10%,#152033 0%,#0a0c10 55%),var(--bg);
+  color:var(--text);font-family:'Barlow',sans-serif;font-size:15px;min-height:100vh;padding-bottom:50px;
+}
+header{padding:38px 16px 26px;text-align:center;position:relative;overflow:hidden}
+header::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at center,rgba(245,200,66,0.08) 0%,transparent 70%);
+  pointer-events:none;
+}
+.eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:800;letter-spacing:4px;color:var(--green);text-transform:uppercase;position:relative}
+h1{font-family:'Barlow Condensed',sans-serif;font-size:clamp(34px,8vw,52px);font-weight:900;line-height:1;letter-spacing:-1px;position:relative;margin-top:4px}
+h1 span{color:var(--gold);text-shadow:0 0 30px rgba(245,200,66,0.35)}
+nav{display:flex;justify-content:center;gap:8px;padding:14px 12px;border-bottom:1px solid var(--border);flex-wrap:wrap;position:sticky;top:0;background:rgba(10,12,16,0.9);backdrop-filter:blur(10px);z-index:10}
+nav button{
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  background:var(--surface);border:1px solid var(--border);color:var(--dim);padding:9px 20px;border-radius:100px;cursor:pointer;transition:all .2s;
+}
+nav button:hover{color:var(--text);border-color:var(--dim)}
+nav button.on{background:linear-gradient(135deg,rgba(245,200,66,0.15),rgba(245,200,66,0.05));color:var(--gold);border-color:var(--gold);box-shadow:0 0 16px rgba(245,200,66,0.2)}
+.wrap{max-width:820px;margin:0 auto;padding:26px 16px}
+.section{display:none}.section.active{display:block;animation:fadein .35s ease}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,0.3);margin-bottom:18px}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.015)}
+.card-title{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:800;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
+.lb-cols{display:grid;grid-template-columns:44px 1fr 70px;padding:9px 20px;font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border);background:rgba(255,255,255,0.015)}
+.lb-cols span:last-child{text-align:right}
+.lb-row{display:grid;grid-template-columns:44px 1fr 70px;align-items:center;padding:13px 20px;border-bottom:1px solid var(--border);transition:background .2s}
+.lb-row:hover{background:rgba(255,255,255,0.03)}
 .lb-row:last-child{border-bottom:none}
-.rank{font-weight:900;color:var(--muted)}
-.pts{font-weight:900;text-align:right;color:var(--gold)}
-select,input{width:100%;background:#111;border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:8px;font-size:14px;margin-bottom:14px}
-.cat{font-weight:800;color:var(--gold);margin:14px 0 6px;font-size:13px;letter-spacing:.5px;text-transform:uppercase}
-.item{display:flex;justify-content:space-between;gap:10px;padding:8px 12px;background:#1a2029;border-radius:6px;margin-bottom:5px;font-size:13px}
-.item b{color:var(--green);white-space:nowrap}
-.total{font-size:22px;font-weight:900;color:var(--gold);text-align:right;padding:10px 4px}
-.err{padding:20px;text-align:center;color:var(--muted)}
+.lb-row.r1{background:linear-gradient(90deg,rgba(245,200,66,0.08),transparent)}
+.lb-row.r2{background:linear-gradient(90deg,rgba(200,211,218,0.05),transparent)}
+.lb-row.r3{background:linear-gradient(90deg,rgba(217,138,74,0.05),transparent)}
+.rank{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;color:var(--muted)}
+.rank.g{color:var(--gold);text-shadow:0 0 12px rgba(245,200,66,0.5)}
+.rank.s{color:var(--silver)}
+.rank.b{color:var(--bronze)}
+.name{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700}
+.pts{font-family:'Barlow Condensed',sans-serif;font-size:20px;font-weight:900;text-align:right;color:var(--text)}
+.r1 .pts{color:var(--gold)}.r2 .pts{color:var(--silver)}.r3 .pts{color:var(--bronze)}
+select{width:100%;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-size:14px;margin-bottom:16px;font-family:'Barlow',sans-serif}
+select:focus{outline:none;border-color:var(--gold)}
+.cat{font-family:'Barlow Condensed',sans-serif;font-weight:800;color:var(--gold);margin:16px 0 8px;font-size:13px;letter-spacing:1.5px;text-transform:uppercase;padding-left:2px}
+.item{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 14px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:8px;margin-bottom:6px;font-size:14px}
+.item b{color:var(--green);font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;white-space:nowrap}
+.total-box{
+  background:linear-gradient(135deg,rgba(245,200,66,0.1),rgba(0,230,118,0.05));
+  border:1px solid rgba(245,200,66,0.35);border-radius:14px;padding:16px 20px;
+  display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;
+}
+.total-box .tb-label{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--dim)}
+.total-box .tb-val{font-family:'Barlow Condensed',sans-serif;font-size:32px;font-weight:900;color:var(--gold)}
+.err{padding:24px;text-align:center;color:var(--muted);font-size:13px}
+.games-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.game-card-head{display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid var(--border);background:rgba(255,255,255,0.02)}
+.game-card-head .gi{font-size:24px}
+.game-card-head .gt{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800}
+.grow{display:grid;grid-template-columns:30px 1fr auto;align-items:center;padding:10px 18px;border-bottom:1px solid var(--border);gap:8px}
+.grow:last-child{border-bottom:none}
+.grow .gr{font-family:'Barlow Condensed',sans-serif;font-size:19px;font-weight:900;color:var(--muted)}
+.grow.g1 .gr{color:var(--gold)}.grow.g2 .gr{color:var(--silver)}.grow.g3 .gr{color:var(--bronze)}
+.grow .gn{font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:700}
+.grow .gs{font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:900;color:var(--green)}
 </style>
 </head>
 <body>
 <header>
-  <div style="color:var(--green);font-size:12px;letter-spacing:2px;margin-bottom:6px">QUINIELA</div>
+  <div class="eyebrow">Quiniela Familia Lopez Félix</div>
   <h1>MUNDIAL <span>2026</span></h1>
 </header>
 <nav>
   <button class="on" id="navLB" onclick="showTab('lb')">🏆 Leaderboard</button>
   <button id="navPerfil" onclick="showTab('perfil')">📇 Perfil</button>
+  <button id="navGames" onclick="showTab('games')">🎮 Mini Juegos</button>
 </nav>
 <div class="wrap">
 
   <div class="section active" id="secLB">
     <div class="card">
+      <div class="card-head"><span class="card-title">🏆 Tabla de Líderes</span></div>
       <div class="lb-cols"><span>#</span><span>Participante</span><span>Total</span></div>
       <div id="lbBody"><div class="err">Cargando…</div></div>
     </div>
@@ -54,16 +103,36 @@ select,input{width:100%;background:#111;border:1px solid var(--border);color:var
     <div id="perfilBody"></div>
   </div>
 
+  <div class="section" id="secGames">
+    <div class="games-grid">
+      <div class="card">
+        <div class="game-card-head"><span class="gi">👑</span><span class="gt">Neymarzazo</span></div>
+        <div id="lbCabezazoBody"><div class="err">Cargando…</div></div>
+      </div>
+      <div class="card">
+        <div class="game-card-head"><span class="gi">🥩</span><span class="gt">Milanesas</span></div>
+        <div id="lbMilanesasBody"><div class="err">Cargando…</div></div>
+      </div>
+      <div class="card">
+        <div class="game-card-head"><span class="gi">🚀</span><span class="gt">Salto del Bicho</span></div>
+        <div id="lbSiuBody"><div class="err">Cargando…</div></div>
+      </div>
+    </div>
+  </div>
+
 </div>
 <script>
 const SID = '1Lxz_7Hf20m685XGDQQmNFL0IclDY8RzK0IXIo0jnZg4';
 const GID_LEADERBOARD = '1369482165';
 const GID_DETALLE = '2656827'; // GID de la hoja "Detalle_Puntos_RAW"
 
+const GAMES_SID = '1pDcY7q9SMP1mLGL12jKY3GKeD4RywOZtA_V7QjAYfDQ';
+const GAMES_GID = '0';
+
 let lbPlayers = [];
 let detalleRows = [];
 
-function csvUrl(gid){ return `https://docs.google.com/spreadsheets/d/${SID}/gviz/tq?tqx=out:csv&gid=${gid}&_=${Date.now()}`; }
+function csvUrl(sid,gid){ return `https://docs.google.com/spreadsheets/d/${sid}/gviz/tq?tqx=out:csv&gid=${gid}&_=${Date.now()}`; }
 
 function parseCSV(txt){
   const rows=[];let row=[],field='',inQ=false,i=0;
@@ -86,14 +155,16 @@ function parseCSV(txt){
 function showTab(t){
   document.getElementById('secLB').classList.toggle('active',t==='lb');
   document.getElementById('secPerfil').classList.toggle('active',t==='perfil');
+  document.getElementById('secGames').classList.toggle('active',t==='games');
   document.getElementById('navLB').classList.toggle('on',t==='lb');
   document.getElementById('navPerfil').classList.toggle('on',t==='perfil');
+  document.getElementById('navGames').classList.toggle('on',t==='games');
 }
 
 async function fetchLeaderboard(){
   const body=document.getElementById('lbBody');
   try{
-    const r=await fetch(csvUrl(GID_LEADERBOARD));
+    const r=await fetch(csvUrl(SID,GID_LEADERBOARD));
     const rows=parseCSV(await r.text());
     let hdr=-1;
     for(let i=0;i<rows.length;i++){ if(rows[i].some(c=>/participante/i.test(c))){hdr=i;break;} }
@@ -114,8 +185,10 @@ async function fetchLeaderboard(){
     if(!players.length){ body.innerHTML='<div class="err">Sin datos.</div>'; return; }
     body.innerHTML=players.map((p,i)=>{
       const rank=i+1;
+      const cls=rank===1?'r1':rank===2?'r2':rank===3?'r3':'';
+      const rc=rank===1?'g':rank===2?'s':rank===3?'b':'';
       const em=rank===1?'🥇':rank===2?'🥈':rank===3?'🥉':rank;
-      return `<div class="lb-row"><span class="rank">${em}</span><span>${p.name}</span><span class="pts">${p.total}</span></div>`;
+      return `<div class="lb-row ${cls}"><span class="rank ${rc}">${em}</span><span class="name">${p.name}</span><span class="pts">${p.total}</span></div>`;
     }).join('');
   }catch(e){
     console.error(e);
@@ -126,7 +199,7 @@ async function fetchLeaderboard(){
 async function fetchDetalle(){
   try{
     if(GID_DETALLE.includes('PEGA_AQUI')) return;
-    const r=await fetch(csvUrl(GID_DETALLE));
+    const r=await fetch(csvUrl(SID,GID_DETALLE));
     const rows=parseCSV(await r.text());
     if(!rows.length) return;
     const hdr=rows[0].map(h=>h.toLowerCase().trim());
@@ -139,6 +212,45 @@ async function fetchDetalle(){
     }
     detalleRows=out;
   }catch(e){ console.error('Error detalle',e); }
+}
+
+async function fetchGames(){
+  const ids={cabezazo:'lbCabezazoBody',milanesas:'lbMilanesasBody',siu:'lbSiuBody'};
+  try{
+    const r=await fetch(csvUrl(GAMES_SID,GAMES_GID));
+    const rows=parseCSV(await r.text());
+    let rec={cabezazo:[],milanesas:[],siu:[]};
+    if(rows.length>1){
+      let hJ=1,hN=2,hS=3;
+      rows[0].forEach((h,i)=>{
+        const hl=(h||'').toLowerCase();
+        if(hl.includes('juego')) hJ=i;
+        if(hl.includes('nombre')) hN=i;
+        if(hl.includes('score')||hl.includes('puntuaci')) hS=i;
+      });
+      for(let i=1;i<rows.length;i++){
+        const row=rows[i]; if(row.length<3) continue;
+        let j=(row[hJ]||'').toLowerCase().trim();
+        const nombre=row[hN]||'Anónimo';
+        const score=parseInt(row[hS],10)||0;
+        if(j==='siu'||j==='salto del bicho') j='siu';
+        if(j==='milanesas'||j==='atrapa la milanesa') j='milanesas';
+        if(rec[j]!==undefined) rec[j].push({name:nombre,score});
+      }
+      for(const k in rec){ rec[k].sort((a,b)=>b.score-a.score); rec[k]=rec[k].slice(0,5); }
+    }
+    const medals=['g1','g2','g3','',''];
+    const emojis=['🥇','🥈','🥉','4','5'];
+    Object.keys(ids).forEach(game=>{
+      const el=document.getElementById(ids[game]);
+      const list=rec[game];
+      if(!list.length){ el.innerHTML='<div class="err">Aún no hay récords.</div>'; return; }
+      el.innerHTML=list.map((x,i)=>`<div class="grow ${medals[i]}"><span class="gr">${emojis[i]}</span><span class="gn">${x.name}</span><span class="gs">${x.score}</span></div>`).join('');
+    });
+  }catch(e){
+    console.error('Error juegos',e);
+    Object.values(ids).forEach(id=>{ document.getElementById(id).innerHTML='<div class="err">Error al cargar récords.</div>'; });
+  }
 }
 
 function populateSelect(){
@@ -165,7 +277,7 @@ function renderPerfil(){
     byCat[r.categoria].push(r);
     total+=r.puntos;
   });
-  let html=`<div class="total">${total} pts totales</div>`;
+  let html=`<div class="total-box"><span class="tb-label">Total de puntos</span><span class="tb-val">${total}</span></div>`;
   Object.keys(byCat).forEach(cat=>{
     html+=`<div class="cat">${cat}</div>`;
     html+=byCat[cat].map(r=>`<div class="item"><span>${r.detalle}</span><b>+${r.puntos}</b></div>`).join('');
@@ -175,6 +287,7 @@ function renderPerfil(){
 
 fetchLeaderboard();
 fetchDetalle().then(()=>{ if(document.getElementById('perfilSelect').value) renderPerfil(); });
+fetchGames();
 </script>
 </body>
 </html>
